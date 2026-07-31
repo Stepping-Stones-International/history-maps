@@ -1,6 +1,6 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
-import HomeMap from "./HomeMap"
+import App from "./App"
 
 const roots = new WeakMap()
 
@@ -10,7 +10,7 @@ function mount() {
 
   const root = createRoot(el)
   roots.set(el, root)
-  root.render(React.createElement(HomeMap))
+  root.render(React.createElement(App))
 }
 
 document.addEventListener("turbo:load", mount)
