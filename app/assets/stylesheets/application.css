@@ -39,9 +39,10 @@ body {
   height: 100%;
 }
 
-/* Collapsible left drawer */
+/* Collapsible left drawer: a permanent icon rail plus a sliding panel. */
 .drawer {
   --drawer-width: 320px;
+  --rail-width: 56px;
 
   position: fixed;
   top: 0;
@@ -49,8 +50,51 @@ body {
   z-index: 10;
   height: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   pointer-events: none;
+}
+
+/* The rail never moves, so the hamburger stays reachable when collapsed. */
+.drawer__rail {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 var(--rail-width);
+  width: var(--rail-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  pointer-events: auto;
+}
+
+.drawer__rail-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.drawer__rail-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.drawer__rail-button[aria-expanded="true"] {
+  background: var(--surface-raised);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .drawer__panel {
@@ -65,8 +109,13 @@ body {
   transition: transform 0.25s ease;
 }
 
+/* Slide the panel left, behind the opaque rail. */
 .drawer--closed .drawer__panel {
-  transform: translateX(calc(-1 * var(--drawer-width)));
+  transform: translateX(calc(-1 * (var(--drawer-width) + var(--rail-width))));
+}
+
+.drawer--closed .drawer__panel {
+  pointer-events: none;
 }
 
 .drawer__header {
@@ -86,36 +135,6 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 1rem 1.25rem;
-}
-
-.drawer__toggle {
-  margin-top: 1.25rem;
-  width: 26px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 1.15rem;
-  line-height: 1;
-  color: var(--text-muted);
-  cursor: pointer;
-  pointer-events: auto;
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-radius: 0 6px 6px 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.45);
-  transition: transform 0.25s ease;
-}
-
-.drawer--closed .drawer__toggle {
-  transform: translateX(calc(-1 * var(--drawer-width)));
-}
-
-.drawer__toggle:hover {
-  background: var(--surface-hover);
-  color: var(--text);
 }
 
 /* MapLibre ships light-themed controls; repaint them for the dark UI.
