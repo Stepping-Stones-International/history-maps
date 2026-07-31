@@ -34,9 +34,30 @@ const TOPO_STYLE = {
     }
   },
   layers: [
-    { id: "background", type: "background", paint: { "background-color": "#b3cede" } },
-    { id: "ocean", type: "raster", source: "ocean", paint: { "raster-opacity": 1 } },
-    { id: "relief", type: "raster", source: "relief", paint: { "raster-opacity": 0.9 } }
+    { id: "background", type: "background", paint: { "background-color": "#0d1218" } },
+    {
+      id: "ocean",
+      type: "raster",
+      source: "ocean",
+      // Esri's rasters are light; dim and desaturate them into the dark theme.
+      paint: {
+        "raster-opacity": 0.5,
+        "raster-brightness-max": 0.22,
+        "raster-saturation": 0.1,
+        "raster-contrast": 0.15
+      }
+    },
+    {
+      id: "relief",
+      type: "raster",
+      source: "relief",
+      paint: {
+        "raster-opacity": 0.9,
+        "raster-brightness-max": 0.34,
+        "raster-saturation": -0.5,
+        "raster-contrast": 0.3
+      }
+    }
   ]
 }
 

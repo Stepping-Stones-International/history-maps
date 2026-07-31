@@ -9,11 +9,26 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+/* The UI is dark-themed unconditionally — it does not follow the OS setting. */
+:root {
+  color-scheme: dark;
+
+  --surface: #131a22;
+  --surface-raised: #1b242e;
+  --surface-hover: #242f3b;
+  --border: #2b3746;
+  --text: #e6edf5;
+  --text-muted: #9aa8b8;
+  --shadow: 0 0 28px rgba(0, 0, 0, 0.55);
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0d1218;
+  color: var(--text);
 }
 
 #home-map,
@@ -43,9 +58,9 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.14);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow);
   pointer-events: auto;
   transition: transform 0.25s ease;
 }
@@ -56,7 +71,7 @@ body {
 
 .drawer__header {
   padding: 1.25rem 1.25rem 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border);
 }
 
 .drawer__title {
@@ -64,7 +79,7 @@ body {
   font-size: 1.35rem;
   font-weight: 650;
   letter-spacing: -0.01em;
-  color: #1b2430;
+  color: var(--text);
 }
 
 .drawer__body {
@@ -83,14 +98,14 @@ body {
   padding: 0;
   font-size: 1.15rem;
   line-height: 1;
-  color: #44515f;
+  color: var(--text-muted);
   cursor: pointer;
   pointer-events: auto;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-left: none;
   border-radius: 0 6px 6px 0;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.45);
   transition: transform 0.25s ease;
 }
 
@@ -99,5 +114,43 @@ body {
 }
 
 .drawer__toggle:hover {
-  background: #f4f6f8;
+  background: var(--surface-hover);
+  color: var(--text);
 }
+
+/* MapLibre ships light-themed controls; repaint them for the dark UI.
+   maplibre.css is served after this file, so every override below doubles a
+   class to out-specify it rather than relying on source order. */
+.maplibregl-ctrl-group.maplibregl-ctrl-group {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+.maplibregl-ctrl-group.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border);
+}
+
+.maplibregl-ctrl-group.maplibregl-ctrl-group button:hover {
+  background: var(--surface-hover);
+}
+
+/* Control glyphs are dark SVGs baked into the stylesheet — invert to light. */
+.maplibregl-ctrl-group.maplibregl-ctrl-group .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.7);
+}
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-ctrl-attrib {
+  background-color: var(--surface-raised);
+  color: var(--text-muted);
+}
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-ctrl-attrib a {
+  color: var(--text-muted);
+}
+
+.maplibregl-ctrl-attrib.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button {
+  background-color: var(--surface-raised);
+  filter: invert(1) brightness(1.7);
+}
+
