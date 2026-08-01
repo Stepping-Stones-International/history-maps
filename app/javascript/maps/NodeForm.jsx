@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Crosshair } from "lucide-react"
 
 // Controlled by the page so the values survive the modal being hidden while
@@ -12,6 +12,15 @@ export default function NodeForm({
   const collectsDate = ["exact", "approximate"].includes(draft.date_type)
   const requiresFullDate = draft.date_type === "exact" && !embedded
   const requiresYear = collectsDate && !embedded
+
+  // Revealed by the checkbox; seeded open for a node that is already embedded.
+  const [embedding, setEmbedding] = useState(Boolean(draft.parent_id))
+
+  const toggleEmbedding = (event) => {
+    const wanted = event.target.checked
+    setEmbedding(wanted)
+    if (!wanted) onChange({ ...draft, parent_id: "" })
+  }
 
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
@@ -187,6 +196,19 @@ export default function NodeForm({
         </button>
       </div>
 
+      <div className="form__field">
+        <label className="form__check">
+          <input
+            type="checkbox"
+            className="form__checkbox"
+            checked={embedding}
+            onChange={toggleEmbedding}
+          />
+          Embed this under another node
+        </label>
+      </div>
+
+      {embedding && (
       <div className="form__row">
         <div className="form__field">
           <label htmlFor="node-parent" className="form__label">Embedded under</label>
@@ -216,6 +238,7 @@ export default function NodeForm({
           />
         </div>
       </div>
+      )}
 
       <div className="form__actions">
         <button type="button" className="button button--text" onClick={onCancel}>Cancel</button>

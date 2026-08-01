@@ -728,6 +728,22 @@ textarea.form__input {
   border-left: 1px solid var(--border);
 }
 
+.form__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.form__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #8fb8e8;
+  cursor: pointer;
+}
+
 .form__field--position {
   flex: 0 0 5.5rem;
 }
