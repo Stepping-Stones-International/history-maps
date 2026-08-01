@@ -110,9 +110,43 @@ body {
 }
 
 .page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+/* Circular icon button, sized up for the primary "add" action. */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.icon-button:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: #3d4d5f;
+}
+
+.icon-button--large {
+  width: 52px;
+  height: 52px;
+}
+
+.icon-button--large .icon-button__glyph {
+  width: 30px;
+  height: 30px;
 }
 
 .page__title {
@@ -147,6 +181,12 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
+}
+
+/* Layout-level flash sits above the page container. */
+.flash--page {
+  max-width: 720px;
+  margin: 1.25rem auto -0.5rem;
 }
 
 .flash--alert {

@@ -3,6 +3,11 @@
 <main class="page">
   <header class="page__header">
     <h1 class="page__title">Topics</h1>
+
+    <%= link_to new_topic_path, class: "icon-button icon-button--large",
+          title: "Add new topic", "aria-label": "Add new topic" do %>
+      <%= lucide_icon "plus", class: "icon-button__glyph" %>
+    <% end %>
   </header>
 
   <% if @topics.any? %>

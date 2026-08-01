@@ -40,6 +40,56 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".site-header form[action=?]", session_path
   end
 
+  test "index shows a large add button linking to the new topic form" do
+    get topics_path
+    assert_select "a.icon-button--large[href=?]", new_topic_path do
+      assert_select "svg.icon-button__glyph"
+    end
+  end
+
+  test "new requires authentication" do
+    get new_topic_path
+    assert_redirected_to new_session_path
+  end
+
+  test "new renders the form when signed in" do
+    sign_in_as users(:one)
+
+    get new_topic_path
+    assert_response :success
+    assert_select "form[action=?]", topics_path
+  end
+
+  test "create attributes the topic to the signed in user" do
+    sign_in_as users(:one)
+
+    assert_difference -> { Topic.count }, 1 do
+      post topics_path, params: { topic: { title: "New Topic", description: "About it." } }
+    end
+
+    assert_redirected_to topics_path
+    assert_equal users(:one), Topic.order(:created_at).last.author
+  end
+
+  test "create rejects a topic without a title" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Topic.count } do
+      post topics_path, params: { topic: { title: "", description: "No title." } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".flash--alert"
+  end
+
+  test "create requires authentication" do
+    assert_no_difference -> { Topic.count } do
+      post topics_path, params: { topic: { title: "Sneaky" } }
+    end
+
+    assert_redirected_to new_session_path
+  end
+
   test "index shows an empty state when there are no topics" do
     Topic.destroy_all
 

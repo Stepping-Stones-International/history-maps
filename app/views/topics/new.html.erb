@@ -1,0 +1,33 @@
+<% content_for :title, "New topic" %>
+
+<main class="page page--narrow">
+  <header class="page__header">
+    <h1 class="page__title">New topic</h1>
+  </header>
+
+  <% if @topic.errors.any? %>
+    <div class="flash flash--alert">
+      <ul class="flash__list">
+        <% @topic.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @topic, class: "form" do |form| %>
+    <div class="form__field">
+      <%= form.label :title, class: "form__label" %>
+      <%= form.text_field :title, required: true, autofocus: true, class: "form__input" %>
+    </div>
+
+    <div class="form__field">
+      <%= form.label :description, class: "form__label" %>
+      <%= form.text_area :description, rows: 5, class: "form__input" %>
+    </div>
+
+    <%= form.submit "Add topic", class: "button" %>
+  <% end %>
+
+  <p class="page__footnote"><%= link_to "Back to topics", topics_path %></p>
+</main>

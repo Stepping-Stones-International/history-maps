@@ -5,14 +5,6 @@
     <h1 class="page__title">Sign in</h1>
   </header>
 
-  <%# Kept as <div> — the generated controller tests assert on div flashes. %>
-  <% if flash[:alert] %>
-    <div class="flash flash--alert"><%= flash[:alert] %></div>
-  <% end %>
-  <% if flash[:notice] %>
-    <div class="flash flash--notice"><%= flash[:notice] %></div>
-  <% end %>
-
   <%= form_with url: session_path, class: "form" do |form| %>
     <div class="form__field">
       <%= form.label :email_address, "Email address", class: "form__label" %>
