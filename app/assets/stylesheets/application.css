@@ -276,6 +276,10 @@ body {
   border: 0;
 }
 
+.form__required {
+  color: #f0a9ad;
+}
+
 .form__sublabel {
   display: block;
   margin-bottom: 0.3rem;

@@ -45,11 +45,14 @@ export default function NodeForm({
         <fieldset className="form__fieldset" aria-label="Date">
           <div className="form__row form__row--date">
             <div className="form__field">
-              <label htmlFor="node-occurred-month" className="form__sublabel">MM</label>
+              <label htmlFor="node-occurred-month" className="form__sublabel">
+                MM <span className="form__required" aria-hidden="true">*</span>
+              </label>
               <input
                 id="node-occurred-month"
                 type="number"
                 inputMode="numeric"
+                required
                 min="1"
                 max="12"
                 placeholder="MM"
@@ -60,11 +63,14 @@ export default function NodeForm({
             </div>
 
             <div className="form__field">
-              <label htmlFor="node-occurred-day" className="form__sublabel">DD</label>
+              <label htmlFor="node-occurred-day" className="form__sublabel">
+                DD <span className="form__required" aria-hidden="true">*</span>
+              </label>
               <input
                 id="node-occurred-day"
                 type="number"
                 inputMode="numeric"
+                required
                 min="1"
                 max="31"
                 placeholder="DD"
@@ -75,11 +81,14 @@ export default function NodeForm({
             </div>
 
             <div className="form__field form__field--year">
-              <label htmlFor="node-occurred-year" className="form__sublabel">YYYY</label>
+              <label htmlFor="node-occurred-year" className="form__sublabel">
+                YYYY <span className="form__required" aria-hidden="true">*</span>
+              </label>
               <input
                 id="node-occurred-year"
                 type="number"
                 inputMode="numeric"
+                required
                 min="1"
                 max="4000"
                 placeholder="YYYY"
