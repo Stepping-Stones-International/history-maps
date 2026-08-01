@@ -66,8 +66,16 @@ class Node < ApplicationRecord
     end
 
     # Runs only when the three-field form was used, leaving occurred_on= alone.
+    # nil means the field was not submitted; "" means it was submitted empty,
+    # which is how editing clears a date.
     def compose_occurred_on
-      return if date_parts.all? { |part| part.to_s.strip.empty? }
+      return if date_parts.all?(&:nil?)
+
+      if date_parts.all? { |part| part.to_s.strip.empty? }
+        @date_error = nil
+        self[:occurred_on] = nil
+        return
+      end
 
       month, day, year = date_parts.map { |part| Integer(part.to_s.strip, exception: false) }
 

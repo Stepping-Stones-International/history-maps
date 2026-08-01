@@ -3,7 +3,7 @@ import { Crosshair } from "lucide-react"
 
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
-export default function NewNodeForm({
+export default function NodeForm({
   draft, dateTypes, eras, onChange, onPickOnMap, onCancel, onSubmit
 }) {
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })

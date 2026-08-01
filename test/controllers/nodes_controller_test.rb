@@ -145,6 +145,81 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "AD", "BC" ], inertia.props[:eras]
   end
 
+  test "update requires authentication" do
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(title: "Renamed")
+
+    assert_redirected_to new_session_path
+    assert_equal "Jerusalem", nodes(:one).reload.title
+  end
+
+  test "update changes the node" do
+    sign_in_as users(:one)
+
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(
+      title: "Renamed", occurred_month: "5", occurred_day: "6", occurred_year: "70", era: "AD"
+    )
+
+    node = nodes(:one).reload
+    assert_equal "Renamed", node.title
+    assert_equal Date.new(70, 5, 6), node.occurred_on
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "update can clear the date" do
+    sign_in_as users(:one)
+    nodes(:one).update!(occurred_on: Date.new(1200, 1, 1))
+
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(
+      occurred_month: "", occurred_day: "", occurred_year: ""
+    )
+
+    assert_nil nodes(:one).reload.occurred_on
+  end
+
+  test "update rejects invalid changes" do
+    sign_in_as users(:one)
+
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(title: "")
+
+    assert_equal "Jerusalem", nodes(:one).reload.title
+    assert_redirected_to edit_topic_path(@topic)
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "blank"
+  end
+
+  test "update does not touch another user's node" do
+    sign_in_as users(:two)
+
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(title: "Hijacked")
+
+    assert_response :not_found
+    assert_equal "Jerusalem", nodes(:one).reload.title
+  end
+
+  test "the map sends nodes with their date split for editing" do
+    sign_in_as users(:one)
+    nodes(:one).update!(occurred_on: Date.new(1054, 7, 16), era: "AD")
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
+
+    assert_equal "7", listed[:occurred_month]
+    assert_equal "16", listed[:occurred_day]
+    assert_equal "1054", listed[:occurred_year]
+    assert_equal "AD", listed[:era]
+  end
+
+  test "the map sends blank date fields for an undated node" do
+    sign_in_as users(:one)
+    nodes(:one).update!(occurred_on: nil)
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
+
+    assert_equal "", listed[:occurred_month]
+    assert_equal "", listed[:occurred_year]
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

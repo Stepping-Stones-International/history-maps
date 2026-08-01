@@ -20,18 +20,7 @@ class TopicsController < ApplicationController
 
     render inertia: "Topics/Edit", props: {
       topic: { id: topic.id, title: topic.title, description: topic.description },
-      nodes: topic.nodes.order(:created_at).map { |node|
-        {
-          id: node.id,
-          title: node.title,
-          description: node.description,
-          date_type: node.date_type,
-          occurred_on: node.occurred_on_formatted,
-          era: node.era,
-          latitude: node.latitude,
-          longitude: node.longitude
-        }
-      },
+      nodes: topic.nodes.order(:created_at).map { |node| node_props(node) },
       # Sent from the model so the form cannot drift from the validation.
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
       eras: Node::ERAS
@@ -53,5 +42,23 @@ class TopicsController < ApplicationController
     # Inertia forms post a flat payload.
     def topic_params
       params.permit(:title, :description)
+    end
+
+    # The date is split back into the three fields the form edits, so a node
+    # can be loaded straight into the same form it was created with.
+    def node_props(node)
+      {
+        id: node.id,
+        title: node.title,
+        description: node.description,
+        date_type: node.date_type,
+        occurred_month: node.occurred_on&.month&.to_s.to_s,
+        occurred_day: node.occurred_on&.day&.to_s.to_s,
+        occurred_year: node.occurred_on&.year&.to_s.to_s,
+        occurred_on: node.occurred_on_formatted,
+        era: node.era,
+        latitude: node.latitude,
+        longitude: node.longitude
+      }
     end
 end

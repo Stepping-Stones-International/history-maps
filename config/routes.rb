@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   # :edit is the map view for a topic.
   resources :topics, only: [ :index, :create, :edit ] do
-    resources :nodes, only: [ :create ]
+    resources :nodes, only: [ :create, :update ]
   end
 
   # Defines the root path route ("/")
