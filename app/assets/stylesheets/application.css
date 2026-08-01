@@ -158,6 +158,15 @@ body {
   border-color: #3d4d5f;
 }
 
+/* Must come after :hover so a disabled button never lights up. */
+.icon-button:disabled,
+.icon-button:disabled:hover {
+  color: #55646f;
+  background: var(--surface);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+
 .icon-button--large {
   width: 52px;
   height: 52px;
@@ -583,6 +592,11 @@ textarea.form__input {
 .timeline__step {
   flex: 0 0 auto;
   cursor: pointer;
+  background: var(--surface-raised);
+}
+
+.timeline__step:disabled,
+.timeline__step:disabled:hover {
   background: var(--surface-raised);
 }
 

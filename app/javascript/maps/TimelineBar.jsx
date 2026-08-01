@@ -11,6 +11,7 @@ export default function TimelineBar({ drawerOpen, onStepBack, onStepForward }) {
           type="button"
           className="icon-button icon-button--small timeline__step"
           onClick={onStepBack}
+          disabled={!onStepBack}
           aria-label="Step back"
           title="Step back"
         >
@@ -23,6 +24,7 @@ export default function TimelineBar({ drawerOpen, onStepBack, onStepForward }) {
           type="button"
           className="icon-button icon-button--small timeline__step"
           onClick={onStepForward}
+          disabled={!onStepForward}
           aria-label="Step forward"
           title="Step forward"
         >
