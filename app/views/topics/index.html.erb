@@ -1,0 +1,20 @@
+<% content_for :title, "Topics" %>
+
+<main class="page">
+  <header class="page__header">
+    <h1 class="page__title">Topics</h1>
+  </header>
+
+  <% if @topics.any? %>
+    <ul class="topic-list">
+      <% @topics.each do |topic| %>
+        <li class="topic">
+          <h2 class="topic__title"><%= topic.title %></h2>
+          <p class="topic__description"><%= topic.description %></p>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="page__empty">No topics yet.</p>
+  <% end %>
+</main>
