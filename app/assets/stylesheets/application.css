@@ -206,9 +206,14 @@ body {
   padding-left: calc(var(--drawer-width) + 1rem);
 }
 
+/* A column of fixed height: the header and the actions stay put while the
+   fields scroll between them, so Save is never pushed off screen. */
 .modal__panel {
   width: 100%;
   max-width: 460px;
+  max-height: min(78vh, 44rem);
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -220,6 +225,7 @@ body {
 }
 
 .modal__header {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -235,14 +241,35 @@ body {
 }
 
 .modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   padding: 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
+.modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Pinned to the bottom of the scrolling body, spanning its full width. */
 .form__actions {
+  position: sticky;
+  bottom: -1.25rem;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
-  margin-top: 1.25rem;
+  margin: 1.25rem -1.25rem -1.25rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
 }
 
 /* Latitude, longitude and the pick-on-map button on one line. */
