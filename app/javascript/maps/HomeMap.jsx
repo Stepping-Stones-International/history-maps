@@ -1,10 +1,22 @@
 import React, { useEffect, useRef } from "react"
 import { Map as MapLibreMap, Marker, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl"
 
-function nodeLabel(title) {
-  const label = document.createElement("span")
-  label.className = "node-label__title"
-  label.textContent = title
+// Built as DOM with textContent, never HTML: this is user input.
+function nodeLabel(node) {
+  const label = document.createElement("div")
+
+  const title = document.createElement("span")
+  title.className = "node-label__title"
+  title.textContent = node.title
+  label.appendChild(title)
+
+  if (node.occurred_on) {
+    const date = document.createElement("span")
+    date.className = "node-label__date"
+    date.textContent = `${node.occurred_on} ${node.era}`.trim()
+    label.appendChild(date)
+  }
+
   return label
 }
 
@@ -133,7 +145,7 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
         existing.getElement().setAttribute("aria-label", node.title)
         labels.current.get(node.id)
           ?.setLngLat([node.longitude, node.latitude])
-          ?.setDOMContent(nodeLabel(node.title))
+          ?.setDOMContent(nodeLabel(node))
         return
       }
 
@@ -147,7 +159,7 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
         className: "node-label"
       })
         .setLngLat([node.longitude, node.latitude])
-        .setDOMContent(nodeLabel(node.title))
+        .setDOMContent(nodeLabel(node))
 
       const marker = new Marker({ color: "#8fb8e8" })
         .setLngLat([node.longitude, node.latitude])

@@ -109,14 +109,14 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_includes inertia.props[:errors].values.flatten.join(" "), "between 1 and 4000"
   end
 
-  test "the map sends dates back formatted MM-DD-YYYY" do
+  test "the map sends dates back unpadded and slash separated" do
     sign_in_as users(:one)
     nodes(:one).update!(occurred_on: Date.new(1054, 7, 16))
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
 
-    assert_equal "07-16-1054", listed[:occurred_on]
+    assert_equal "7/16/1054", listed[:occurred_on]
   end
 
   test "create stores the chosen era" do

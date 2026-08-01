@@ -7,8 +7,11 @@ class Node < ApplicationRecord
     "disputed" => "Disputed / Alternate Dates (Contested History)"
   }.freeze
 
-  # The form displays dates in this order.
+  # Accepted by the legacy string setter below.
   DATE_FORMAT = "%m-%d-%Y".freeze
+
+  # Shown in the sidebar and on map labels: no padding, slash separated.
+  DISPLAY_FORMAT = "%-m/%-d/%-Y".freeze
 
   MIN_YEAR = 1
   MAX_YEAR = 4000
@@ -50,7 +53,7 @@ class Node < ApplicationRecord
   end
 
   def occurred_on_formatted
-    occurred_on&.strftime(DATE_FORMAT)
+    occurred_on&.strftime(DISPLAY_FORMAT)
   end
 
   # The stored year is always positive, so the era has to travel with it.

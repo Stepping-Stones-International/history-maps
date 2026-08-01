@@ -125,7 +125,7 @@ class NodeTest < ActiveSupport::TestCase
     )
 
     assert node.valid?
-    assert_equal "04-06-0323 BC", node.occurred_on_with_era
+    assert_equal "4/6/323 BC", node.occurred_on_with_era
   end
 
   test "rejects an unknown era" do
@@ -151,7 +151,7 @@ class NodeTest < ActiveSupport::TestCase
     )
 
     assert_equal Date.new(1776, 7, 4), node.occurred_on
-    assert_equal "07-04-1776", node.occurred_on_formatted
+    assert_equal "7/4/1776", node.occurred_on_formatted
   end
 
   test "reads the date as month first, not day first" do
