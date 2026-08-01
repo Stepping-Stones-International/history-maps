@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { Link } from "@inertiajs/react"
 import { ChevronLeft } from "lucide-react"
 
@@ -31,8 +31,9 @@ function CollapseIcon() {
   )
 }
 
-export default function Drawer({ title, children }) {
-  const [open, setOpen] = useState(true)
+// Controlled: the page owns `open` so the timeline can follow the drawer.
+export default function Drawer({ title, open, onOpenChange, children }) {
+  const setOpen = onOpenChange
 
   return (
     <aside className={`drawer ${open ? "drawer--open" : "drawer--closed"}`}>
