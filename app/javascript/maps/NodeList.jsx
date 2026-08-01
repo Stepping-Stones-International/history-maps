@@ -49,7 +49,7 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
         >
           <span className="node-list__title">
             {index && <span className="node-list__index">{index}.</span>}
-            {node.title}
+            <span className="node-list__label">{node.title}</span>
           </span>
           {node.date_display && (
             <span className="node-list__date">{node.date_display}</span>

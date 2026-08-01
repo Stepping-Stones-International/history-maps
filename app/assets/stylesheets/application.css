@@ -681,7 +681,23 @@ textarea.form__input {
 .drawer__body {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem;
+  overflow-x: hidden;
+  padding: 1rem 1rem 1rem 1.25rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.drawer__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drawer__body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.drawer__body::-webkit-scrollbar-thumb:hover {
+  background: #3d4d5f;
 }
 
 /* Node list in the drawer */
@@ -821,14 +837,27 @@ textarea.form__input {
 }
 
 .node-list__title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   font-size: 0.92rem;
   font-weight: 550;
 }
 
+/* Number in its own column so titles line up whatever the digit count, and a
+   wrapped title hangs under itself rather than under the number. */
 .node-list__index {
-  margin-right: 0.35rem;
+  flex: 0 0 auto;
+  min-width: 1.5rem;
+  text-align: right;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.node-list__label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .node-list__date {
