@@ -59,9 +59,82 @@ body {
   letter-spacing: -0.02em;
 }
 
+.page--narrow {
+  max-width: 420px;
+}
+
 .page__empty {
   margin: 0;
   color: var(--text-muted);
+}
+
+.page__footnote {
+  margin: 1.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+.page__footnote a,
+.flash a {
+  color: #8fb8e8;
+}
+
+.flash {
+  margin: 0 0 1.25rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.flash--alert {
+  border-color: #6b2f34;
+  color: #f0a9ad;
+}
+
+.flash--notice {
+  border-color: #2f5a45;
+  color: #93d6b4;
+}
+
+.form__field {
+  margin-bottom: 1rem;
+}
+
+.form__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.form__input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.form__input:focus {
+  outline: 2px solid #4b7fc4;
+  outline-offset: 1px;
+}
+
+.button {
+  padding: 0.6rem 1.1rem;
+  font: inherit;
+  font-weight: 550;
+  color: var(--text);
+  cursor: pointer;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.button:hover {
+  background: var(--surface-raised);
 }
 
 .topic-list {
@@ -90,6 +163,13 @@ body {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.55;
+}
+
+.topic__author {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 /* Collapsible left drawer. Collapsed shows the icon rail; open shows the

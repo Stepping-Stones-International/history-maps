@@ -11,6 +11,7 @@
         <li class="topic">
           <h2 class="topic__title"><%= topic.title %></h2>
           <p class="topic__description"><%= topic.description %></p>
+          <p class="topic__author">by <%= topic.author.email_address %></p>
         </li>
       <% end %>
     </ul>
