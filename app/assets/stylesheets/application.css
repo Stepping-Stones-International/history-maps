@@ -704,6 +704,24 @@ textarea.form__input {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
+/* Node label shown on marker hover. Clicking it selects the node, same as the
+   pin, so it must not swallow the pointer. */
+.node-label .maplibregl-popup-content {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.node-label .maplibregl-popup-tip {
+  display: none;
+}
+
 /* Timeline bar: pinned to the bottom of the map area. `left` tracks the
    drawer's current width so the bar stays centred in the visible map, and
    transitions with it when the drawer collapses. */
