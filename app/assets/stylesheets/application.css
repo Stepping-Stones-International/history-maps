@@ -362,20 +362,6 @@ textarea.form__input {
   text-decoration: underline;
 }
 
-.drawer__topic-title {
-  margin: 0 0 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.drawer__topic-description {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
 .topic__description {
   margin: 0;
   color: var(--text-muted);
@@ -501,12 +487,15 @@ textarea.form__input {
   color: var(--text);
 }
 
+/* Holds a topic title, so it has to wrap rather than overflow the panel. */
 .drawer__title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 650;
+  line-height: 1.3;
   letter-spacing: -0.01em;
   color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 .drawer__body {

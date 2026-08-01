@@ -9,10 +9,7 @@ export default function Edit({ topic }) {
     <>
       <Head title={topic.title} />
       <HomeMap />
-      <Drawer>
-        <p className="drawer__topic-title">{topic.title}</p>
-        {topic.description && <p className="drawer__topic-description">{topic.description}</p>}
-      </Drawer>
+      <Drawer title={topic.title} />
     </>
   )
 }
