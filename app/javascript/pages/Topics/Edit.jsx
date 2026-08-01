@@ -118,7 +118,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
         )}
       </div>
 
-      <TimelineBar drawerOpen={drawerOpen} />
+      <TimelineBar nodes={nodes} drawerOpen={drawerOpen} />
 
       {/* Hidden, not unmounted, while picking: the draft stays put. */}
       {editor && !picking && (

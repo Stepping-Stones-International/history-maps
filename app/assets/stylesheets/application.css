@@ -873,13 +873,60 @@ textarea.form__input {
   opacity: 1;
 }
 
-/* Takes the space left between the two step buttons. */
+/* Takes the space left between the two step buttons. Marks are positioned
+   against it, so it owns the height rather than being the line itself. */
 .timeline__track {
+  position: relative;
   flex: 1;
   min-width: 0;
+  align-self: stretch;
+}
+
+.timeline__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
   height: 2px;
   background: var(--border);
   border-radius: 1px;
+}
+
+/* Minor segment: one step of years. */
+.timeline__tick {
+  position: absolute;
+  bottom: 14px;
+  width: 1px;
+  height: 6px;
+  margin-left: -0.5px;
+  background: #3d4d5f;
+}
+
+/* Major line: one of our nodes. */
+.timeline__epoch {
+  position: absolute;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline__epoch-line {
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  background: #8fb8e8;
+  border-radius: 1px;
+}
+
+.timeline__epoch-label {
+  position: absolute;
+  bottom: 18px;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text);
 }
 
 .timeline__step {
