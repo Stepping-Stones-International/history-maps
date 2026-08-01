@@ -578,6 +578,14 @@ textarea.form__input {
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   pointer-events: auto;
+  opacity: 0.5;
+  transition: opacity 0.25s ease-in-out;
+}
+
+/* focus-within too, so it surfaces for keyboard users once the steps work. */
+.timeline__bar:hover,
+.timeline__bar:focus-within {
+  opacity: 1;
 }
 
 /* Takes the space left between the two step buttons. */
