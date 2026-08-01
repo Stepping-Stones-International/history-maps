@@ -825,6 +825,12 @@ textarea.form__input {
   font-weight: 550;
 }
 
+.node-list__index {
+  margin-right: 0.35rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .node-list__date {
   font-size: 0.78rem;
   color: var(--text-muted);

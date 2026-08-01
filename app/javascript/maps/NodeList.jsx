@@ -18,6 +18,8 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
   const embedded = childrenOf(node.id)
   const hasEmbedded = embedded.length > 0
   const isOpen = expanded.has(node.id)
+  // Only embedded nodes carry a meaningful order, and only once one is set.
+  const index = node.parent_id && node.position > 0 ? node.position : null
 
   return (
     <li className="node-list__branch">
@@ -45,7 +47,10 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
           onClick={() => onHighlight(node)}
           aria-pressed={node.id === highlightedId}
         >
-          <span className="node-list__title">{node.title}</span>
+          <span className="node-list__title">
+            {index && <span className="node-list__index">{index}.</span>}
+            {node.title}
+          </span>
           {node.date_display && (
             <span className="node-list__date">{node.date_display}</span>
           )}
