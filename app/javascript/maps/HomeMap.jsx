@@ -82,6 +82,27 @@ const TOPO_STYLE = {
 
 const SVG_NS = "http://www.w3.org/2000/svg"
 
+const AREA_SOURCE = "node-areas"
+
+// A ring of [longitude, latitude] pairs becomes a closed polygon. GeoJSON wants
+// the first point repeated at the end, which the stored ring does not carry.
+function areaFeatures(nodes) {
+  return nodes
+    .filter((node) => Array.isArray(node.area) && node.area.length >= 3)
+    .map((node) => {
+      const ring = [ ...node.area ]
+      const [ first ] = ring
+      const last = ring[ring.length - 1]
+      if (first[0] !== last[0] || first[1] !== last[1]) ring.push(first)
+
+      return {
+        type: "Feature",
+        properties: { id: node.id, title: node.title },
+        geometry: { type: "Polygon", coordinates: [ ring ] }
+      }
+    })
+}
+
 const MARKER_COLOR = "#8fb8e8"
 const MARKER_ACTIVE_COLOR = "#f2b640"
 const MARKER_SIZE = { width: 20, height: 18 }
@@ -124,6 +145,7 @@ export default function HomeMap({
   const map = useRef(null)
   const markers = useRef(new Map())
   const labels = useRef(new Map())
+  const styleReady = useRef(false)
   const highlightedRef = useRef(highlightedId)
   highlightedRef.current = highlightedId
   // Held in refs so changing these does not re-bind the map and marker
@@ -134,6 +156,9 @@ export default function HomeMap({
   selectHandler.current = onNodeSelect
   const placingRef = useRef(placing)
   placingRef.current = placing
+  // Read by the load handler, which may fire after the first render.
+  const nodesRef = useRef(nodes)
+  nodesRef.current = nodes
 
   useEffect(() => {
     if (map.current) return
@@ -165,6 +190,55 @@ export default function HomeMap({
     }
 
     map.current.addControl(new NavigationControl({ showCompass: false }), "top-right")
+
+    // Areas are map layers, so they always sit beneath the waypoints, which are
+    // DOM elements above the canvas.
+    //
+    // Hung off the style rather than "load": load also waits for the first
+    // tiles, so a slow or unreachable tile server would leave areas undrawn.
+    // Returns true once the layers are in place. addSource throws while the
+    // style is still loading, so this waits to be told the style has settled.
+    const addAreaLayers = () => {
+      if (!map.current) return false
+      if (map.current.getSource(AREA_SOURCE)) return true
+      if (!map.current.isStyleLoaded()) return false
+      map.current.addSource(AREA_SOURCE, {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] }
+      })
+
+      map.current.addLayer({
+        id: `${AREA_SOURCE}-fill`,
+        type: "fill",
+        source: AREA_SOURCE,
+        paint: { "fill-color": "#8fb8e8", "fill-opacity": 0.18 }
+      })
+
+      map.current.addLayer({
+        id: `${AREA_SOURCE}-line`,
+        type: "line",
+        source: AREA_SOURCE,
+        paint: { "line-color": "#8fb8e8", "line-width": 1.5, "line-opacity": 0.8 }
+      })
+
+      styleReady.current = true
+      map.current.getSource(AREA_SOURCE)?.setData({
+        type: "FeatureCollection",
+        features: areaFeatures(nodesRef.current)
+      })
+
+      return true
+    }
+
+    // styledata fires repeatedly as the style settles; stop listening once the
+    // layers are in.
+    if (!addAreaLayers()) {
+      const retry = () => { if (addAreaLayers()) map.current?.off("styledata", retry) }
+      map.current.on("styledata", retry)
+      // load fires once the style and first tiles are in; belt and braces for
+      // the case where styledata has stopped firing by then.
+      map.current.once("load", () => addAreaLayers())
+    }
 
     map.current.on("click", (event) => {
       clickHandler.current?.({ longitude: event.lngLat.lng, latitude: event.lngLat.lat })
@@ -264,6 +338,16 @@ export default function HomeMap({
       markers.current.delete(id)
       labels.current.get(id)?.remove()
       labels.current.delete(id)
+    })
+  }, [nodes])
+
+  // Keep the drawn areas in step with the nodes.
+  useEffect(() => {
+    if (!map.current || !styleReady.current) return
+
+    map.current.getSource(AREA_SOURCE)?.setData({
+      type: "FeatureCollection",
+      features: areaFeatures(nodes)
     })
   }, [nodes])
 

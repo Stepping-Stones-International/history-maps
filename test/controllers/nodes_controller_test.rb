@@ -394,6 +394,45 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_nil listed[:latitude]
   end
 
+  test "create stores an area on a layer" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      layer: "true", latitude: "", longitude: "",
+      area_json: "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]"
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal 3, node.area.size
+    assert_equal [ 35.0, 31.5 ], node.area.first
+  end
+
+  test "create rejects an unparsable area" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(
+        layer: "true", latitude: "", longitude: "", area_json: "not json"
+      )
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "valid JSON"
+  end
+
+  test "the map is sent an area to draw and the text to edit" do
+    sign_in_as users(:one)
+    layer = @topic.nodes.create!(title: "Judea", date_type: "range", layer: true,
+      area_json: "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]")
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == layer.id }
+
+    assert_equal [ [ 35.0, 31.5 ], [ 35.4, 31.5 ], [ 35.4, 31.9 ] ], listed[:area]
+    assert_equal "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]", listed[:area_json]
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

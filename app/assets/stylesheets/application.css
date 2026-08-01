@@ -461,6 +461,12 @@ textarea.form__input {
   resize: vertical;
 }
 
+.form__input--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
 .form__input:disabled {
   color: #55646f;
   cursor: not-allowed;

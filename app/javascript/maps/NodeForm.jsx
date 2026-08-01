@@ -39,7 +39,9 @@ export default function NodeForm({
 
   const toggleLayer = (event) => {
     const wanted = event.target.checked
-    onChange(wanted ? { ...draft, layer: true, latitude: "", longitude: "" } : { ...draft, layer: false })
+    onChange(wanted
+      ? { ...draft, layer: true, latitude: "", longitude: "" }
+      : { ...draft, layer: false, area_json: "" })
   }
 
   const typeOptions = embedding
@@ -278,6 +280,24 @@ export default function NodeForm({
           Layer
         </label>
       </div>
+
+      {isLayer && (
+        <div className="form__field">
+          <label htmlFor="node-area" className="form__label">Area outline</label>
+          <p className="form__note">
+            A ring of [longitude, latitude] pairs. Leave empty for a layer with no shape.
+          </p>
+          <textarea
+            id="node-area"
+            rows={5}
+            spellCheck={false}
+            className="form__input form__input--code"
+            placeholder={'[\n  [-117.8672, 33.7501],\n  [-117.8665, 33.7508],\n  [-117.8657, 33.7514]\n]'}
+            value={draft.area_json || ""}
+            onChange={set("area_json")}
+          />
+        </div>
+      )}
 
       <div className="form__actions">
         <button type="button" className="button button--text" onClick={onCancel}>Cancel</button>

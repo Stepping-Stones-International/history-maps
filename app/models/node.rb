@@ -54,6 +54,7 @@ class Node < ApplicationRecord
   validate :date_exists
   validate :parent_belongs_to_same_topic
   validate :parent_is_not_itself_or_below
+  validate :area_is_a_ring
 
   def dated?
     occurred_year.present?
@@ -65,6 +66,31 @@ class Node < ApplicationRecord
 
   def placed?
     latitude.present? && longitude.present?
+  end
+
+  def area?
+    area.present?
+  end
+
+  # The form edits the ring as text, so it survives a typo without losing what
+  # was typed. Anything unparsable is remembered for the validation to report.
+  def area_json=(value)
+    @area_syntax_error = false
+    return super_area(value) unless value.is_a?(String)
+
+    trimmed = value.strip
+    return super_area(nil) if trimmed.empty?
+
+    begin
+      super_area(JSON.parse(trimmed))
+    rescue JSON::ParserError
+      @area_syntax_error = true
+      super_area(nil)
+    end
+  end
+
+  def area_json
+    area && JSON.generate(area)
   end
 
   # Self and everything embedded beneath, so a node cannot be filed under one
@@ -102,6 +128,31 @@ class Node < ApplicationRecord
   end
 
   private
+    def super_area(value)
+      self[:area] = value
+    end
+
+    # A ring of [longitude, latitude] pairs, and only on a layer.
+    def area_is_a_ring
+      return errors.add(:area, "must be valid JSON") if @area_syntax_error
+      return if area.blank?
+      return errors.add(:area, "can only be given to a layer") unless layer?
+
+      unless area.is_a?(Array) && area.size >= 3
+        return errors.add(:area, "needs at least three points")
+      end
+
+      return if area.all? { |point| coordinate_pair?(point) }
+
+      errors.add(:area, "must be a list of [longitude, latitude] pairs")
+    end
+
+    def coordinate_pair?(point)
+      point.is_a?(Array) && point.size == 2 &&
+        point.all? { |number| number.is_a?(Numeric) } &&
+        point[0].between?(-180, 180) && point[1].between?(-90, 90)
+    end
+
     # Clearing the field should mean "first", not a missing number.
     def default_position
       self.position = 0 if position.nil?

@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_213048) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_220532) do
   create_table "nodes", id: :string, force: :cascade do |t|
+    t.json "area"
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
     t.text "description"

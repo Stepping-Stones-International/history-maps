@@ -343,6 +343,56 @@ class NodeTest < ActiveSupport::TestCase
     assert layer.valid?, "coordinates are not required of a layer"
   end
 
+  test "a layer can outline an area" do
+    layer = Node.new(topic: @topic, title: "Judea", date_type: "range", layer: true,
+      area_json: "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]")
+
+    assert layer.valid?, layer.errors.full_messages.to_sentence
+    assert_equal [ [ 35.0, 31.5 ], [ 35.4, 31.5 ], [ 35.4, 31.9 ] ], layer.area
+  end
+
+  test "rejects an area that is not valid JSON" do
+    layer = Node.new(topic: @topic, title: "Judea", date_type: "range", layer: true,
+      area_json: "[[35.0,31.5],")
+
+    assert_not layer.valid?
+    assert_includes layer.errors[:area], "must be valid JSON"
+  end
+
+  test "rejects an area with too few points" do
+    layer = Node.new(topic: @topic, title: "Judea", date_type: "range", layer: true,
+      area_json: "[[35.0,31.5],[35.4,31.5]]")
+
+    assert_not layer.valid?
+    assert_includes layer.errors[:area], "needs at least three points"
+  end
+
+  test "rejects points that are not longitude and latitude pairs" do
+    [ "[[35.0],[35.4,31.5],[35.4,31.9]]", "[[500,31.5],[35.4,31.5],[35.4,31.9]]",
+      '[["a","b"],[35.4,31.5],[35.4,31.9]]' ].each do |ring|
+      layer = Node.new(topic: @topic, title: "Judea", date_type: "range", layer: true, area_json: ring)
+
+      assert_not layer.valid?, "expected #{ring} to be rejected"
+      assert_predicate layer.errors[:area], :any?
+    end
+  end
+
+  test "only a layer can carry an area" do
+    node = build_node(title: "Placed", date_type: "range",
+      area_json: "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]")
+
+    assert_not node.valid?
+    assert_includes node.errors[:area], "can only be given to a layer"
+  end
+
+  test "a blank area leaves the layer without a shape" do
+    layer = Node.new(topic: @topic, title: "Judea", date_type: "range", layer: true, area_json: "  ")
+
+    assert layer.valid?
+    assert_nil layer.area
+    assert_not layer.area?
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy

@@ -32,7 +32,7 @@ class NodesController < ApplicationController
     def node_params
       params.permit(
         :date_type, :occurred_month, :occurred_day, :occurred_year, :era,
-        :title, :description, :latitude, :longitude, :parent_id, :position, :layer
+        :title, :description, :latitude, :longitude, :parent_id, :position, :layer, :area_json
       )
     end
 end

@@ -84,6 +84,8 @@ class TopicsController < ApplicationController
         title: node.title,
         description: node.description,
         layer: node.layer,
+        area: node.area,
+        area_json: node.area_json,
         parent_id: node.parent_id,
         position: node.position,
         date_type: node.date_type,
