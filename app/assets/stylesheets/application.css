@@ -9,6 +9,14 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+/* Border-box everywhere: width: 100% inputs would otherwise add their padding
+   and border on top and overflow their container. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* The UI is dark-themed unconditionally — it does not follow the OS setting. */
 :root {
   color-scheme: dark;
@@ -284,13 +292,20 @@ body {
 }
 
 .form__input {
+  display: block;
   width: 100%;
+  max-width: 100%;
   padding: 0.6rem 0.7rem;
   font: inherit;
   color: var(--text);
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 8px;
+}
+
+/* Dragging the resize handle must not widen it past the modal either. */
+textarea.form__input {
+  resize: vertical;
 }
 
 .form__input:focus {
