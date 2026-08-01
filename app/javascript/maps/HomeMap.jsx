@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { Map as MapLibreMap, NavigationControl, setWorkerUrl } from "maplibre-gl"
+import { Map as MapLibreMap, Marker, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl"
 
 const workerUrl = document.querySelector('meta[name="maplibre-worker-url"]')?.content
 if (workerUrl) setWorkerUrl(workerUrl)
@@ -61,9 +61,13 @@ const TOPO_STYLE = {
   ]
 }
 
-export default function HomeMap() {
+export default function HomeMap({ nodes = [], placing = false, onMapClick }) {
   const container = useRef(null)
   const map = useRef(null)
+  const markers = useRef(new Map())
+  // Held in a ref so changing the handler does not re-bind the map listener.
+  const clickHandler = useRef(onMapClick)
+  clickHandler.current = onMapClick
 
   useEffect(() => {
     if (map.current) return
@@ -80,11 +84,64 @@ export default function HomeMap() {
 
     map.current.addControl(new NavigationControl({ showCompass: false }), "top-right")
 
+    map.current.on("click", (event) => {
+      clickHandler.current?.({ longitude: event.lngLat.lng, latitude: event.lngLat.lat })
+    })
+
     return () => {
+      markers.current.forEach((marker) => marker.remove())
+      markers.current.clear()
       map.current?.remove()
       map.current = null
     }
   }, [])
+
+  // Crosshair while a node is waiting to be placed.
+  useEffect(() => {
+    const canvas = map.current?.getCanvas()
+    if (canvas) canvas.style.cursor = placing ? "crosshair" : ""
+  }, [placing])
+
+  // Reconcile markers against the current nodes.
+  useEffect(() => {
+    if (!map.current) return
+
+    const seen = new Set()
+
+    nodes.forEach((node) => {
+      seen.add(node.id)
+      if (markers.current.has(node.id)) return
+
+      // Built as DOM with textContent, never HTML: this is user input.
+      const content = document.createElement("div")
+      content.className = "node-popup"
+
+      const title = document.createElement("p")
+      title.className = "node-popup__title"
+      title.textContent = node.title
+      content.appendChild(title)
+
+      if (node.description) {
+        const description = document.createElement("p")
+        description.className = "node-popup__description"
+        description.textContent = node.description
+        content.appendChild(description)
+      }
+
+      const marker = new Marker({ color: "#8fb8e8" })
+        .setLngLat([node.longitude, node.latitude])
+        .setPopup(new Popup({ offset: 18, closeButton: false }).setDOMContent(content))
+        .addTo(map.current)
+
+      markers.current.set(node.id, marker)
+    })
+
+    markers.current.forEach((marker, id) => {
+      if (seen.has(id)) return
+      marker.remove()
+      markers.current.delete(id)
+    })
+  }, [nodes])
 
   return <div ref={container} className="home-map" />
 }

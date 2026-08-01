@@ -13,7 +13,9 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # :edit is the map view for a topic.
-  resources :topics, only: [ :index, :create, :edit ]
+  resources :topics, only: [ :index, :create, :edit ] do
+    resources :nodes, only: [ :create ]
+  end
 
   # Defines the root path route ("/")
   root "topics#index"

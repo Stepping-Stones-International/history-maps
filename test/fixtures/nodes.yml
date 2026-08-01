@@ -1,0 +1,18 @@
+# Ids and foreign keys are explicit: fixtures derive integer ids for string
+# primary keys, which would not match the UUIDs the app generates.
+
+one:
+  id: c4e8a1b6-7d29-4f38-9a5c-1e2b3c4d5e6f
+  topic_id: b1d4f2a7-9e35-4c81-a6f0-3d5e7c9b1a24
+  title: Jerusalem
+  description: MyText
+  latitude: 31.7683
+  longitude: 35.2137
+
+two:
+  id: d5f9b2c7-8e3a-4049-ab6d-2f3c4d5e6f70
+  topic_id: e8a3c6d1-4b72-4f95-b3c8-5a7d9e1f3b46
+  title: Antioch
+  description: MyText
+  latitude: 36.2021
+  longitude: 36.1603

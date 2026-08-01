@@ -547,6 +547,76 @@ textarea.form__input {
   flex: 0 0 auto;
 }
 
+/* Map actions: top-left of the map area, tracking the drawer like the timeline. */
+.map-actions {
+  position: fixed;
+  top: 1rem;
+  left: calc(var(--rail-width) + 1rem);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: left var(--drawer-transition);
+}
+
+.map-actions--inset {
+  left: calc(var(--drawer-width) + 1rem);
+}
+
+.map-actions__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.button__glyph {
+  width: 16px;
+  height: 16px;
+}
+
+.placing-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Node popups: MapLibre's default popup is light, so restyle it. */
+.maplibregl-popup-content.maplibregl-popup-content {
+  padding: 0.7rem 0.9rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip { border-bottom-color: var(--surface); }
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip { border-top-color: var(--surface); }
+.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--surface); }
+.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--surface); }
+
+.node-popup__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.node-popup__description {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
 /* Timeline bar: pinned to the bottom of the map area. `left` tracks the
    drawer's current width so the bar stays centred in the visible map, and
    transitions with it when the drawer collapses. */

@@ -19,7 +19,16 @@ class TopicsController < ApplicationController
     topic = Current.user.topics.find(params[:id])
 
     render inertia: "Topics/Edit", props: {
-      topic: { id: topic.id, title: topic.title, description: topic.description }
+      topic: { id: topic.id, title: topic.title, description: topic.description },
+      nodes: topic.nodes.order(:created_at).map { |node|
+        {
+          id: node.id,
+          title: node.title,
+          description: node.description,
+          latitude: node.latitude,
+          longitude: node.longitude
+        }
+      }
     }
   end
 
