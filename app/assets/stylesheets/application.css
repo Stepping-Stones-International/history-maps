@@ -500,6 +500,38 @@ body {
   padding: 1rem 1.25rem;
 }
 
+/* Pinned to the bottom of the panel by the body's flex: 1 above. */
+.drawer__footer {
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.drawer__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem 0.45rem 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.drawer__back:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+.drawer__back-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
 /* MapLibre ships light-themed controls; repaint them for the dark UI.
    maplibre.css is served after this file, so every override below doubles a
    class to out-specify it rather than relying on source order. */

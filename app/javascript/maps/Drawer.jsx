@@ -1,4 +1,6 @@
 import React, { useState } from "react"
+import { Link } from "@inertiajs/react"
+import { ChevronLeft } from "lucide-react"
 
 function HamburgerIcon() {
   return (
@@ -63,6 +65,13 @@ export default function Drawer({ children }) {
           </button>
         </header>
         <div className="drawer__body">{children}</div>
+
+        <footer className="drawer__footer">
+          <Link href="/" className="drawer__back">
+            <ChevronLeft className="drawer__back-icon" aria-hidden="true" />
+            Back to Topics
+          </Link>
+        </footer>
       </div>
     </aside>
   )
