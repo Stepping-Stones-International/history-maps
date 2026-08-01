@@ -562,7 +562,8 @@ textarea.form__input {
   min-height: 64px;
   display: flex;
   align-items: center;
-  padding: 0 1.25rem;
+  gap: 1rem;
+  padding: 0 1rem;
   background: rgba(19, 26, 34, 0.92);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -570,12 +571,19 @@ textarea.form__input {
   pointer-events: auto;
 }
 
-/* Placeholder line; markers will hang off this later. */
+/* Takes the space left between the two step buttons. */
 .timeline__track {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 2px;
   background: var(--border);
   border-radius: 1px;
+}
+
+.timeline__step {
+  flex: 0 0 auto;
+  cursor: pointer;
+  background: var(--surface-raised);
 }
 
 /* MapLibre ships light-themed controls; repaint them for the dark UI.
