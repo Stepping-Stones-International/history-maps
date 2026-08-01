@@ -69,6 +69,50 @@ export default function NodeForm({
   return (
     <form onSubmit={submit} className="form">
       <div className="form__field">
+        <label className="form__check">
+          <input
+            type="checkbox"
+            className="form__checkbox"
+            checked={embedding}
+            onChange={toggleEmbedding}
+          />
+          Embed this under another node
+        </label>
+      </div>
+
+      {embedding && (
+      <div className="form__row">
+        <div className="form__field">
+          <label htmlFor="node-parent" className="form__label">Embedded under</label>
+          <select
+            id="node-parent"
+            className="form__input form__select"
+            value={draft.parent_id || ""}
+            onChange={set("parent_id")}
+          >
+            <option value="">Nothing — a node of its own</option>
+            {parentOptions.map((option) => (
+              <option key={option.id} value={option.id}>{option.title}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form__field form__field--position">
+          <label htmlFor="node-position" className="form__label">Order</label>
+          <input
+            id="node-position"
+            type="number"
+            min="1"
+            step="1"
+            className="form__input"
+            value={draft.position ?? ""}
+            onChange={set("position")}
+          />
+        </div>
+      </div>
+      )}
+
+      <div className="form__field">
         <label htmlFor="node-date-type" className="form__label">Date type</label>
         <select
           id="node-date-type"
@@ -225,49 +269,6 @@ export default function NodeForm({
         </button>
       </div>
 
-      <div className="form__field">
-        <label className="form__check">
-          <input
-            type="checkbox"
-            className="form__checkbox"
-            checked={embedding}
-            onChange={toggleEmbedding}
-          />
-          Embed this under another node
-        </label>
-      </div>
-
-      {embedding && (
-      <div className="form__row">
-        <div className="form__field">
-          <label htmlFor="node-parent" className="form__label">Embedded under</label>
-          <select
-            id="node-parent"
-            className="form__input form__select"
-            value={draft.parent_id || ""}
-            onChange={set("parent_id")}
-          >
-            <option value="">Nothing — a node of its own</option>
-            {parentOptions.map((option) => (
-              <option key={option.id} value={option.id}>{option.title}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form__field form__field--position">
-          <label htmlFor="node-position" className="form__label">Order</label>
-          <input
-            id="node-position"
-            type="number"
-            min="1"
-            step="1"
-            className="form__input"
-            value={draft.position ?? ""}
-            onChange={set("position")}
-          />
-        </div>
-      </div>
-      )}
 
       <div className="form__field">
         <label className="form__check">
