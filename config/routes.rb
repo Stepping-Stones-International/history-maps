@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # :edit is the map view for a topic.
-  resources :topics, only: [ :index, :create, :edit ] do
+  resources :topics, only: [ :index, :create, :edit, :update ] do
     resources :nodes, only: [ :create, :update ]
   end
 

@@ -805,6 +805,21 @@ textarea.form__input {
   left: calc(var(--drawer-width) + 1rem);
 }
 
+/* Sits left of New Node, matching its height. */
+.map-actions__settings {
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.map-actions__settings .icon-button__glyph {
+  width: 18px;
+  height: 18px;
+}
+
 .map-actions__button {
   display: inline-flex;
   align-items: center;

@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 import { Head, router } from "@inertiajs/react"
-import { MapPin } from "lucide-react"
+import { MapPin, Settings } from "lucide-react"
 import HomeMap from "../../maps/HomeMap"
 import Drawer from "../../maps/Drawer"
 import TimelineBar from "../../maps/TimelineBar"
 import NodeForm from "../../maps/NodeForm"
 import NodeList from "../../maps/NodeList"
+import TopicSettingsForm from "../../maps/TopicSettingsForm"
 import Modal from "../../components/Modal"
 
 const EMPTY_DRAFT = {
@@ -44,6 +45,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
   const [picking, setPicking] = useState(false)
   // Which node is called out on the map; clicking its row again clears it.
   const [highlightedId, setHighlightedId] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const close = () => {
     setEditor(null)
@@ -111,6 +113,16 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
       </Drawer>
 
       <div className={`map-actions ${drawerOpen ? "map-actions--inset" : ""}`}>
+        <button
+          type="button"
+          className="icon-button map-actions__settings"
+          onClick={() => setSettingsOpen(true)}
+          aria-label="Topic settings"
+          title="Topic settings"
+        >
+          <Settings className="icon-button__glyph" />
+        </button>
+
         <button type="button" className="button map-actions__button" onClick={startNew}>
           <MapPin className="button__glyph" aria-hidden="true" />
           New Node
@@ -127,6 +139,20 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
       </div>
 
       <TimelineBar nodes={nodes} drawerOpen={drawerOpen} />
+
+      {settingsOpen && (
+        <Modal
+          title="Topic settings"
+          className={`modal--map ${drawerOpen ? "modal--map-inset" : ""}`}
+          onClose={() => setSettingsOpen(false)}
+        >
+          <TopicSettingsForm
+            topic={topic}
+            onDone={() => setSettingsOpen(false)}
+            onCancel={() => setSettingsOpen(false)}
+          />
+        </Modal>
+      )}
 
       {/* Hidden, not unmounted, while picking: the draft stays put. */}
       {editor && !picking && (

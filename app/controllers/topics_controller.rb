@@ -39,6 +39,17 @@ class TopicsController < ApplicationController
     end
   end
 
+  def update
+    topic = Current.user.topics.find(params[:id])
+
+    if topic.update(topic_params)
+      redirect_to edit_topic_path(topic), notice: "Topic updated."
+    else
+      redirect_to edit_topic_path(topic),
+        alert: "That topic could not be saved.", inertia: { errors: topic.errors }
+    end
+  end
+
   private
     # Inertia forms post a flat payload.
     def topic_params

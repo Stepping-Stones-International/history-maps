@@ -24,6 +24,46 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @topic.title, inertia.props[:topic][:title]
   end
 
+  test "update renames a topic and changes its description" do
+    sign_in_as users(:one)
+
+    patch topic_path(@topic), params: { title: "Renamed", description: "New words." }
+
+    @topic.reload
+    assert_equal "Renamed", @topic.title
+    assert_equal "New words.", @topic.description
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "update rejects a blank title" do
+    sign_in_as users(:one)
+    original = @topic.title
+
+    patch topic_path(@topic), params: { title: "" }
+
+    assert_equal original, @topic.reload.title
+    assert_redirected_to edit_topic_path(@topic)
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "blank"
+  end
+
+  test "update requires authentication" do
+    patch topic_path(@topic), params: { title: "Renamed" }
+
+    assert_redirected_to new_session_path
+    assert_not_equal "Renamed", @topic.reload.title
+  end
+
+  test "update does not touch another user's topic" do
+    sign_in_as users(:two)
+    original = @topic.title
+
+    patch topic_path(@topic), params: { title: "Hijacked" }
+
+    assert_response :not_found
+    assert_equal original, @topic.reload.title
+  end
+
   test "edit requires authentication" do
     get edit_topic_path(@topic)
     assert_redirected_to new_session_path
