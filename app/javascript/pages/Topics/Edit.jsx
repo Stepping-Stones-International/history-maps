@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Head, router } from "@inertiajs/react"
 import { MapPin, Settings } from "lucide-react"
 import HomeMap from "../../maps/HomeMap"
@@ -45,7 +45,41 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
   const [picking, setPicking] = useState(false)
   // Which node is called out on the map; clicking its row again clears it.
   const [highlightedId, setHighlightedId] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  // null when closed, otherwise the topic draft being edited.
+  const [settings, setSettings] = useState(null)
+  const [capturingView, setCapturingView] = useState(false)
+  // Filled in by the map so the current centre and zoom can be read on demand.
+  const viewReader = useRef(null)
+
+  const openSettings = () => setSettings({
+    title: topic.title,
+    description: topic.description || "",
+    center_latitude: topic.default_view?.latitude ?? "",
+    center_longitude: topic.default_view?.longitude ?? "",
+    zoom: topic.default_view?.zoom ?? ""
+  })
+
+  const closeSettings = () => {
+    setSettings(null)
+    setCapturingView(false)
+  }
+
+  const takeCurrentView = () => {
+    const view = viewReader.current?.()
+    if (view) {
+      setSettings((current) => ({
+        ...current,
+        center_latitude: view.latitude,
+        center_longitude: view.longitude,
+        zoom: view.zoom
+      }))
+    }
+    setCapturingView(false)
+  }
+
+  const saveSettings = () => {
+    router.patch(`/topics/${topic.id}`, settings, { onSuccess: closeSettings })
+  }
 
   const close = () => {
     setEditor(null)
@@ -99,6 +133,8 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
         nodes={nodes}
         placing={picking}
         highlightedId={highlightedId}
+        defaultView={topic.default_view}
+        viewReader={viewReader}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
@@ -116,7 +152,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
         <button
           type="button"
           className="icon-button map-actions__settings"
-          onClick={() => setSettingsOpen(true)}
+          onClick={openSettings}
           aria-label="Topic settings"
           title="Topic settings"
         >
@@ -140,18 +176,33 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
 
       <TimelineBar nodes={nodes} drawerOpen={drawerOpen} />
 
-      {settingsOpen && (
+      {/* Hidden, not unmounted, while the map is being positioned. */}
+      {settings && !capturingView && (
         <Modal
           title="Topic settings"
           className={`modal--map ${drawerOpen ? "modal--map-inset" : ""}`}
-          onClose={() => setSettingsOpen(false)}
+          onClose={closeSettings}
         >
           <TopicSettingsForm
-            topic={topic}
-            onDone={() => setSettingsOpen(false)}
-            onCancel={() => setSettingsOpen(false)}
+            draft={settings}
+            onChange={setSettings}
+            onSetView={() => setCapturingView(true)}
+            onCancel={closeSettings}
+            onSubmit={saveSettings}
           />
         </Modal>
+      )}
+
+      {capturingView && (
+        <div className={`view-capture ${drawerOpen ? "view-capture--inset" : ""}`} role="status">
+          <span className="view-capture__hint">Move and zoom the map, then</span>
+          <button type="button" className="button" onClick={takeCurrentView}>
+            Set map location and zoom
+          </button>
+          <button type="button" className="button button--text" onClick={() => setCapturingView(false)}>
+            Cancel
+          </button>
+        </div>
       )}
 
       {/* Hidden, not unmounted, while picking: the draft stays put. */}

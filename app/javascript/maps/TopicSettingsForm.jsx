@@ -1,15 +1,20 @@
-import React, { useState } from "react"
-import { router, usePage } from "@inertiajs/react"
+import React from "react"
+import { usePage } from "@inertiajs/react"
+import { Crosshair } from "lucide-react"
 import FormErrors from "../components/FormErrors"
 
-export default function TopicSettingsForm({ topic, onDone, onCancel }) {
+// Controlled by the page so the values survive the modal being hidden while
+// the map is moved to the view worth remembering.
+export default function TopicSettingsForm({ draft, onChange, onSetView, onCancel, onSubmit }) {
   const { errors } = usePage().props
-  const [title, setTitle] = useState(topic.title)
-  const [description, setDescription] = useState(topic.description || "")
+  const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
+
+  const hasView = [ draft.center_latitude, draft.center_longitude, draft.zoom ]
+    .every((part) => part !== "" && part !== null && part !== undefined)
 
   const submit = (event) => {
     event.preventDefault()
-    router.patch(`/topics/${topic.id}`, { title, description }, { onSuccess: onDone })
+    onSubmit()
   }
 
   return (
@@ -26,8 +31,8 @@ export default function TopicSettingsForm({ topic, onDone, onCancel }) {
           required
           autoFocus
           className="form__input"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={draft.title}
+          onChange={set("title")}
         />
       </div>
 
@@ -37,9 +42,24 @@ export default function TopicSettingsForm({ topic, onDone, onCancel }) {
           id="topic-description"
           rows={4}
           className="form__input"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={draft.description}
+          onChange={set("description")}
         />
+      </div>
+
+      <div className="form__field">
+        <span className="form__label">Opening view</span>
+
+        <p className="form__note">
+          {hasView
+            ? `Centred on ${draft.center_latitude}, ${draft.center_longitude} at zoom ${draft.zoom}.`
+            : "Opens on the whole region until you set one."}
+        </p>
+
+        <button type="button" className="button button--wide" onClick={onSetView}>
+          <Crosshair className="button__glyph" aria-hidden="true" />
+          Set map location and zoom
+        </button>
       </div>
 
       <div className="form__actions">

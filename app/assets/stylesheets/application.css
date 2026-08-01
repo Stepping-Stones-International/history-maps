@@ -805,6 +805,53 @@ textarea.form__input {
   left: calc(var(--drawer-width) + 1rem);
 }
 
+/* Top centre of the map while an opening view is being chosen. */
+.view-capture {
+  position: fixed;
+  top: 1rem;
+  left: var(--rail-width);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  pointer-events: none;
+  transition: left var(--drawer-transition);
+}
+
+.view-capture--inset {
+  left: var(--drawer-width);
+}
+
+.view-capture > * {
+  pointer-events: auto;
+}
+
+.view-capture__hint {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.button--wide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.form__note {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 /* Sits left of New Node, matching its height. */
 .map-actions__settings {
   width: 38px;

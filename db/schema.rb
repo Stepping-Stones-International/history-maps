@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_072112) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_203046) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
@@ -38,10 +38,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_072112) do
 
   create_table "topics", id: :string, force: :cascade do |t|
     t.string "author_id", null: false
+    t.float "center_latitude"
+    t.float "center_longitude"
     t.datetime "created_at", null: false
     t.text "description"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.float "zoom"
     t.index ["author_id"], name: "index_topics_on_author_id"
   end
 

@@ -117,7 +117,8 @@ function paintMarker(element, active) {
 }
 
 export default function HomeMap({
-  nodes = [], placing = false, highlightedId = null, onMapClick, onNodeSelect
+  nodes = [], placing = false, highlightedId = null, defaultView = null,
+  viewReader = null, onMapClick, onNodeSelect
 }) {
   const container = useRef(null)
   const map = useRef(null)
@@ -137,15 +138,31 @@ export default function HomeMap({
   useEffect(() => {
     if (map.current) return
 
+    // A saved view wins; otherwise open on the region this was built around.
+    const opening = defaultView
+      ? { center: [ defaultView.longitude, defaultView.latitude ], zoom: defaultView.zoom }
+      : { bounds: REGION_BOUNDS, fitBoundsOptions: { padding: 20 } }
+
     map.current = new MapLibreMap({
       container: container.current,
       style: TOPO_STYLE,
-      bounds: REGION_BOUNDS,
-      fitBoundsOptions: { padding: 20 },
       minZoom: 3,
       maxZoom: 12,
-      attributionControl: { compact: true }
+      attributionControl: { compact: true },
+      ...opening
     })
+
+    // Lets the page read the current view when asked to remember it.
+    if (viewReader) {
+      viewReader.current = () => {
+        const center = map.current.getCenter()
+        return {
+          latitude: Number(center.lat.toFixed(6)),
+          longitude: Number(center.lng.toFixed(6)),
+          zoom: Number(map.current.getZoom().toFixed(2))
+        }
+      }
+    }
 
     map.current.addControl(new NavigationControl({ showCompass: false }), "top-right")
 

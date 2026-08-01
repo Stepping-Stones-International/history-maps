@@ -19,7 +19,12 @@ class TopicsController < ApplicationController
     topic = Current.user.topics.find(params[:id])
 
     render inertia: "Topics/Edit", props: {
-      topic: { id: topic.id, title: topic.title, description: topic.description },
+      topic: {
+        id: topic.id,
+        title: topic.title,
+        description: topic.description,
+        default_view: topic.default_view
+      },
       nodes: topic.nodes.sort_by(&:chronological_key).map { |node| node_props(node) },
       # Sent from the model so the form cannot drift from the validation.
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
@@ -53,7 +58,7 @@ class TopicsController < ApplicationController
   private
     # Inertia forms post a flat payload.
     def topic_params
-      params.permit(:title, :description)
+      params.permit(:title, :description, :center_latitude, :center_longitude, :zoom)
     end
 
     # The date is split back into the three fields the form edits, so a node

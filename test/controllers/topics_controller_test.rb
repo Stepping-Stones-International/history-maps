@@ -47,6 +47,47 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_includes inertia.props[:errors].values.flatten.join(" "), "blank"
   end
 
+  test "update stores an opening view" do
+    sign_in_as users(:one)
+
+    patch topic_path(@topic), params: {
+      title: @topic.title, center_latitude: "31.2001", center_longitude: "29.9187", zoom: "6.5"
+    }
+
+    @topic.reload
+    assert_in_delta 31.2001, @topic.center_latitude, 0.0001
+    assert_in_delta 29.9187, @topic.center_longitude, 0.0001
+    assert_in_delta 6.5, @topic.zoom, 0.01
+  end
+
+  test "the map is sent the opening view" do
+    sign_in_as users(:one)
+    @topic.update!(center_latitude: 31.2, center_longitude: 29.9, zoom: 6.5)
+
+    get edit_topic_path(@topic)
+
+    assert_in_delta 31.2, inertia.props[:topic][:default_view][:latitude], 0.001
+    assert_in_delta 6.5, inertia.props[:topic][:default_view][:zoom], 0.01
+  end
+
+  test "the map is sent no view when none is set" do
+    sign_in_as users(:one)
+
+    get edit_topic_path(@topic)
+    assert_nil inertia.props[:topic][:default_view]
+  end
+
+  test "update rejects half an opening view" do
+    sign_in_as users(:one)
+
+    patch topic_path(@topic), params: { title: @topic.title, center_latitude: "31.2" }
+
+    assert_nil @topic.reload.center_latitude
+    assert_redirected_to edit_topic_path(@topic)
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "centre and a zoom"
+  end
+
   test "update requires authentication" do
     patch topic_path(@topic), params: { title: "Renamed" }
 
