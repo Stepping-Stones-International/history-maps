@@ -110,7 +110,11 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
 
       {/* Hidden, not unmounted, while picking: the draft stays put. */}
       {editor && !picking && (
-        <Modal title={editor.mode === "edit" ? "Edit node" : "New node"} onClose={close}>
+        <Modal
+          title={editor.mode === "edit" ? "Edit node" : "New node"}
+          className={`modal--map ${drawerOpen ? "modal--map-inset" : ""}`}
+          onClose={close}
+        >
           <NodeForm
             draft={draft}
             dateTypes={dateTypes}

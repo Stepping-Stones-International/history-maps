@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react"
 import { X } from "lucide-react"
 
-export default function Modal({ title, onClose, children }) {
+export default function Modal({ title, className = "", onClose, children }) {
   const panel = useRef(null)
   // Held in a ref so a new onClose identity does not re-run the effects below.
   const close = useRef(onClose)
@@ -23,7 +23,10 @@ export default function Modal({ title, onClose, children }) {
   }, [])
 
   return (
-    <div className="modal" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className={`modal ${className}`.trim()}
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div
         className="modal__panel"
         role="dialog"

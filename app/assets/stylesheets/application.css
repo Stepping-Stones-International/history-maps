@@ -194,6 +194,18 @@ body {
   background: rgba(4, 8, 12, 0.66);
 }
 
+/* On the map, centre the panel over the map area rather than the viewport.
+   Padding rather than `left`, so the backdrop still covers the whole screen
+   and keeps the drawer behind it inert. */
+.modal--map {
+  padding-left: calc(var(--rail-width) + 1rem);
+  transition: padding-left var(--drawer-transition);
+}
+
+.modal--map-inset {
+  padding-left: calc(var(--drawer-width) + 1rem);
+}
+
 .modal__panel {
   width: 100%;
   max-width: 460px;
