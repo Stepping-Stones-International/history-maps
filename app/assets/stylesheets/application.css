@@ -1186,6 +1186,32 @@ textarea.form__input {
   border-radius: 1px;
 }
 
+/* A span: a bar from its start to its end, capped at both ends. */
+.timeline__span {
+  position: absolute;
+  bottom: 14px;
+}
+
+.timeline__span-bar {
+  display: block;
+  height: 10px;
+  background: rgba(143, 184, 232, 0.35);
+  border-left: 2px solid #8fb8e8;
+  border-right: 2px solid #8fb8e8;
+  border-radius: 2px;
+}
+
+.timeline__span-label {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text);
+}
+
 .timeline__epoch-label {
   position: absolute;
   bottom: 18px;

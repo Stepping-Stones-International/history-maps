@@ -34,11 +34,23 @@ export default function TimelineBar({ nodes = [], drawerOpen, onStepBack, onStep
             />
           ))}
 
-          {scale?.epochs.map(({ node, left }) => (
-            <span key={node.id} className="timeline__epoch" style={{ left: `${left}%` }}>
-              <span className="timeline__epoch-label">{node.date_display}</span>
-              <span className="timeline__epoch-line" />
-            </span>
+          {scale?.epochs.map(({ node, left, right }) => (
+            right === null ? (
+              <span key={node.id} className="timeline__epoch" style={{ left: `${left}%` }}>
+                <span className="timeline__epoch-label">{node.date_display}</span>
+                <span className="timeline__epoch-line" />
+              </span>
+            ) : (
+              // A span: a bar between its two ends, each end marked.
+              <span
+                key={node.id}
+                className="timeline__span"
+                style={{ left: `${left}%`, width: `${Math.max(right - left, 0.4)}%` }}
+              >
+                <span className="timeline__span-label">{node.date_display}</span>
+                <span className="timeline__span-bar" />
+              </span>
+            )
           ))}
         </div>
 
