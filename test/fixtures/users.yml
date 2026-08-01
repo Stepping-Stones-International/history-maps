@@ -1,9 +1,13 @@
 <% password_digest = BCrypt::Password.create("password") %>
 
+# Ids are set explicitly: fixtures derive integer ids for string primary keys,
+# which would not match the UUIDs the app generates at runtime.
 one:
+  id: 3f6b1e5a-0c41-4a2f-9f7d-1b2c3d4e5f60
   email_address: one@example.com
   password_digest: <%= password_digest %>
 
 two:
+  id: 7c2d9b84-5e13-4c6a-8d0e-2f4a6b8c0d1e
   email_address: two@example.com
   password_digest: <%= password_digest %>

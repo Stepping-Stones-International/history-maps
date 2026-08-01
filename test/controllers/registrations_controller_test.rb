@@ -17,7 +17,8 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to root_url
-    assert_equal "fresh@example.com", User.last.email_address
+    # Not User.last: UUID primary keys give no chronological ordering.
+    assert User.exists?(email_address: "fresh@example.com")
 
     # Following the redirect proves the session cookie was set.
     follow_redirect!

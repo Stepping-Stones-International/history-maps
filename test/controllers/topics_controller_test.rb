@@ -94,7 +94,7 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to topics_path
-    assert_equal users(:one), Topic.order(:created_at).last.author
+    assert_equal users(:one), Topic.find_by!(title: "New Topic").author
   end
 
   test "create rejects a topic without a title" do
