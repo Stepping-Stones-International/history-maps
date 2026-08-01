@@ -3,17 +3,24 @@ import { X } from "lucide-react"
 
 export default function Modal({ title, onClose, children }) {
   const panel = useRef(null)
+  // Held in a ref so a new onClose identity does not re-run the effects below.
+  const close = useRef(onClose)
+  close.current = onClose
+
+  // Mount only. Re-running this would pull focus out of whatever the user is
+  // typing in every time the parent re-renders.
+  useEffect(() => {
+    panel.current?.focus()
+  }, [])
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.key === "Escape") onClose()
+      if (event.key === "Escape") close.current()
     }
 
     document.addEventListener("keydown", onKeyDown)
-    panel.current?.focus()
-
     return () => document.removeEventListener("keydown", onKeyDown)
-  }, [onClose])
+  }, [])
 
   return (
     <div className="modal" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
