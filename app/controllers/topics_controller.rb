@@ -34,7 +34,8 @@ class TopicsController < ApplicationController
       redirect_to edit_topic_path(topic), notice: "Topic added."
     else
       # Back to the list, where the modal stays open and shows the errors.
-      redirect_to topics_path, inertia: { errors: topic.errors }
+      redirect_to topics_path,
+        alert: "That topic could not be saved.", inertia: { errors: topic.errors }
     end
   end
 

@@ -7,7 +7,8 @@ class NodesController < ApplicationController
     if node.save
       redirect_to edit_topic_path(@topic), notice: "Node added."
     else
-      redirect_to edit_topic_path(@topic), inertia: { errors: node.errors }
+      redirect_to edit_topic_path(@topic),
+        alert: "That node could not be saved.", inertia: { errors: node.errors }
     end
   end
 
@@ -17,7 +18,8 @@ class NodesController < ApplicationController
     if node.update(node_params)
       redirect_to edit_topic_path(@topic), notice: "Node updated."
     else
-      redirect_to edit_topic_path(@topic), inertia: { errors: node.errors }
+      redirect_to edit_topic_path(@topic),
+        alert: "That node could not be saved.", inertia: { errors: node.errors }
     end
   end
 

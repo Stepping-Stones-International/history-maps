@@ -1,6 +1,7 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
 import { createInertiaApp } from "@inertiajs/react"
+import Toasts from "../components/Toasts"
 
 import TopicsIndex from "../pages/Topics/Index"
 import TopicsEdit from "../pages/Topics/Edit"
@@ -27,7 +28,18 @@ createInertiaApp({
     return page
   },
   setup({ el, App, props }) {
-    createRoot(el).render(<App {...props} />)
+    // Rendered through App's children so Toasts sits inside the page context
+    // and appears on every page, including the layout-less map.
+    createRoot(el).render(
+      <App {...props}>
+        {({ Component, props: pageProps, key }) => (
+          <>
+            <Component key={key} {...pageProps} />
+            <Toasts />
+          </>
+        )}
+      </App>
+    )
   }
 }).catch((error) => {
   // A failed boot leaves a blank page, so make the cause visible.

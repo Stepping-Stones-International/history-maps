@@ -188,6 +188,33 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "AD", "BC" ], inertia.props[:eras]
   end
 
+  test "create reports success for the toast" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params
+    follow_redirect!
+
+    assert_equal "Node added.", inertia.props[:flash][:notice]
+  end
+
+  test "create reports failure for the toast" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(title: "")
+    follow_redirect!
+
+    assert_equal "That node could not be saved.", inertia.props[:flash][:alert]
+  end
+
+  test "update reports success for the toast" do
+    sign_in_as users(:one)
+
+    patch topic_node_path(@topic, nodes(:one)), params: node_params(title: "Renamed")
+    follow_redirect!
+
+    assert_equal "Node updated.", inertia.props[:flash][:notice]
+  end
+
   test "update requires authentication" do
     patch topic_node_path(@topic, nodes(:one)), params: node_params(title: "Renamed")
 
