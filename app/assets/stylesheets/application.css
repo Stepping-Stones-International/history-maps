@@ -39,7 +39,8 @@ body {
   height: 100%;
 }
 
-/* Collapsible left drawer: a permanent icon rail plus a sliding panel. */
+/* Collapsible left drawer. Collapsed shows the icon rail; open shows the
+   panel instead — the two never appear at once. */
 .drawer {
   --drawer-width: 320px;
   --rail-width: 56px;
@@ -49,17 +50,16 @@ body {
   left: 0;
   z-index: 10;
   height: 100%;
-  display: flex;
-  align-items: stretch;
   pointer-events: none;
 }
 
-/* The rail never moves, so the hamburger stays reachable when collapsed. */
 .drawer__rail {
-  position: relative;
-  z-index: 2;
-  flex: 0 0 var(--rail-width);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
   width: var(--rail-width);
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,6 +69,13 @@ body {
   border-right: 1px solid var(--border);
   box-shadow: var(--shadow);
   pointer-events: auto;
+  transition: transform 0.25s ease, visibility 0.25s;
+}
+
+.drawer--open .drawer__rail {
+  transform: translateX(calc(-1 * var(--rail-width) - 2px));
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .drawer__rail-button {
@@ -91,13 +98,11 @@ body {
   color: var(--text);
 }
 
-.drawer__rail-button[aria-expanded="true"] {
-  background: var(--surface-raised);
-  border-color: var(--border);
-  color: var(--text);
-}
-
 .drawer__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
   width: var(--drawer-width);
   height: 100%;
   display: flex;
@@ -106,21 +111,44 @@ body {
   border-right: 1px solid var(--border);
   box-shadow: var(--shadow);
   pointer-events: auto;
-  transition: transform 0.25s ease;
-}
-
-/* Slide the panel left, behind the opaque rail. */
-.drawer--closed .drawer__panel {
-  transform: translateX(calc(-1 * (var(--drawer-width) + var(--rail-width))));
+  transition: transform 0.25s ease, visibility 0.25s;
 }
 
 .drawer--closed .drawer__panel {
+  transform: translateX(calc(-1 * var(--drawer-width) - 2px));
+  visibility: hidden;
   pointer-events: none;
 }
 
 .drawer__header {
-  padding: 1.25rem 1.25rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 0.85rem 1rem 1.25rem;
   border-bottom: 1px solid var(--border);
+}
+
+.drawer__collapse {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.drawer__collapse:hover {
+  background: var(--surface-hover);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .drawer__title {
