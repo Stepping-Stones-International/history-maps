@@ -1,5 +1,6 @@
-import React from "react"
-import { Pencil } from "lucide-react"
+import React, { useState } from "react"
+import { ChevronRight, Pencil } from "lucide-react"
+import { expandedIds, remember } from "../lib/expandedNodes"
 
 // The server sends the nodes flat, already ordered; this nests them.
 function nest(nodes) {
@@ -13,8 +14,10 @@ function nest(nodes) {
   return { roots: children.get(null) || [], childrenOf: (id) => children.get(id) || [] }
 }
 
-function Row({ node, childrenOf, highlightedId, onHighlight, onEdit, depth }) {
+function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight, onEdit, depth }) {
   const embedded = childrenOf(node.id)
+  const hasEmbedded = embedded.length > 0
+  const isOpen = expanded.has(node.id)
 
   return (
     <li className="node-list__branch">
@@ -22,6 +25,20 @@ function Row({ node, childrenOf, highlightedId, onHighlight, onEdit, depth }) {
         className={`node-list__item ${node.id === highlightedId ? "node-list__item--active" : ""}`}
         style={{ marginLeft: `${depth * 0.85}rem` }}
       >
+        {hasEmbedded ? (
+          <button
+            type="button"
+            className={`node-list__toggle ${isOpen ? "node-list__toggle--open" : ""}`}
+            onClick={() => onToggle(node.id)}
+            aria-expanded={isOpen}
+            aria-label={`${isOpen ? "Collapse" : "Expand"} ${node.title}`}
+          >
+            <ChevronRight className="node-list__caret" />
+          </button>
+        ) : (
+          <span className="node-list__toggle-space" aria-hidden="true" />
+        )}
+
         <button
           type="button"
           className="node-list__select"
@@ -45,13 +62,15 @@ function Row({ node, childrenOf, highlightedId, onHighlight, onEdit, depth }) {
         </button>
       </div>
 
-      {embedded.length > 0 && (
+      {hasEmbedded && isOpen && (
         <ol className="node-list__embedded">
           {embedded.map((child) => (
             <Row
               key={child.id}
               node={child}
               childrenOf={childrenOf}
+              expanded={expanded}
+              onToggle={onToggle}
               highlightedId={highlightedId}
               onHighlight={onHighlight}
               onEdit={onEdit}
@@ -65,6 +84,22 @@ function Row({ node, childrenOf, highlightedId, onHighlight, onEdit, depth }) {
 }
 
 export default function NodeList({ nodes, highlightedId, onHighlight, onEdit }) {
+  // Closed unless this browser remembers it being opened.
+  const [expanded, setExpanded] = useState(expandedIds)
+
+  const toggle = (id) => {
+    setExpanded((current) => {
+      const next = new Set(current)
+      const opening = !next.has(id)
+
+      if (opening) next.add(id)
+      else next.delete(id)
+
+      remember(id, opening)
+      return next
+    })
+  }
+
   if (nodes.length === 0) {
     return <p className="node-list__empty">No nodes yet.</p>
   }
@@ -78,6 +113,8 @@ export default function NodeList({ nodes, highlightedId, onHighlight, onEdit }) 
           key={node.id}
           node={node}
           childrenOf={childrenOf}
+          expanded={expanded}
+          onToggle={toggle}
           highlightedId={highlightedId}
           onHighlight={onHighlight}
           onEdit={onEdit}

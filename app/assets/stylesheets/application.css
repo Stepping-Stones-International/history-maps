@@ -754,6 +754,41 @@ textarea.form__input {
   flex: 0 0 5.5rem;
 }
 
+/* Disclosure caret, shown only when a node embeds others. */
+.node-list__toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 26px;
+  padding: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.node-list__toggle:hover {
+  color: var(--text);
+}
+
+.node-list__caret {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.15s ease;
+}
+
+.node-list__toggle--open .node-list__caret {
+  transform: rotate(90deg);
+}
+
+/* Keeps titles lined up when a node has nothing embedded. */
+.node-list__toggle-space {
+  flex: 0 0 auto;
+  width: 18px;
+}
+
 .node-list__select {
   flex: 1;
   min-width: 0;
