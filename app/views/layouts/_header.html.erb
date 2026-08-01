@@ -1,0 +1,13 @@
+<header class="site-header">
+  <%= link_to "BibleMind", root_path, class: "site-header__brand" %>
+
+  <nav class="site-header__nav">
+    <% if authenticated? %>
+      <span class="site-header__user"><%= Current.user.email_address %></span>
+      <%= button_to "Log out", session_path, method: :delete, class: "button button--quiet" %>
+    <% else %>
+      <%= link_to "Log in", new_session_path, class: "site-header__link" %>
+      <%= link_to "Sign up", new_registration_path, class: "button" %>
+    <% end %>
+  </nav>
+</header>

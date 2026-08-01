@@ -39,6 +39,69 @@ body {
   height: 100%;
 }
 
+/* Site header: shown on every page except the full-bleed map. */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__brand {
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-header__brand:hover {
+  color: #fff;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.site-header__link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.site-header__link:hover {
+  color: var(--text);
+}
+
+.site-header__user {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.button--quiet {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.button--quiet:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* button_to renders a form; keep it inline with the other nav items. */
+.site-header__nav form {
+  margin: 0;
+}
+
+.flash__list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
 /* Standard content pages (the map homepage manages its own layout). */
 .page {
   max-width: 720px;
@@ -123,6 +186,8 @@ body {
 }
 
 .button {
+  display: inline-block;
+  text-decoration: none;
   padding: 0.6rem 1.1rem;
   font: inherit;
   font-weight: 550;

@@ -60,4 +60,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # Enforces the 90% line coverage benchmark; the suite fails below it.
+  gem "simplecov", require: false
 end

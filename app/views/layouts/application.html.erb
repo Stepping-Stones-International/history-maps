@@ -28,6 +28,8 @@
   </head>
 
   <body>
+    <%# The map is full-bleed and has its own drawer, so it opts out via content_for. %>
+    <%= render "layouts/header" unless content_for?(:hide_header) %>
     <%= yield %>
   </body>
 </html>
