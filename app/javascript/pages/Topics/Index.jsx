@@ -26,7 +26,11 @@ export default function Index({ topics }) {
           <ul className="topic-list">
             {topics.map((topic) => (
               <li key={topic.id} className="topic">
-                <h2 className="topic__title">{topic.title}</h2>
+                <h2 className="topic__title">
+                  <Link href={`/topics/${topic.id}/edit`} className="topic__link">
+                    {topic.title}
+                  </Link>
+                </h2>
                 <p className="topic__description">{topic.description}</p>
                 <p className="topic__author">by {topic.author_email}</p>
               </li>

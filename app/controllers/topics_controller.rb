@@ -18,6 +18,15 @@ class TopicsController < ApplicationController
     render inertia: "Topics/New"
   end
 
+  # The map view for a topic. Scoped to the signed-in user's own topics.
+  def edit
+    topic = Current.user.topics.find(params[:id])
+
+    render inertia: "Topics/Edit", props: {
+      topic: { id: topic.id, title: topic.title, description: topic.description }
+    }
+  end
+
   def create
     topic = Current.user.topics.new(topic_params)
 

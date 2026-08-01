@@ -270,6 +270,30 @@ body {
   font-weight: 600;
 }
 
+.topic__link {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.topic__link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.drawer__topic-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.drawer__topic-description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .topic__description {
   margin: 0;
   color: var(--text-muted);

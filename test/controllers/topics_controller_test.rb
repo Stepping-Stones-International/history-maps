@@ -9,6 +9,33 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_inertia_component "Topics/Index"
   end
 
+  test "the root path is the topics list" do
+    get root_path
+    assert_response :success
+    assert_inertia_component "Topics/Index"
+  end
+
+  test "edit renders the map for the topic" do
+    sign_in_as users(:one)
+
+    get edit_topic_path(@topic)
+    assert_response :success
+    assert_inertia_component "Topics/Edit"
+    assert_equal @topic.title, inertia.props[:topic][:title]
+  end
+
+  test "edit requires authentication" do
+    get edit_topic_path(@topic)
+    assert_redirected_to new_session_path
+  end
+
+  test "edit does not expose another user's topic" do
+    sign_in_as users(:two)
+
+    get edit_topic_path(topics(:one))
+    assert_response :not_found
+  end
+
   test "index lists topics with their author" do
     get topics_path
 
