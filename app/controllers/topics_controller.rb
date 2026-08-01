@@ -26,6 +26,7 @@ class TopicsController < ApplicationController
           title: node.title,
           description: node.description,
           date_type: node.date_type,
+          occurred_on: node.occurred_on_formatted,
           latitude: node.latitude,
           longitude: node.longitude
         }

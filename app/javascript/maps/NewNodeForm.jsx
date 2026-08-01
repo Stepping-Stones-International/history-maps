@@ -6,6 +6,12 @@ import { Crosshair } from "lucide-react"
 export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, onCancel, onSubmit }) {
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
+  // Clear the date when it stops applying, so a hidden field is not submitted.
+  const setDateType = (event) => {
+    const date_type = event.target.value
+    onChange({ ...draft, date_type, occurred_on: date_type === "exact" ? draft.occurred_on : "" })
+  }
+
   const submit = (event) => {
     event.preventDefault()
     onSubmit()
@@ -19,13 +25,30 @@ export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, o
           id="node-date-type"
           className="form__input form__select"
           value={draft.date_type}
-          onChange={set("date_type")}
+          onChange={setDateType}
         >
           {dateTypes.map(({ value, label }) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
       </div>
+
+      {draft.date_type === "exact" && (
+        <div className="form__field">
+          <label htmlFor="node-occurred-on" className="form__label">Date</label>
+          <input
+            id="node-occurred-on"
+            type="text"
+            inputMode="numeric"
+            placeholder="MM-DD-YYYY"
+            pattern="\d{2}-\d{2}-\d{4}"
+            title="Use MM-DD-YYYY"
+            className="form__input"
+            value={draft.occurred_on}
+            onChange={set("occurred_on")}
+          />
+        </div>
+      )}
 
       <div className="form__field">
         <label htmlFor="node-title" className="form__label">Title</label>

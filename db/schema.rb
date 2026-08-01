@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_055808) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_060410) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
     t.text "description"
     t.float "latitude", null: false
     t.float "longitude", null: false
+    t.date "occurred_on"
     t.string "title", null: false
     t.string "topic_id", null: false
     t.datetime "updated_at", null: false

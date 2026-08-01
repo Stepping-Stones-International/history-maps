@@ -75,6 +75,36 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_topic_path(@topic)
   end
 
+  test "create stores an exact date sent as MM-DD-YYYY" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(date_type: "exact", occurred_on: "12-25-0336")
+
+    assert_equal Date.new(336, 12, 25), Node.find_by!(title: "Ephesus").occurred_on
+  end
+
+  test "create rejects a misformatted date" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(occurred_on: "25-12-1990")
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "MM-DD-YYYY"
+  end
+
+  test "the map sends dates back formatted MM-DD-YYYY" do
+    sign_in_as users(:one)
+    nodes(:one).update!(occurred_on: Date.new(1054, 7, 16))
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
+
+    assert_equal "07-16-1054", listed[:occurred_on]
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

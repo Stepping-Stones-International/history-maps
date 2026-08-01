@@ -51,6 +51,50 @@ class NodeTest < ActiveSupport::TestCase
     assert_predicate node.errors[:date_type], :any?
   end
 
+  test "parses an MM-DD-YYYY date from the form" do
+    node = Node.create!(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "07-04-1776"
+    )
+
+    assert_equal Date.new(1776, 7, 4), node.occurred_on
+    assert_equal "07-04-1776", node.occurred_on_formatted
+  end
+
+  test "reads the date as month first, not day first" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "03-04-1500")
+
+    assert_equal 3, node.occurred_on.month
+    assert_equal 4, node.occurred_on.day
+  end
+
+  test "rejects a date that is not MM-DD-YYYY" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "1776-07-04")
+
+    assert_not node.valid?
+    assert_includes node.errors[:occurred_on], "must be formatted MM-DD-YYYY"
+  end
+
+  test "rejects a date that does not exist" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "02-31-1900")
+
+    assert_not node.valid?
+    assert_predicate node.errors[:occurred_on], :any?
+  end
+
+  test "accepts a blank date" do
+    node = Node.new(topic: @topic, title: "Undated", latitude: 0, longitude: 0, occurred_on: "")
+
+    assert node.valid?
+    assert_nil node.occurred_on
+  end
+
+  test "still accepts a Date object" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: Date.new(1500, 1, 2))
+
+    assert node.valid?
+    assert_equal Date.new(1500, 1, 2), node.occurred_on
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy

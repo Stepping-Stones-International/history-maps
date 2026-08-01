@@ -7,7 +7,14 @@ import TimelineBar from "../../maps/TimelineBar"
 import NewNodeForm from "../../maps/NewNodeForm"
 import Modal from "../../components/Modal"
 
-const EMPTY_DRAFT = { date_type: "exact", title: "", description: "", latitude: "", longitude: "" }
+const EMPTY_DRAFT = {
+  date_type: "exact",
+  occurred_on: "",
+  title: "",
+  description: "",
+  latitude: "",
+  longitude: ""
+}
 
 // Full-bleed map with its own drawer, so it renders without Layout.
 export default function Edit({ topic, nodes, dateTypes }) {
