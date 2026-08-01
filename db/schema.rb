@@ -10,12 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_220532) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_232048) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.json "area"
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
     t.text "description"
+    t.integer "ends_day"
+    t.string "ends_era", default: "AD", null: false
+    t.integer "ends_month"
+    t.string "ends_type", default: "exact", null: false
+    t.integer "ends_year"
     t.string "era", default: "AD", null: false
     t.float "latitude"
     t.boolean "layer", default: false, null: false
@@ -25,6 +30,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_220532) do
     t.integer "occurred_year"
     t.string "parent_id"
     t.integer "position", default: 0, null: false
+    t.integer "starts_day"
+    t.string "starts_era", default: "AD", null: false
+    t.integer "starts_month"
+    t.string "starts_type", default: "exact", null: false
+    t.integer "starts_year"
     t.string "title", null: false
     t.string "topic_id", null: false
     t.datetime "updated_at", null: false

@@ -15,6 +15,16 @@ class Node < ApplicationRecord
 
   ERAS = %w[AD BC].freeze
 
+  # How each end of a span is known. Exact wants a whole date; the other two
+  # settle for a year.
+  RANGE_TYPES = {
+    "exact" => "Exact",
+    "approximate" => "Approximate",
+    "disputed" => "Disputed"
+  }.freeze
+
+  RANGE_EDGES = %w[starts ends].freeze
+
   MIN_YEAR = 1
   MAX_YEAR = 4000
 
@@ -55,6 +65,9 @@ class Node < ApplicationRecord
   validate :parent_belongs_to_same_topic
   validate :parent_is_not_itself_or_below
   validate :area_is_a_ring
+  validate :range_ends_are_given
+  validate :range_ends_exist
+  validate :range_runs_forwards
 
   def dated?
     occurred_year.present?
@@ -116,18 +129,81 @@ class Node < ApplicationRecord
   end
 
   # "March 5, 325 AD", "c. March 325 AD", "c. 325 AD" — month and day are
-  # dropped when unknown, and approximate dates are marked with c.
+  # dropped when unknown, approximate dates are marked with c. and disputed
+  # ones with a trailing question mark. A span reads as its two ends.
   def date_display
+    return range_display if date_type == "range"
     return unless dated?
 
-    day_and_year = [ occurred_day, occurred_year ].compact.join(", ")
-    written = [ month_name, day_and_year ].compact.join(" ")
-    prefix = date_type == "approximate" ? "c. " : ""
+    written_date(occurred_year, occurred_month, occurred_day, era, date_type)
+  end
 
-    "#{prefix}#{written} #{era}"
+  def range_display
+    return unless starts_year.present? && ends_year.present?
+
+    first = written_date(starts_year, starts_month, starts_day, starts_era, starts_type)
+    last = written_date(ends_year, ends_month, ends_day, ends_era, ends_type)
+
+    "#{first} – #{last}"
   end
 
   private
+    def written_date(year, month, day, era_name, kind)
+      day_and_year = [ day, year ].compact.join(", ")
+      written = [ month && Date::MONTHNAMES[month], day_and_year ].compact.join(" ")
+
+      case kind
+      when "approximate" then "c. #{written} #{era_name}"
+      when "disputed" then "#{written} #{era_name}?"
+      else "#{written} #{era_name}"
+      end
+    end
+
+    def range?
+      date_type == "range"
+    end
+
+    def range_ends_are_given
+      return unless range?
+
+      RANGE_EDGES.each do |edge|
+        year = public_send(:"#{edge}_year")
+        errors.add(:"#{edge}_year", "can't be blank") if year.blank?
+
+        next unless public_send(:"#{edge}_type") == "exact"
+
+        errors.add(:"#{edge}_month", "can't be blank") if public_send(:"#{edge}_month").blank?
+        errors.add(:"#{edge}_day", "can't be blank") if public_send(:"#{edge}_day").blank?
+      end
+    end
+
+    def range_ends_exist
+      return unless range?
+
+      RANGE_EDGES.each do |edge|
+        parts = [ :year, :month, :day ].map { |part| public_send(:"#{edge}_#{part}") }
+        next if parts.any?(&:blank?)
+        next if Date.valid_date?(*parts)
+
+        errors.add(:base, "The #{edge == "starts" ? "start" : "end"} date does not exist")
+      end
+    end
+
+    def range_runs_forwards
+      return unless range?
+      return if starts_year.blank? || ends_year.blank?
+      return if (range_key("starts") <=> range_key("ends")) <= 0
+
+      errors.add(:ends_year, "must not be before the start")
+    end
+
+    def range_key(edge)
+      year = public_send(:"#{edge}_year")
+      signed = public_send(:"#{edge}_era") == "BC" ? -year : year
+
+      [ signed, public_send(:"#{edge}_month") || 0, public_send(:"#{edge}_day") || 0 ]
+    end
+
     def super_area(value)
       self[:area] = value
     end

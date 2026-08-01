@@ -15,6 +15,8 @@ const EMPTY_DRAFT = {
   parent_id: "",
   position: "",
   date_type: "exact",
+  starts_type: "exact", starts_month: "", starts_day: "", starts_year: "", starts_era: "AD",
+  ends_type: "exact", ends_month: "", ends_day: "", ends_year: "", ends_era: "AD",
   occurred_month: "",
   occurred_day: "",
   occurred_year: "",
@@ -32,6 +34,16 @@ const draftFrom = (node) => ({
   parent_id: node.parent_id || "",
   position: node.position ?? "",
   date_type: node.date_type,
+  starts_type: node.starts_type || "exact",
+  starts_month: node.starts_month || "",
+  starts_day: node.starts_day || "",
+  starts_year: node.starts_year || "",
+  starts_era: node.starts_era || "AD",
+  ends_type: node.ends_type || "exact",
+  ends_month: node.ends_month || "",
+  ends_day: node.ends_day || "",
+  ends_year: node.ends_year || "",
+  ends_era: node.ends_era || "AD",
   occurred_month: node.occurred_month,
   occurred_day: node.occurred_day,
   occurred_year: node.occurred_year,
@@ -43,7 +55,7 @@ const draftFrom = (node) => ({
 })
 
 // Full-bleed map with its own drawer, so it renders without Layout.
-export default function Edit({ topic, nodes, dateTypes, eras }) {
+export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   // null when closed, otherwise { mode: "new" } or { mode: "edit", id }.
@@ -243,6 +255,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
           <NodeForm
             draft={draft}
             dateTypes={dateTypes}
+            rangeTypes={rangeTypes}
             eras={eras}
             parentOptions={parentChoices}
             onChange={setDraft}

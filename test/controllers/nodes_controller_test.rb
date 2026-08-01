@@ -239,7 +239,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     patch topic_node_path(@topic, nodes(:one)), params: node_params(
-      date_type: "range", occurred_month: "", occurred_day: "", occurred_year: ""
+      date_type: "none", occurred_month: "", occurred_day: "", occurred_year: ""
     )
 
     assert_nil nodes(:one).reload.occurred_year
@@ -279,7 +279,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the map sends blank date fields for an undated node" do
     sign_in_as users(:one)
-    nodes(:one).update!(date_type: "range", occurred_year: nil, occurred_month: nil, occurred_day: nil)
+    nodes(:one).update!(date_type: "none", occurred_year: nil, occurred_month: nil, occurred_day: nil)
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
@@ -293,7 +293,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     @topic.nodes.destroy_all
     @topic.nodes.create!(title: "Later", date_type: "exact",
       occurred_year: 800, occurred_month: 1, occurred_day: 1, latitude: 0, longitude: 0)
-    @topic.nodes.create!(title: "Undated", date_type: "range", latitude: 0, longitude: 0)
+    @topic.nodes.create!(title: "Undated", date_type: "none", latitude: 0, longitude: 0)
     @topic.nodes.create!(title: "Earlier", date_type: "approximate",
       occurred_year: 44, era: "BC", latitude: 0, longitude: 0)
 
@@ -313,7 +313,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "update can change the order under a parent" do
     sign_in_as users(:one)
-    child = @topic.nodes.create!(title: "Child", date_type: "range",
+    child = @topic.nodes.create!(title: "Child", date_type: "none",
       latitude: 0, longitude: 0, parent: nodes(:one))
 
     patch topic_node_path(@topic, child), params: node_params(
@@ -325,7 +325,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the sidebar receives each node's parent and order" do
     sign_in_as users(:one)
-    child = @topic.nodes.create!(title: "Child", date_type: "range",
+    child = @topic.nodes.create!(title: "Child", date_type: "none",
       latitude: 0, longitude: 0, parent: nodes(:one))
 
     get edit_topic_path(@topic)
@@ -338,10 +338,10 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
   test "embedded nodes follow their parent in the order given" do
     sign_in_as users(:one)
     @topic.nodes.destroy_all
-    parent = @topic.nodes.create!(title: "Parent", date_type: "range", latitude: 0, longitude: 0)
-    @topic.nodes.create!(title: "Second", date_type: "range", latitude: 0, longitude: 0,
+    parent = @topic.nodes.create!(title: "Parent", date_type: "none", latitude: 0, longitude: 0)
+    @topic.nodes.create!(title: "Second", date_type: "none", latitude: 0, longitude: 0,
       parent: parent, position: 2)
-    @topic.nodes.create!(title: "First", date_type: "range", latitude: 0, longitude: 0,
+    @topic.nodes.create!(title: "First", date_type: "none", latitude: 0, longitude: 0,
       parent: parent, position: 1)
 
     get edit_topic_path(@topic)
@@ -352,7 +352,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "update detaches a node when the parent is cleared" do
     sign_in_as users(:one)
-    child = @topic.nodes.create!(title: "Child", date_type: "range",
+    child = @topic.nodes.create!(title: "Child", date_type: "none",
       latitude: 0, longitude: 0, parent: nodes(:one))
 
     patch topic_node_path(@topic, child), params: node_params(
@@ -385,7 +385,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the sidebar is told which nodes are layers" do
     sign_in_as users(:one)
-    layer = @topic.nodes.create!(title: "Sources", date_type: "range", layer: true)
+    layer = @topic.nodes.create!(title: "Sources", date_type: "none", layer: true)
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == layer.id }
@@ -423,7 +423,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the map is sent an area to draw and the text to edit" do
     sign_in_as users(:one)
-    layer = @topic.nodes.create!(title: "Judea", date_type: "range", layer: true,
+    layer = @topic.nodes.create!(title: "Judea", date_type: "none", layer: true,
       area_json: "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]")
 
     get edit_topic_path(@topic)
@@ -431,6 +431,44 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal [ [ 35.0, 31.5 ], [ 35.4, 31.5 ], [ 35.4, 31.9 ] ], listed[:area]
     assert_equal "[[35.0,31.5],[35.4,31.5],[35.4,31.9]]", listed[:area_json]
+  end
+
+  test "create stores both ends of a range" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      date_type: "range",
+      starts_type: "exact", starts_year: "325", starts_month: "5", starts_day: "20",
+      ends_type: "approximate", ends_year: "400", ends_month: "", ends_day: ""
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal [ 325, 5, 20 ], [ node.starts_year, node.starts_month, node.starts_day ]
+    assert_equal "approximate", node.ends_type
+    assert_equal "May 20, 325 AD – c. 400 AD", node.date_display
+  end
+
+  test "create rejects a range with no end" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(
+        date_type: "range",
+        starts_type: "approximate", starts_year: "325",
+        ends_type: "approximate", ends_year: ""
+      )
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "the map is sent the range type options" do
+    sign_in_as users(:one)
+
+    get edit_topic_path(@topic)
+
+    assert_equal Node::RANGE_TYPES.keys, inertia.props[:rangeTypes].map { |o| o[:value] }
+    assert_includes inertia.props[:rangeTypes].map { |o| o[:label] }, "Disputed"
   end
 
   test "the map is sent the date type options" do

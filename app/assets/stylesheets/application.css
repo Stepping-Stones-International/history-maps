@@ -303,6 +303,21 @@ body {
   border: 0;
 }
 
+/* The range section, set apart from the single fields around it. */
+.form__block {
+  margin: 0 0 1rem;
+  padding: 0.9rem 0.9rem 0.4rem;
+  background: rgba(27, 36, 46, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.form__block-part + .form__block-part {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
 .form__required {
   color: #f0a9ad;
 }

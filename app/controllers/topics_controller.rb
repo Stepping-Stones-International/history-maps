@@ -28,6 +28,7 @@ class TopicsController < ApplicationController
       nodes: ordered_nodes(topic).map { |node| node_props(node) },
       # Sent from the model so the form cannot drift from the validation.
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
+      rangeTypes: Node::RANGE_TYPES.map { |value, label| { value: value, label: label } },
       eras: Node::ERAS
     }
   end
@@ -89,6 +90,16 @@ class TopicsController < ApplicationController
         parent_id: node.parent_id,
         position: node.position,
         date_type: node.date_type,
+        starts_type: node.starts_type,
+        starts_month: node.starts_month.to_s,
+        starts_day: node.starts_day.to_s,
+        starts_year: node.starts_year.to_s,
+        starts_era: node.starts_era,
+        ends_type: node.ends_type,
+        ends_month: node.ends_month.to_s,
+        ends_day: node.ends_day.to_s,
+        ends_year: node.ends_year.to_s,
+        ends_era: node.ends_era,
         occurred_month: node.occurred_month.to_s,
         occurred_day: node.occurred_day.to_s,
         occurred_year: node.occurred_year.to_s,

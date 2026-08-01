@@ -1,15 +1,18 @@
 import React, { useState } from "react"
 import { Crosshair } from "lucide-react"
+import DateParts from "./DateParts"
 
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
 export default function NodeForm({
-  draft, dateTypes, eras, parentOptions = [], onChange, onPickOnMap, onCancel, onSubmit
+  draft, dateTypes, eras, rangeTypes = [], parentOptions = [],
+  onChange, onPickOnMap, onCancel, onSubmit
 }) {
   // Exact wants a whole date; approximate settles for a year. An embedded node
   // takes its moment from its parent, so nothing is required of it.
   const embedded = Boolean(draft.parent_id)
   const collectsDate = ["exact", "approximate"].includes(draft.date_type)
+  const isRange = draft.date_type === "range"
   const requiresFullDate = draft.date_type === "exact" && !embedded
   const requiresYear = collectsDate && !embedded
 
@@ -196,6 +199,62 @@ export default function NodeForm({
                 {eras.map((era) => <option key={era} value={era}>{era}</option>)}
               </select>
             </div>
+          </div>
+        </fieldset>
+      )}
+
+      {isRange && (
+        <fieldset className="form__fieldset form__block" aria-label="Date range">
+          <div className="form__block-part">
+            <div className="form__field">
+              <label htmlFor="node-starts_type" className="form__label">Start date</label>
+              <select
+                id="node-starts_type"
+                className="form__input form__select"
+                value={draft.starts_type || "exact"}
+                onChange={set("starts_type")}
+              >
+                {rangeTypes.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+
+            <DateParts
+              prefix="starts"
+              label="Start date"
+              kind={draft.starts_type || "exact"}
+              draft={draft}
+              eras={eras}
+              onChange={onChange}
+              required={!embedded}
+            />
+          </div>
+
+          <div className="form__block-part">
+            <div className="form__field">
+              <label htmlFor="node-ends_type" className="form__label">End date</label>
+              <select
+                id="node-ends_type"
+                className="form__input form__select"
+                value={draft.ends_type || "exact"}
+                onChange={set("ends_type")}
+              >
+                {rangeTypes.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
+
+            <DateParts
+              prefix="ends"
+              label="End date"
+              kind={draft.ends_type || "exact"}
+              draft={draft}
+              eras={eras}
+              onChange={onChange}
+              required={!embedded}
+            />
           </div>
         </fieldset>
       )}
