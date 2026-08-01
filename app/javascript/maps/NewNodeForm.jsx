@@ -3,7 +3,7 @@ import { Crosshair } from "lucide-react"
 
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
-export default function NewNodeForm({ draft, onChange, onPickOnMap, onCancel, onSubmit }) {
+export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, onCancel, onSubmit }) {
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
   const submit = (event) => {
@@ -13,6 +13,20 @@ export default function NewNodeForm({ draft, onChange, onPickOnMap, onCancel, on
 
   return (
     <form onSubmit={submit} className="form">
+      <div className="form__field">
+        <label htmlFor="node-date-type" className="form__label">Date type</label>
+        <select
+          id="node-date-type"
+          className="form__input form__select"
+          value={draft.date_type}
+          onChange={set("date_type")}
+        >
+          {dateTypes.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="form__field">
         <label htmlFor="node-title" className="form__label">Title</label>
         <input

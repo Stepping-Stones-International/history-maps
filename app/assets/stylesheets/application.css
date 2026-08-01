@@ -341,6 +341,16 @@ textarea.form__input {
   resize: vertical;
 }
 
+/* Native select, restyled: its own chevron replaces the platform one. */
+.form__select {
+  appearance: none;
+  padding-right: 2.2rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239aa8b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
 .form__input:focus {
   outline: 2px solid #4b7fc4;
   outline-offset: 1px;

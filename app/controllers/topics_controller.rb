@@ -25,10 +25,13 @@ class TopicsController < ApplicationController
           id: node.id,
           title: node.title,
           description: node.description,
+          date_type: node.date_type,
           latitude: node.latitude,
           longitude: node.longitude
         }
-      }
+      },
+      # Sent from the model so the form cannot drift from the validation.
+      dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } }
     }
   end
 

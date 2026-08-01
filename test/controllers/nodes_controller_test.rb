@@ -57,6 +57,34 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "create stores the chosen date type" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(date_type: "disputed")
+
+    assert_equal "disputed", Node.find_by!(title: "Ephesus").date_type
+  end
+
+  test "create rejects an unknown date type" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(date_type: "someday")
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "the map is sent the date type options" do
+    sign_in_as users(:one)
+
+    get edit_topic_path(@topic)
+    offered = inertia.props[:dateTypes]
+
+    assert_equal Node::DATE_TYPES.keys, offered.map { |option| option[:value] }
+    assert_includes offered.map { |option| option[:label] }, "Exact Date (Point in Time)"
+  end
+
   test "the topic's map lists its nodes" do
     sign_in_as users(:one)
 

@@ -7,10 +7,10 @@ import TimelineBar from "../../maps/TimelineBar"
 import NewNodeForm from "../../maps/NewNodeForm"
 import Modal from "../../components/Modal"
 
-const EMPTY_DRAFT = { title: "", description: "", latitude: "", longitude: "" }
+const EMPTY_DRAFT = { date_type: "exact", title: "", description: "", latitude: "", longitude: "" }
 
 // Full-bleed map with its own drawer, so it renders without Layout.
-export default function Edit({ topic, nodes }) {
+export default function Edit({ topic, nodes, dateTypes }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [composing, setComposing] = useState(false)
@@ -74,6 +74,7 @@ export default function Edit({ topic, nodes }) {
         <Modal title="New node" onClose={close}>
           <NewNodeForm
             draft={draft}
+            dateTypes={dateTypes}
             onChange={setDraft}
             onPickOnMap={() => setPicking(true)}
             onCancel={close}

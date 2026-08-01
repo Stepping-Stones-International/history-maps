@@ -33,6 +33,24 @@ class NodeTest < ActiveSupport::TestCase
     assert_predicate node.errors[:longitude], :any?
   end
 
+  test "defaults to an exact date type" do
+    node = Node.create!(topic: @topic, title: "Dated", latitude: 0, longitude: 0)
+    assert_equal "exact", node.date_type
+  end
+
+  test "accepts every offered date type" do
+    Node::DATE_TYPES.each_key do |value|
+      node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, date_type: value)
+      assert node.valid?, "expected #{value} to be a valid date type"
+    end
+  end
+
+  test "rejects an unknown date type" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, date_type: "someday")
+    assert_not node.valid?
+    assert_predicate node.errors[:date_type], :any?
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy
