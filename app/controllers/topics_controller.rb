@@ -27,12 +27,14 @@ class TopicsController < ApplicationController
           description: node.description,
           date_type: node.date_type,
           occurred_on: node.occurred_on_formatted,
+          era: node.era,
           latitude: node.latitude,
           longitude: node.longitude
         }
       },
       # Sent from the model so the form cannot drift from the validation.
-      dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } }
+      dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
+      eras: Node::ERAS
     }
   end
 

@@ -3,7 +3,9 @@ import { Crosshair } from "lucide-react"
 
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
-export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, onCancel, onSubmit }) {
+export default function NewNodeForm({
+  draft, dateTypes, eras, onChange, onPickOnMap, onCancel, onSubmit
+}) {
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
   // Clear the date when it stops applying, so hidden fields are not submitted.
@@ -11,7 +13,7 @@ export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, o
     const date_type = event.target.value
     const cleared = date_type === "exact"
       ? {}
-      : { occurred_month: "", occurred_day: "", occurred_year: "" }
+      : { occurred_month: "", occurred_day: "", occurred_year: "", era: "AD" }
 
     onChange({ ...draft, date_type, ...cleared })
   }
@@ -37,10 +39,10 @@ export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, o
         </select>
       </div>
 
+      {/* The fieldset is named for screen readers only; the MM/DD/YYYY
+          sublabels carry it visually. */}
       {draft.date_type === "exact" && (
-        <fieldset className="form__fieldset">
-          <legend className="form__label">Date</legend>
-
+        <fieldset className="form__fieldset" aria-label="Date">
           <div className="form__row form__row--date">
             <div className="form__field">
               <label htmlFor="node-occurred-month" className="form__sublabel">MM</label>
@@ -85,6 +87,18 @@ export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, o
                 value={draft.occurred_year}
                 onChange={set("occurred_year")}
               />
+            </div>
+
+            <div className="form__field form__field--era">
+              <label htmlFor="node-era" className="form__sublabel">Era</label>
+              <select
+                id="node-era"
+                className="form__input form__select"
+                value={draft.era}
+                onChange={set("era")}
+              >
+                {eras.map((era) => <option key={era} value={era}>{era}</option>)}
+              </select>
             </div>
           </div>
         </fieldset>

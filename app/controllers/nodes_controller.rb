@@ -14,7 +14,7 @@ class NodesController < ApplicationController
     # Inertia forms post a flat payload.
     def node_params
       params.permit(
-        :date_type, :occurred_month, :occurred_day, :occurred_year,
+        :date_type, :occurred_month, :occurred_day, :occurred_year, :era,
         :title, :description, :latitude, :longitude
       )
     end

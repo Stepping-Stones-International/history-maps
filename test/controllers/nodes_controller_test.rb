@@ -119,6 +119,32 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "07-16-1054", listed[:occurred_on]
   end
 
+  test "create stores the chosen era" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      occurred_month: "3", occurred_day: "15", occurred_year: "44", era: "BC"
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal "BC", node.era
+    assert_equal Date.new(44, 3, 15), node.occurred_on
+  end
+
+  test "create defaults the era to AD" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params
+    assert_equal "AD", Node.find_by!(title: "Ephesus").era
+  end
+
+  test "the map is sent the era options" do
+    sign_in_as users(:one)
+
+    get edit_topic_path(@topic)
+    assert_equal [ "AD", "BC" ], inertia.props[:eras]
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

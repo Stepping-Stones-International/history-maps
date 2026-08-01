@@ -254,6 +254,10 @@ body {
   flex: 1 1 auto;
 }
 
+.form__row--date .form__field--era {
+  flex: 0 0 5.5rem;
+}
+
 .form__fieldset {
   margin: 0 0 1rem;
   padding: 0;

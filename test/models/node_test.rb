@@ -113,6 +113,38 @@ class NodeTest < ActiveSupport::TestCase
     assert_nil node.occurred_on
   end
 
+  test "defaults to the AD era" do
+    node = Node.create!(topic: @topic, title: "Dated", latitude: 0, longitude: 0)
+    assert_equal "AD", node.era
+  end
+
+  test "accepts BC as an era" do
+    node = Node.new(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0, era: "BC",
+      occurred_month: "4", occurred_day: "6", occurred_year: "323"
+    )
+
+    assert node.valid?
+    assert_equal "04-06-0323 BC", node.occurred_on_with_era
+  end
+
+  test "rejects an unknown era" do
+    node = Node.new(topic: @topic, title: "Dated", latitude: 0, longitude: 0, era: "CE")
+
+    assert_not node.valid?
+    assert_predicate node.errors[:era], :any?
+  end
+
+  test "keeps the stored year positive for BC dates" do
+    node = Node.create!(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0, era: "BC",
+      occurred_month: "1", occurred_day: "1", occurred_year: "500"
+    )
+
+    assert_equal 500, node.occurred_on.year
+    assert_equal "BC", node.era
+  end
+
   test "parses an MM-DD-YYYY date from the form" do
     node = Node.create!(
       topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "07-04-1776"

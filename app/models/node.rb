@@ -13,6 +13,8 @@ class Node < ApplicationRecord
   MIN_YEAR = 1
   MAX_YEAR = 4000
 
+  ERAS = %w[AD BC].freeze
+
   # The form sends the date as three separate fields.
   attr_accessor :occurred_month, :occurred_day, :occurred_year
 
@@ -22,6 +24,7 @@ class Node < ApplicationRecord
 
   validates :title, presence: true
   validates :date_type, inclusion: { in: DATE_TYPES.keys }
+  validates :era, inclusion: { in: ERAS }
   validates :latitude, presence: true,
     numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }
   validates :longitude, presence: true,
@@ -48,6 +51,13 @@ class Node < ApplicationRecord
 
   def occurred_on_formatted
     occurred_on&.strftime(DATE_FORMAT)
+  end
+
+  # The stored year is always positive, so the era has to travel with it.
+  def occurred_on_with_era
+    return if occurred_on.nil?
+
+    "#{occurred_on_formatted} #{era}"
   end
 
   private

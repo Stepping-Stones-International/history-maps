@@ -12,6 +12,7 @@ const EMPTY_DRAFT = {
   occurred_month: "",
   occurred_day: "",
   occurred_year: "",
+  era: "AD",
   title: "",
   description: "",
   latitude: "",
@@ -19,7 +20,7 @@ const EMPTY_DRAFT = {
 }
 
 // Full-bleed map with its own drawer, so it renders without Layout.
-export default function Edit({ topic, nodes, dateTypes }) {
+export default function Edit({ topic, nodes, dateTypes, eras }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [composing, setComposing] = useState(false)
@@ -84,6 +85,7 @@ export default function Edit({ topic, nodes, dateTypes }) {
           <NewNodeForm
             draft={draft}
             dateTypes={dateTypes}
+            eras={eras}
             onChange={setDraft}
             onPickOnMap={() => setPicking(true)}
             onCancel={close}
