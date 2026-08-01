@@ -80,11 +80,51 @@ const TOPO_STYLE = {
   ]
 }
 
-export default function HomeMap({ nodes = [], placing = false, onMapClick, onNodeSelect }) {
+const SVG_NS = "http://www.w3.org/2000/svg"
+
+const MARKER_COLOR = "#8fb8e8"
+const MARKER_ACTIVE_COLOR = "#f2b640"
+const MARKER_SIZE = { width: 20, height: 18 }
+const MARKER_ACTIVE_SIZE = { width: 30, height: 27 }
+
+// A triangle pointing down at its coordinate, drawn ourselves so colour and
+// size are plain CSS rather than surgery on MapLibre's pin.
+function markerElement() {
+  const element = document.createElement("div")
+  element.className = "node-marker"
+
+  const svg = document.createElementNS(SVG_NS, "svg")
+  svg.setAttribute("viewBox", "0 0 20 18")
+
+  const triangle = document.createElementNS(SVG_NS, "polygon")
+  triangle.setAttribute("points", "0,0 20,0 10,18")
+
+  svg.appendChild(triangle)
+  element.appendChild(svg)
+  paintMarker(element, false)
+  return element
+}
+
+// Size and colour are set as attributes rather than left to CSS, so the
+// triangle cannot be left at its base size by a stylesheet ordering surprise.
+function paintMarker(element, active) {
+  const { width, height } = active ? MARKER_ACTIVE_SIZE : MARKER_SIZE
+  const svg = element.querySelector("svg")
+
+  svg.setAttribute("width", width)
+  svg.setAttribute("height", height)
+  svg.querySelector("polygon").setAttribute("fill", active ? MARKER_ACTIVE_COLOR : MARKER_COLOR)
+}
+
+export default function HomeMap({
+  nodes = [], placing = false, highlightedId = null, onMapClick, onNodeSelect
+}) {
   const container = useRef(null)
   const map = useRef(null)
   const markers = useRef(new Map())
   const labels = useRef(new Map())
+  const highlightedRef = useRef(highlightedId)
+  highlightedRef.current = highlightedId
   // Held in refs so changing these does not re-bind the map and marker
   // listeners, which are attached once when each is created.
   const clickHandler = useRef(onMapClick)
@@ -162,7 +202,7 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
         .setLngLat([node.longitude, node.latitude])
         .setDOMContent(nodeLabel(node))
 
-      const marker = new Marker({ color: "#8fb8e8" })
+      const marker = new Marker({ element: markerElement(), anchor: "bottom" })
         .setLngLat([node.longitude, node.latitude])
         .addTo(map.current)
 
@@ -180,7 +220,8 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
       element.addEventListener("click", select)
 
       const showLabel = () => { if (!popup.isOpen()) popup.addTo(map.current) }
-      const hideLabel = () => popup.remove()
+      // A highlighted node keeps its label up after the cursor leaves.
+      const hideLabel = () => { if (highlightedRef.current !== node.id) popup.remove() }
 
       element.addEventListener("mouseenter", showLabel)
       element.addEventListener("mouseleave", hideLabel)
@@ -207,6 +248,23 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
       labels.current.delete(id)
     })
   }, [nodes])
+
+  // Highlighted node: bigger, recoloured, with its label showing.
+  useEffect(() => {
+    if (!map.current) return
+
+    markers.current.forEach((marker, id) => {
+      const active = id === highlightedId
+      const element = marker.getElement()
+      element.classList.toggle("node-marker--active", active)
+      paintMarker(element, active)
+
+      const popup = labels.current.get(id)
+      if (!popup) return
+      if (active && !popup.isOpen()) popup.addTo(map.current)
+      if (!active && popup.isOpen()) popup.remove()
+    })
+  }, [highlightedId, nodes])
 
   return <div ref={container} className="home-map" />
 }

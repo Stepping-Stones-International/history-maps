@@ -42,6 +42,8 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
   // Held here rather than in the form so it survives the modal being hidden.
   const [draft, setDraft] = useState(EMPTY_DRAFT)
   const [picking, setPicking] = useState(false)
+  // Which node is called out on the map; clicking its row again clears it.
+  const [highlightedId, setHighlightedId] = useState(null)
 
   const close = () => {
     setEditor(null)
@@ -94,12 +96,18 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
       <HomeMap
         nodes={nodes}
         placing={picking}
+        highlightedId={highlightedId}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
 
       <Drawer title={topic.title} open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <NodeList nodes={nodes} onSelect={startEditing} />
+        <NodeList
+          nodes={nodes}
+          highlightedId={highlightedId}
+          onHighlight={(node) => setHighlightedId((current) => (current === node.id ? null : node.id))}
+          onEdit={startEditing}
+        />
       </Drawer>
 
       <div className={`map-actions ${drawerOpen ? "map-actions--inset" : ""}`}>

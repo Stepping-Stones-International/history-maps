@@ -694,17 +694,13 @@ textarea.form__input {
   color: var(--text-muted);
 }
 
+/* Selecting the row calls the node out on the map; the pencil edits it. */
 .node-list__item {
-  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.55rem 0.6rem;
-  font: inherit;
-  text-align: left;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.2rem 0.4rem 0.2rem 0.2rem;
   color: var(--text);
-  cursor: pointer;
-  background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
   transition: background 0.15s ease, border-color 0.15s ease;
@@ -712,6 +708,42 @@ textarea.form__input {
 
 .node-list__item:hover {
   background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+.node-list__item--active {
+  background: var(--surface-raised);
+  border-color: #6b5a2c;
+}
+
+.node-list__select {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.35rem 0.4rem;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.node-list__item--active .node-list__title {
+  color: #f2b640;
+}
+
+.node-list__edit {
+  flex: 0 0 auto;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.node-list__item:hover .node-list__edit {
+  color: var(--text);
   border-color: var(--border);
 }
 
@@ -797,6 +829,23 @@ textarea.form__input {
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Waypoints: triangles pointing down at their coordinate. */
+.node-marker {
+  color: #8fb8e8;
+  line-height: 0;
+  cursor: pointer;
+}
+
+/* Size and fill come from the marker's own attributes; this only adds the
+   lift when a node is highlighted from the sidebar. */
+.node-marker svg {
+  display: block;
+}
+
+.node-marker--active svg {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.6));
 }
 
 /* Node label shown on marker hover. Clicking it selects the node, same as the
