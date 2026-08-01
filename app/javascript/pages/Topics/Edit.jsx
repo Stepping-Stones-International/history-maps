@@ -161,7 +161,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
 
         <button type="button" className="button map-actions__button" onClick={startNew}>
           <MapPin className="button__glyph" aria-hidden="true" />
-          New Node
+          New Node / Layer
         </button>
 
         {picking && (
