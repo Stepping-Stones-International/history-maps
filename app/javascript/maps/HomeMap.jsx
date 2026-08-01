@@ -10,10 +10,10 @@ function nodeLabel(node) {
   title.textContent = node.title
   label.appendChild(title)
 
-  if (node.occurred_on) {
+  if (node.date_display) {
     const date = document.createElement("span")
     date.className = "node-label__date"
-    date.textContent = `${node.occurred_on} ${node.era}`.trim()
+    date.textContent = node.date_display
     label.appendChild(date)
   }
 

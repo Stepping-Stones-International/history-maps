@@ -11,8 +11,8 @@ export default function NodeList({ nodes, onSelect }) {
         <li key={node.id}>
           <button type="button" className="node-list__item" onClick={() => onSelect(node)}>
             <span className="node-list__title">{node.title}</span>
-            {node.occurred_on && (
-              <span className="node-list__date">{node.occurred_on} {node.era}</span>
+            {node.date_display && (
+              <span className="node-list__date">{node.date_display}</span>
             )}
           </button>
         </li>

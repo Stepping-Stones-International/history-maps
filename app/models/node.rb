@@ -7,23 +7,16 @@ class Node < ApplicationRecord
     "disputed" => "Disputed / Alternate Dates (Contested History)"
   }.freeze
 
-  # Accepted by the legacy string setter below.
-  DATE_FORMAT = "%m-%d-%Y".freeze
+  # Date types that collect a date at all, and what they insist on.
+  DATED_TYPES = %w[exact approximate].freeze
+  FULL_DATE_TYPES = %w[exact].freeze
 
-  # Shown in the sidebar and on map labels: no padding, slash separated.
-  DISPLAY_FORMAT = "%-m/%-d/%-Y".freeze
+  ERAS = %w[AD BC].freeze
 
   MIN_YEAR = 1
   MAX_YEAR = 4000
 
-  ERAS = %w[AD BC].freeze
-
-  # The form sends the date as three separate fields.
-  attr_accessor :occurred_month, :occurred_day, :occurred_year
-
   belongs_to :topic
-
-  before_validation :compose_occurred_on
 
   validates :title, presence: true
   validates :date_type, inclusion: { in: DATE_TYPES.keys }
@@ -32,76 +25,59 @@ class Node < ApplicationRecord
     numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }
   validates :longitude, presence: true,
     numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }
-  validate :occurred_on_was_usable
 
-  # Also accepts MM-DD-YYYY, plus the Date and ISO forms fixtures and the
-  # console use. An unusable value is remembered so validation can report it
-  # rather than raising.
-  def occurred_on=(value)
-    @date_error = nil
+  validates :occurred_year,
+    numericality: { only_integer: true, in: MIN_YEAR..MAX_YEAR }, allow_nil: true
+  validates :occurred_month,
+    numericality: { only_integer: true, in: 1..12 }, allow_nil: true
+  validates :occurred_day,
+    numericality: { only_integer: true, in: 1..31 }, allow_nil: true
 
-    if value.is_a?(String) && value.present?
-      begin
-        super(Date.strptime(value, DATE_FORMAT))
-      rescue Date::Error
-        @date_error = :format
-        super(nil)
-      end
-    else
-      super
-    end
+  validate :required_date_parts_present
+  validate :day_accompanied_by_month
+  validate :date_exists
+
+  def dated?
+    occurred_year.present?
   end
 
-  def occurred_on_formatted
-    occurred_on&.strftime(DISPLAY_FORMAT)
-  end
+  # "March 5, 325 AD", "c. March 325 AD", "c. 325 AD" — month and day are
+  # dropped when unknown, and approximate dates are marked with c.
+  def date_display
+    return unless dated?
 
-  # The stored year is always positive, so the era has to travel with it.
-  def occurred_on_with_era
-    return if occurred_on.nil?
+    day_and_year = [ occurred_day, occurred_year ].compact.join(", ")
+    written = [ month_name, day_and_year ].compact.join(" ")
+    prefix = date_type == "approximate" ? "c. " : ""
 
-    "#{occurred_on_formatted} #{era}"
+    "#{prefix}#{written} #{era}"
   end
 
   private
-    def date_parts
-      [ occurred_month, occurred_day, occurred_year ]
+    def month_name
+      Date::MONTHNAMES[occurred_month] if occurred_month
     end
 
-    # Runs only when the three-field form was used, leaving occurred_on= alone.
-    # nil means the field was not submitted; "" means it was submitted empty,
-    # which is how editing clears a date.
-    def compose_occurred_on
-      return if date_parts.all?(&:nil?)
+    def required_date_parts_present
+      return unless DATED_TYPES.include?(date_type)
 
-      if date_parts.all? { |part| part.to_s.strip.empty? }
-        @date_error = nil
-        self[:occurred_on] = nil
-        return
-      end
+      errors.add(:occurred_year, "can't be blank") if occurred_year.blank?
+      return unless FULL_DATE_TYPES.include?(date_type)
 
-      month, day, year = date_parts.map { |part| Integer(part.to_s.strip, exception: false) }
-
-      if year.nil? || !year.between?(MIN_YEAR, MAX_YEAR)
-        return fail_date(:year)
-      end
-
-      self[:occurred_on] = Date.new(year, month, day)
-      @date_error = nil
-    rescue Date::Error, TypeError
-      fail_date(:unreal)
+      errors.add(:occurred_month, "can't be blank") if occurred_month.blank?
+      errors.add(:occurred_day, "can't be blank") if occurred_day.blank?
     end
 
-    def fail_date(reason)
-      @date_error = reason
-      self[:occurred_on] = nil
+    def day_accompanied_by_month
+      return if occurred_day.blank? || occurred_month.present?
+
+      errors.add(:occurred_month, "is needed when a day is given")
     end
 
-    def occurred_on_was_usable
-      case @date_error
-      when :format then errors.add(:occurred_on, "must be formatted MM-DD-YYYY")
-      when :year then errors.add(:occurred_year, "must be between #{MIN_YEAR} and #{MAX_YEAR}")
-      when :unreal then errors.add(:occurred_on, "must be a real date")
-      end
+    def date_exists
+      return if [ occurred_year, occurred_month, occurred_day ].any?(&:blank?)
+      return if Date.valid_date?(occurred_year, occurred_month, occurred_day)
+
+      errors.add(:base, "That date does not exist")
     end
 end

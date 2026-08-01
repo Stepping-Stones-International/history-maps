@@ -6,6 +6,10 @@ one:
   topic_id: b1d4f2a7-9e35-4c81-a6f0-3d5e7c9b1a24
   title: Jerusalem
   description: MyText
+  date_type: exact
+  occurred_year: 1054
+  occurred_month: 7
+  occurred_day: 16
   latitude: 31.7683
   longitude: 35.2137
 
@@ -14,5 +18,7 @@ two:
   topic_id: e8a3c6d1-4b72-4f95-b3c8-5a7d9e1f3b46
   title: Antioch
   description: MyText
+  date_type: approximate
+  occurred_year: 300
   latitude: 36.2021
   longitude: 36.1603

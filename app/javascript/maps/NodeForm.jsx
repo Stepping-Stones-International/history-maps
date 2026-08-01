@@ -6,12 +6,17 @@ import { Crosshair } from "lucide-react"
 export default function NodeForm({
   draft, dateTypes, eras, onChange, onPickOnMap, onCancel, onSubmit
 }) {
+  // Exact wants a whole date; approximate settles for a year.
+  const collectsDate = ["exact", "approximate"].includes(draft.date_type)
+  const requiresFullDate = draft.date_type === "exact"
+
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
   // Clear the date when it stops applying, so hidden fields are not submitted.
   const setDateType = (event) => {
     const date_type = event.target.value
-    const cleared = date_type === "exact"
+    const keepsDate = ["exact", "approximate"].includes(date_type)
+    const cleared = keepsDate
       ? {}
       : { occurred_month: "", occurred_day: "", occurred_year: "", era: "AD" }
 
@@ -41,18 +46,18 @@ export default function NodeForm({
 
       {/* The fieldset is named for screen readers only; the MM/DD/YYYY
           sublabels carry it visually. */}
-      {draft.date_type === "exact" && (
+      {collectsDate && (
         <fieldset className="form__fieldset" aria-label="Date">
           <div className="form__row form__row--date">
             <div className="form__field">
               <label htmlFor="node-occurred-month" className="form__sublabel">
-                MM <span className="form__required" aria-hidden="true">*</span>
+                MM {requiresFullDate && <span className="form__required" aria-hidden="true">*</span>}
               </label>
               <input
                 id="node-occurred-month"
                 type="number"
                 inputMode="numeric"
-                required
+                required={requiresFullDate}
                 min="1"
                 max="12"
                 placeholder="MM"
@@ -64,13 +69,13 @@ export default function NodeForm({
 
             <div className="form__field">
               <label htmlFor="node-occurred-day" className="form__sublabel">
-                DD <span className="form__required" aria-hidden="true">*</span>
+                DD {requiresFullDate && <span className="form__required" aria-hidden="true">*</span>}
               </label>
               <input
                 id="node-occurred-day"
                 type="number"
                 inputMode="numeric"
-                required
+                required={requiresFullDate}
                 min="1"
                 max="31"
                 placeholder="DD"

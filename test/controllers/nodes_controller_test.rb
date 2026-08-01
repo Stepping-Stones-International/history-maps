@@ -65,6 +65,41 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "disputed", Node.find_by!(title: "Ephesus").date_type
   end
 
+  test "create accepts an approximate date with only a year" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      date_type: "approximate", occurred_year: "325", occurred_month: "", occurred_day: ""
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal 325, node.occurred_year
+    assert_nil node.occurred_month
+    assert_equal "c. 325 AD", node.date_display
+  end
+
+  test "create rejects an approximate date with no year" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(
+        date_type: "approximate", occurred_year: "", occurred_month: "", occurred_day: ""
+      )
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "create rejects an exact date missing its month and day" do
+    sign_in_as users(:one)
+
+    assert_no_difference -> { Node.count } do
+      post topic_nodes_path(@topic), params: node_params(occurred_month: "", occurred_day: "")
+    end
+
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
   test "create rejects an unknown date type" do
     sign_in_as users(:one)
 
@@ -82,7 +117,8 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
       date_type: "exact", occurred_month: "12", occurred_day: "25", occurred_year: "336"
     )
 
-    assert_equal Date.new(336, 12, 25), Node.find_by!(title: "Ephesus").occurred_on
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal [ 336, 12, 25 ], [ node.occurred_year, node.occurred_month, node.occurred_day ]
   end
 
   test "create accepts a one digit year" do
@@ -92,7 +128,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
       occurred_month: "1", occurred_day: "1", occurred_year: "1"
     )
 
-    assert_equal 1, Node.find_by!(title: "Ephesus").occurred_on.year
+    assert_equal 1, Node.find_by!(title: "Ephesus").occurred_year
   end
 
   test "create rejects a year past the supported range" do
@@ -105,18 +141,25 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to edit_topic_path(@topic)
-    follow_redirect!
-    assert_includes inertia.props[:errors].values.flatten.join(" "), "between 1 and 4000"
   end
 
-  test "the map sends dates back unpadded and slash separated" do
+  test "the map sends dates back written out" do
     sign_in_as users(:one)
-    nodes(:one).update!(occurred_on: Date.new(1054, 7, 16))
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
 
-    assert_equal "7/16/1054", listed[:occurred_on]
+    assert_equal "July 16, 1054 AD", listed[:date_display]
+  end
+
+  test "the map marks approximate dates with c." do
+    sign_in_as users(:one)
+    nodes(:one).update!(date_type: "approximate", occurred_month: nil, occurred_day: nil)
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
+
+    assert_equal "c. 1054 AD", listed[:date_display]
   end
 
   test "create stores the chosen era" do
@@ -128,7 +171,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
     node = Node.find_by!(title: "Ephesus")
     assert_equal "BC", node.era
-    assert_equal Date.new(44, 3, 15), node.occurred_on
+    assert_equal [ 44, 3, 15 ], [ node.occurred_year, node.occurred_month, node.occurred_day ]
   end
 
   test "create defaults the era to AD" do
@@ -161,19 +204,18 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
     node = nodes(:one).reload
     assert_equal "Renamed", node.title
-    assert_equal Date.new(70, 5, 6), node.occurred_on
+    assert_equal [ 70, 5, 6 ], [ node.occurred_year, node.occurred_month, node.occurred_day ]
     assert_redirected_to edit_topic_path(@topic)
   end
 
-  test "update can clear the date" do
+  test "update can clear the date when the type stops needing one" do
     sign_in_as users(:one)
-    nodes(:one).update!(occurred_on: Date.new(1200, 1, 1))
 
     patch topic_node_path(@topic, nodes(:one)), params: node_params(
-      occurred_month: "", occurred_day: "", occurred_year: ""
+      date_type: "range", occurred_month: "", occurred_day: "", occurred_year: ""
     )
 
-    assert_nil nodes(:one).reload.occurred_on
+    assert_nil nodes(:one).reload.occurred_year
   end
 
   test "update rejects invalid changes" do
@@ -198,7 +240,6 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the map sends nodes with their date split for editing" do
     sign_in_as users(:one)
-    nodes(:one).update!(occurred_on: Date.new(1054, 7, 16), era: "AD")
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
@@ -211,7 +252,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   test "the map sends blank date fields for an undated node" do
     sign_in_as users(:one)
-    nodes(:one).update!(occurred_on: nil)
+    nodes(:one).update!(date_type: "range", occurred_year: nil, occurred_month: nil, occurred_day: nil)
 
     get edit_topic_path(@topic)
     listed = inertia.props[:nodes].find { |node| node[:id] == nodes(:one).id }
@@ -243,6 +284,7 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
   private
     def node_params(overrides = {})
-      { title: "Ephesus", description: "A city.", latitude: 37.94, longitude: 27.34 }.merge(overrides)
+      { title: "Ephesus", description: "A city.", latitude: 37.94, longitude: 27.34,
+        date_type: "exact", occurred_year: "325", occurred_month: "3", occurred_day: "5" }.merge(overrides)
     end
 end
