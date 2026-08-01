@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # TEMPORARY: browser-side diagnostics sink, development only.
+  post "diagnostics" => "diagnostics#create" if Rails.env.development?
+
   # :edit is the map view for a topic.
   resources :topics, only: [ :index, :create, :edit ] do
     resources :nodes, only: [ :create, :update ]
