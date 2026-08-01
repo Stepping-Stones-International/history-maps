@@ -233,6 +233,25 @@ body {
   margin-top: 1.25rem;
 }
 
+/* Latitude, longitude and the pick-on-map button on one line. */
+.form__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.form__row .form__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.form__row-action {
+  flex: 0 0 auto;
+  cursor: pointer;
+  /* Line the button up with the inputs, not their labels. */
+  margin-bottom: 1rem;
+}
+
 .form__error {
   margin: 0.4rem 0 0;
   font-size: 0.85rem;

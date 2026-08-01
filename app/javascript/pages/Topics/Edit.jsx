@@ -7,39 +7,60 @@ import TimelineBar from "../../maps/TimelineBar"
 import NewNodeForm from "../../maps/NewNodeForm"
 import Modal from "../../components/Modal"
 
+const EMPTY_DRAFT = { title: "", description: "", latitude: "", longitude: "" }
+
 // Full-bleed map with its own drawer, so it renders without Layout.
 export default function Edit({ topic, nodes }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   const [composing, setComposing] = useState(false)
-  // Details captured from the modal, waiting for a map click to give them a place.
-  const [pending, setPending] = useState(null)
+  // Held here rather than in the form so it survives the modal being hidden.
+  const [draft, setDraft] = useState(EMPTY_DRAFT)
+  const [picking, setPicking] = useState(false)
 
-  const placeNode = ({ latitude, longitude }) => {
-    if (!pending) return
+  const close = () => {
+    setComposing(false)
+    setPicking(false)
+    setDraft(EMPTY_DRAFT)
+  }
 
-    router.post(`/topics/${topic.id}/nodes`, { ...pending, latitude, longitude }, {
-      onFinish: () => setPending(null)
-    })
+  const takeCoordinates = ({ latitude, longitude }) => {
+    if (!picking) return
+
+    // Six decimals is roughly 10cm — far beyond what a click can mean.
+    setDraft((current) => ({
+      ...current,
+      latitude: latitude.toFixed(6),
+      longitude: longitude.toFixed(6)
+    }))
+    setPicking(false)
+  }
+
+  const save = () => {
+    router.post(`/topics/${topic.id}/nodes`, draft, { onSuccess: close })
   }
 
   return (
     <>
       <Head title={topic.title} />
 
-      <HomeMap nodes={nodes} placing={!!pending} onMapClick={placeNode} />
+      <HomeMap nodes={nodes} placing={picking} onMapClick={takeCoordinates} />
       <Drawer title={topic.title} open={drawerOpen} onOpenChange={setDrawerOpen} />
 
       <div className={`map-actions ${drawerOpen ? "map-actions--inset" : ""}`}>
-        <button type="button" className="button map-actions__button" onClick={() => setComposing(true)}>
+        <button
+          type="button"
+          className="button map-actions__button"
+          onClick={() => { setDraft(EMPTY_DRAFT); setComposing(true) }}
+        >
           <MapPin className="button__glyph" aria-hidden="true" />
           New Node
         </button>
 
-        {pending && (
+        {picking && (
           <div className="placing-hint" role="status">
-            Click the map to place “{pending.title}”
-            <button type="button" className="button button--quiet" onClick={() => setPending(null)}>
+            Click the map to set the coordinates
+            <button type="button" className="button button--quiet" onClick={() => setPicking(false)}>
               Cancel
             </button>
           </div>
@@ -48,14 +69,15 @@ export default function Edit({ topic, nodes }) {
 
       <TimelineBar drawerOpen={drawerOpen} />
 
-      {composing && (
-        <Modal title="New node" onClose={() => setComposing(false)}>
+      {/* Hidden, not unmounted, while picking: the draft stays put. */}
+      {composing && !picking && (
+        <Modal title="New node" onClose={close}>
           <NewNodeForm
-            onCancel={() => setComposing(false)}
-            onReady={(details) => {
-              setPending(details)
-              setComposing(false)
-            }}
+            draft={draft}
+            onChange={setDraft}
+            onPickOnMap={() => setPicking(true)}
+            onCancel={close}
+            onSubmit={save}
           />
         </Modal>
       )}

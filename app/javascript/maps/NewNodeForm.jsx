@@ -1,13 +1,14 @@
-import React, { useState } from "react"
+import React from "react"
+import { Crosshair } from "lucide-react"
 
-// Collects the details only; the coordinates come from the map click that follows.
-export default function NewNodeForm({ onCancel, onReady }) {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
+// Controlled by the page so the values survive the modal being hidden while
+// coordinates are picked off the map.
+export default function NewNodeForm({ draft, onChange, onPickOnMap, onCancel, onSubmit }) {
+  const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
   const submit = (event) => {
     event.preventDefault()
-    onReady({ title: title.trim(), description: description.trim() })
+    onSubmit()
   }
 
   return (
@@ -20,8 +21,8 @@ export default function NewNodeForm({ onCancel, onReady }) {
           required
           autoFocus
           className="form__input"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={draft.title}
+          onChange={set("title")}
         />
       </div>
 
@@ -31,14 +32,56 @@ export default function NewNodeForm({ onCancel, onReady }) {
           id="node-description"
           rows={4}
           className="form__input"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={draft.description}
+          onChange={set("description")}
         />
+      </div>
+
+      <div className="form__row">
+        <div className="form__field">
+          <label htmlFor="node-latitude" className="form__label">Latitude</label>
+          <input
+            id="node-latitude"
+            type="number"
+            step="any"
+            min="-90"
+            max="90"
+            required
+            className="form__input"
+            value={draft.latitude}
+            onChange={set("latitude")}
+          />
+        </div>
+
+        <div className="form__field">
+          <label htmlFor="node-longitude" className="form__label">Longitude</label>
+          <input
+            id="node-longitude"
+            type="number"
+            step="any"
+            min="-180"
+            max="180"
+            required
+            className="form__input"
+            value={draft.longitude}
+            onChange={set("longitude")}
+          />
+        </div>
+
+        <button
+          type="button"
+          className="icon-button icon-button--small form__row-action"
+          onClick={onPickOnMap}
+          aria-label="Pick coordinates on the map"
+          title="Pick coordinates on the map"
+        >
+          <Crosshair className="icon-button__glyph" />
+        </button>
       </div>
 
       <div className="form__actions">
         <button type="button" className="button button--quiet" onClick={onCancel}>Cancel</button>
-        <button type="submit" className="button">Place on map</button>
+        <button type="submit" className="button">Save</button>
       </div>
     </form>
   )
