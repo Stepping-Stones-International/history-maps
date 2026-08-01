@@ -545,7 +545,7 @@ textarea.form__input {
   position: fixed;
   left: var(--rail-width);
   right: 0;
-  bottom: 1.5rem;
+  bottom: 3.25rem;
   z-index: 5;
   display: flex;
   justify-content: center;
