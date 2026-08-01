@@ -3,6 +3,10 @@ require "test_helper"
 class NodeTest < ActiveSupport::TestCase
   setup { @topic = topics(:one) }
 
+  def build_node(**attributes)
+    Node.new({ topic: @topic, latitude: 0, longitude: 0, date_type: "exact" }.merge(attributes))
+  end
+
   test "is valid with a title, topic and coordinates" do
     assert Node.new(topic: @topic, title: "Ephesus", latitude: 37.94, longitude: 27.34,
       date_type: "range").valid?
@@ -153,6 +157,41 @@ class NodeTest < ActiveSupport::TestCase
     assert_not node.valid?
     assert_predicate node.errors[:occurred_month], :any?
     assert_predicate node.errors[:occurred_day], :any?
+  end
+
+  test "sorts oldest first, counting BC years backwards" do
+    Node.destroy_all
+
+    undated = build_node(title: "Undated", date_type: "range")
+    ad_late = build_node(title: "1054 AD", occurred_year: 1054, occurred_month: 7, occurred_day: 16)
+    ad_early = build_node(title: "325 AD", occurred_year: 325, occurred_month: 5, occurred_day: 20)
+    bc_near = build_node(title: "44 BC", occurred_year: 44, era: "BC", date_type: "approximate")
+    bc_far = build_node(title: "500 BC", occurred_year: 500, era: "BC", date_type: "approximate")
+
+    [ undated, ad_late, ad_early, bc_near, bc_far ].each(&:save!)
+
+    assert_equal [ "500 BC", "44 BC", "325 AD", "1054 AD", "Undated" ],
+      Node.all.sort_by(&:chronological_key).map(&:title)
+  end
+
+  test "sorts a bare year before the same year with a month" do
+    Node.destroy_all
+
+    with_month = build_node(title: "March", occurred_year: 325, occurred_month: 3, date_type: "approximate")
+    year_only = build_node(title: "Year only", occurred_year: 325, date_type: "approximate")
+    [ with_month, year_only ].each(&:save!)
+
+    assert_equal [ "Year only", "March" ], Node.all.sort_by(&:chronological_key).map(&:title)
+  end
+
+  test "sorts months and days forwards within a BC year" do
+    Node.destroy_all
+
+    later = build_node(title: "May", occurred_year: 44, occurred_month: 5, occurred_day: 20, era: "BC")
+    earlier = build_node(title: "March", occurred_year: 44, occurred_month: 3, occurred_day: 15, era: "BC")
+    [ later, earlier ].each(&:save!)
+
+    assert_equal [ "March", "May" ], Node.all.sort_by(&:chronological_key).map(&:title)
   end
 
   test "is destroyed along with its topic" do

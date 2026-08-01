@@ -20,7 +20,7 @@ class TopicsController < ApplicationController
 
     render inertia: "Topics/Edit", props: {
       topic: { id: topic.id, title: topic.title, description: topic.description },
-      nodes: topic.nodes.order(:created_at).map { |node| node_props(node) },
+      nodes: topic.nodes.sort_by(&:chronological_key).map { |node| node_props(node) },
       # Sent from the model so the form cannot drift from the validation.
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
       eras: Node::ERAS

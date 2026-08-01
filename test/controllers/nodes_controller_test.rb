@@ -288,6 +288,21 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "", listed[:occurred_year]
   end
 
+  test "the sidebar receives nodes oldest first" do
+    sign_in_as users(:one)
+    @topic.nodes.destroy_all
+    @topic.nodes.create!(title: "Later", date_type: "exact",
+      occurred_year: 800, occurred_month: 1, occurred_day: 1, latitude: 0, longitude: 0)
+    @topic.nodes.create!(title: "Undated", date_type: "range", latitude: 0, longitude: 0)
+    @topic.nodes.create!(title: "Earlier", date_type: "approximate",
+      occurred_year: 44, era: "BC", latitude: 0, longitude: 0)
+
+    get edit_topic_path(@topic)
+
+    assert_equal [ "Earlier", "Later", "Undated" ],
+      inertia.props[:nodes].map { |node| node[:title] }
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

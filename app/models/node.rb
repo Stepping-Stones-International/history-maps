@@ -41,6 +41,20 @@ class Node < ApplicationRecord
     occurred_year.present?
   end
 
+  # Ascending chronological order. BC years count backwards, so their year is
+  # negated; months and days still run forwards within a year. A node with only
+  # a year comes before one that also names a month. Undated nodes sort last,
+  # and created_at breaks ties so the order never wobbles between requests.
+  def chronological_key
+    [
+      dated? ? 0 : 1,
+      dated? ? signed_year : 0,
+      occurred_month || 0,
+      occurred_day || 0,
+      created_at || Time.current
+    ]
+  end
+
   # "March 5, 325 AD", "c. March 325 AD", "c. 325 AD" — month and day are
   # dropped when unknown, and approximate dates are marked with c.
   def date_display
@@ -54,6 +68,10 @@ class Node < ApplicationRecord
   end
 
   private
+    def signed_year
+      era == "BC" ? -occurred_year : occurred_year
+    end
+
     def month_name
       Date::MONTHNAMES[occurred_month] if occurred_month
     end
