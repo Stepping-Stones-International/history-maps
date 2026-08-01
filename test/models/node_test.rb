@@ -312,6 +312,16 @@ class NodeTest < ActiveSupport::TestCase
     assert_equal 0, node.reload.position
   end
 
+  test "accepts a dateless type" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    child = build_node(title: "Child", date_type: "none", parent: parent)
+
+    assert child.valid?
+    assert_not child.dated?
+    assert_nil child.date_display
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy

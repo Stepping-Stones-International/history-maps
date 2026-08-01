@@ -16,11 +16,26 @@ export default function NodeForm({
   // Revealed by the checkbox; seeded open for a node that is already embedded.
   const [embedding, setEmbedding] = useState(Boolean(draft.parent_id))
 
+  // Embedding defaults to no date; detaching gives a dateless node one back,
+  // since "No Date" is not offered to a node of its own.
   const toggleEmbedding = (event) => {
     const wanted = event.target.checked
     setEmbedding(wanted)
-    if (!wanted) onChange({ ...draft, parent_id: "" })
+
+    if (wanted) {
+      onChange({ ...draft, date_type: "none" })
+    } else {
+      onChange({
+        ...draft,
+        parent_id: "",
+        date_type: draft.date_type === "none" ? "exact" : draft.date_type
+      })
+    }
   }
+
+  const typeOptions = embedding
+    ? dateTypes
+    : dateTypes.filter((option) => option.value !== "none")
 
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
@@ -50,7 +65,7 @@ export default function NodeForm({
           value={draft.date_type}
           onChange={setDateType}
         >
-          {dateTypes.map(({ value, label }) => (
+          {typeOptions.map(({ value, label }) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>

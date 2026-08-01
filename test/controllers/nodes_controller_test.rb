@@ -379,6 +379,20 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal Node::DATE_TYPES.keys, offered.map { |option| option[:value] }
     assert_includes offered.map { |option| option[:label] }, "Exact Date (Point in Time)"
+    assert_includes offered.map { |option| option[:label] }, "No Date"
+  end
+
+  test "create accepts an embedded node with no date" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      date_type: "none", parent_id: nodes(:one).id,
+      occurred_year: "", occurred_month: "", occurred_day: ""
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert_equal "none", node.date_type
+    assert_not node.dated?
   end
 
   test "the topic's map lists its nodes" do

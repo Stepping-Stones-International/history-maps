@@ -1,6 +1,8 @@
 class Node < ApplicationRecord
   # Stored value => label shown in the form.
   DATE_TYPES = {
+    # Offered only to embedded nodes, which take their moment from their parent.
+    "none" => "No Date",
     "exact" => "Exact Date (Point in Time)",
     "approximate" => "Approximate / Circa Date (Uncertain Point)",
     "range" => "Date Range / Span (Duration)",
