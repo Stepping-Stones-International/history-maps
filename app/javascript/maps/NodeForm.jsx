@@ -4,11 +4,14 @@ import { Crosshair } from "lucide-react"
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
 export default function NodeForm({
-  draft, dateTypes, eras, onChange, onPickOnMap, onCancel, onSubmit
+  draft, dateTypes, eras, parentOptions = [], onChange, onPickOnMap, onCancel, onSubmit
 }) {
-  // Exact wants a whole date; approximate settles for a year.
+  // Exact wants a whole date; approximate settles for a year. An embedded node
+  // takes its moment from its parent, so nothing is required of it.
+  const embedded = Boolean(draft.parent_id)
   const collectsDate = ["exact", "approximate"].includes(draft.date_type)
-  const requiresFullDate = draft.date_type === "exact"
+  const requiresFullDate = draft.date_type === "exact" && !embedded
+  const requiresYear = collectsDate && !embedded
 
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
@@ -87,13 +90,13 @@ export default function NodeForm({
 
             <div className="form__field form__field--year">
               <label htmlFor="node-occurred-year" className="form__sublabel">
-                YYYY <span className="form__required" aria-hidden="true">*</span>
+                YYYY {requiresYear && <span className="form__required" aria-hidden="true">*</span>}
               </label>
               <input
                 id="node-occurred-year"
                 type="number"
                 inputMode="numeric"
-                required
+                required={requiresYear}
                 min="1"
                 max="4000"
                 placeholder="YYYY"
@@ -182,6 +185,36 @@ export default function NodeForm({
         >
           <Crosshair className="icon-button__glyph" />
         </button>
+      </div>
+
+      <div className="form__row">
+        <div className="form__field">
+          <label htmlFor="node-parent" className="form__label">Embedded under</label>
+          <select
+            id="node-parent"
+            className="form__input form__select"
+            value={draft.parent_id || ""}
+            onChange={set("parent_id")}
+          >
+            <option value="">Nothing — a node of its own</option>
+            {parentOptions.map((option) => (
+              <option key={option.id} value={option.id}>{option.title}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form__field form__field--position">
+          <label htmlFor="node-position" className="form__label">Order</label>
+          <input
+            id="node-position"
+            type="number"
+            min="1"
+            step="1"
+            className="form__input"
+            value={draft.position ?? ""}
+            onChange={set("position")}
+          />
+        </div>
       </div>
 
       <div className="form__actions">

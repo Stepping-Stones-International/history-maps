@@ -194,6 +194,107 @@ class NodeTest < ActiveSupport::TestCase
     assert_equal [ "March", "May" ], Node.all.sort_by(&:chronological_key).map(&:title)
   end
 
+  test "can be embedded under another node in the same topic" do
+    parent = build_node(title: "Parent", occurred_year: 100, occurred_month: 1, occurred_day: 1)
+    parent.save!
+    child = build_node(title: "Child", occurred_year: 101, occurred_month: 1, occurred_day: 1, parent: parent)
+
+    assert child.valid?
+    child.save!
+    assert_equal [ child ], parent.reload.children.to_a
+  end
+
+  test "rejects a parent from another topic" do
+    other = topics(:two).nodes.create!(title: "Elsewhere", date_type: "range", latitude: 0, longitude: 0)
+    child = build_node(title: "Child", date_type: "range", parent: other)
+
+    assert_not child.valid?
+    assert_includes child.errors[:parent], "must be part of the same topic"
+  end
+
+  test "rejects being embedded under itself" do
+    node = build_node(title: "Loop", date_type: "range")
+    node.save!
+    node.parent = node
+
+    assert_not node.valid?
+    assert_predicate node.errors[:parent], :any?
+  end
+
+  test "rejects being embedded under its own descendant" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    child = build_node(title: "Child", date_type: "range", parent: parent)
+    child.save!
+
+    parent.parent = child
+    assert_not parent.valid?
+    assert_predicate parent.errors[:parent], :any?
+  end
+
+  test "new siblings are placed after the ones already there" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    first = build_node(title: "First", date_type: "range", parent: parent)
+    first.save!
+    second = build_node(title: "Second", date_type: "range", parent: parent)
+    second.save!
+
+    assert_equal 1, first.position
+    assert_equal 2, second.position
+    assert_equal [ "First", "Second" ], parent.reload.children.map(&:title)
+  end
+
+  test "children are listed in the order set for them" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    first = build_node(title: "First", date_type: "range", parent: parent)
+    first.save!
+    second = build_node(title: "Second", date_type: "range", parent: parent)
+    second.save!
+
+    second.update!(position: 1)
+    first.update!(position: 2)
+
+    assert_equal [ "Second", "First" ], parent.reload.children.map(&:title)
+  end
+
+  test "embedded nodes go when their parent does" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    build_node(title: "Child", date_type: "range", parent: parent).save!
+
+    assert_difference -> { Node.count }, -2 do
+      parent.destroy
+    end
+  end
+
+  test "an embedded node needs no date, whatever its type" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    child = build_node(title: "Child", date_type: "exact", parent: parent)
+
+    assert child.valid?, child.errors.full_messages.to_sentence
+    assert_not child.dated?
+  end
+
+  test "an embedded node still rejects a date that does not exist" do
+    parent = build_node(title: "Parent", date_type: "range")
+    parent.save!
+    child = build_node(title: "Child", date_type: "exact", parent: parent,
+      occurred_year: 1900, occurred_month: 2, occurred_day: 31)
+
+    assert_not child.valid?
+    assert_includes child.errors[:base], "That date does not exist"
+  end
+
+  test "a node of its own still needs its date" do
+    node = build_node(title: "Standalone", date_type: "exact")
+
+    assert_not node.valid?
+    assert_includes node.errors[:occurred_year], "can't be blank"
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy

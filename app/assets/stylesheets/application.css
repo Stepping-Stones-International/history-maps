@@ -716,6 +716,22 @@ textarea.form__input {
   border-color: #6b5a2c;
 }
 
+/* Embedded nodes, indented under the one they belong to. */
+.node-list__branch {
+  list-style: none;
+}
+
+.node-list__embedded {
+  margin: 0 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--border);
+}
+
+.form__field--position {
+  flex: 0 0 5.5rem;
+}
+
 .node-list__select {
   flex: 1;
   min-width: 0;

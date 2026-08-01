@@ -10,6 +10,8 @@ import TopicSettingsForm from "../../maps/TopicSettingsForm"
 import Modal from "../../components/Modal"
 
 const EMPTY_DRAFT = {
+  parent_id: "",
+  position: "",
   date_type: "exact",
   occurred_month: "",
   occurred_day: "",
@@ -23,6 +25,8 @@ const EMPTY_DRAFT = {
 
 // Only the fields the form edits; id and display-only values are left behind.
 const draftFrom = (node) => ({
+  parent_id: node.parent_id || "",
+  position: node.position ?? "",
   date_type: node.date_type,
   occurred_month: node.occurred_month,
   occurred_day: node.occurred_day,
@@ -114,6 +118,26 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
     }))
     setPicking(false)
   }
+
+  // A node cannot be embedded under itself or under something it already
+  // contains, so those are left out of the choices.
+  const parentChoices = (() => {
+    if (editor?.mode !== "edit") return nodes
+
+    const excluded = new Set([ editor.id ])
+    let grew = true
+    while (grew) {
+      grew = false
+      nodes.forEach((node) => {
+        if (node.parent_id && excluded.has(node.parent_id) && !excluded.has(node.id)) {
+          excluded.add(node.id)
+          grew = true
+        }
+      })
+    }
+
+    return nodes.filter((node) => !excluded.has(node.id))
+  })()
 
   // Called on the router, not through a detached reference: router.patch binds
   // this, so pulling it into a variable throws when it reaches this.visit.
@@ -216,6 +240,7 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
             draft={draft}
             dateTypes={dateTypes}
             eras={eras}
+            parentOptions={parentChoices}
             onChange={setDraft}
             onPickOnMap={() => setPicking(true)}
             onCancel={close}

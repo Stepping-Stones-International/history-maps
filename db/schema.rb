@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_203046) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_205405) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
@@ -21,9 +21,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_203046) do
     t.integer "occurred_day"
     t.integer "occurred_month"
     t.integer "occurred_year"
+    t.string "parent_id"
+    t.integer "position", default: 0, null: false
     t.string "title", null: false
     t.string "topic_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["parent_id", "position"], name: "index_nodes_on_parent_id_and_position"
+    t.index ["parent_id"], name: "index_nodes_on_parent_id"
     t.index ["topic_id"], name: "index_nodes_on_topic_id"
   end
 
@@ -56,6 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_203046) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "nodes", "nodes", column: "parent_id"
   add_foreign_key "nodes", "topics"
   add_foreign_key "sessions", "users"
   add_foreign_key "topics", "users", column: "author_id"

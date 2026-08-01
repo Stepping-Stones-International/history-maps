@@ -303,6 +303,53 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
       inertia.props[:nodes].map { |node| node[:title] }
   end
 
+  test "create can embed a node under another" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(parent_id: nodes(:one).id)
+
+    assert_equal nodes(:one), Node.find_by!(title: "Ephesus").parent
+  end
+
+  test "update can change the order under a parent" do
+    sign_in_as users(:one)
+    child = @topic.nodes.create!(title: "Child", date_type: "range",
+      latitude: 0, longitude: 0, parent: nodes(:one))
+
+    patch topic_node_path(@topic, child), params: node_params(
+      title: "Child", parent_id: nodes(:one).id, position: "7"
+    )
+
+    assert_equal 7, child.reload.position
+  end
+
+  test "the sidebar receives each node's parent and order" do
+    sign_in_as users(:one)
+    child = @topic.nodes.create!(title: "Child", date_type: "range",
+      latitude: 0, longitude: 0, parent: nodes(:one))
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == child.id }
+
+    assert_equal nodes(:one).id, listed[:parent_id]
+    assert_equal child.position, listed[:position]
+  end
+
+  test "embedded nodes follow their parent in the order given" do
+    sign_in_as users(:one)
+    @topic.nodes.destroy_all
+    parent = @topic.nodes.create!(title: "Parent", date_type: "range", latitude: 0, longitude: 0)
+    @topic.nodes.create!(title: "Second", date_type: "range", latitude: 0, longitude: 0,
+      parent: parent, position: 2)
+    @topic.nodes.create!(title: "First", date_type: "range", latitude: 0, longitude: 0,
+      parent: parent, position: 1)
+
+    get edit_topic_path(@topic)
+
+    assert_equal [ "Parent", "First", "Second" ],
+      inertia.props[:nodes].map { |node| node[:title] }
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 
