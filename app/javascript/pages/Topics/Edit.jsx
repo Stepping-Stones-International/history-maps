@@ -77,13 +77,14 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
     setPicking(false)
   }
 
+  // Called on the router, not through a detached reference: router.patch binds
+  // this, so pulling it into a variable throws when it reaches this.visit.
   const save = () => {
-    const url = editor.mode === "edit"
-      ? `/topics/${topic.id}/nodes/${editor.id}`
-      : `/topics/${topic.id}/nodes`
-
-    const send = editor.mode === "edit" ? router.patch : router.post
-    send(url, draft, { onSuccess: close })
+    if (editor.mode === "edit") {
+      router.patch(`/topics/${topic.id}/nodes/${editor.id}`, draft, { onSuccess: close })
+    } else {
+      router.post(`/topics/${topic.id}/nodes`, draft, { onSuccess: close })
+    }
   }
 
   return (
