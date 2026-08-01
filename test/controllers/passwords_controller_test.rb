@@ -61,7 +61,9 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
   end
 
   private
+    # Flash is no longer server-rendered HTML; it arrives as an Inertia prop.
     def assert_notice(text)
-      assert_select "div", /#{text}/
+      messages = (inertia.props[:flash] || {}).values.join(" ")
+      assert_match(/#{text}/, messages)
     end
 end

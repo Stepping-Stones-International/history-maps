@@ -41,7 +41,7 @@ export default function Drawer({ children }) {
           className="drawer__rail-button"
           onClick={() => setOpen(true)}
           tabIndex={open ? -1 : 0}
-          aria-label="Expand BibleMind panel"
+          aria-label="Expand Knowledge panel"
           title="Expand"
         >
           <HamburgerIcon />
@@ -50,13 +50,13 @@ export default function Drawer({ children }) {
 
       <div className="drawer__panel" aria-hidden={!open}>
         <header className="drawer__header">
-          <h1 className="drawer__title">BibleMind</h1>
+          <h1 className="drawer__title">Knowledge</h1>
           <button
             type="button"
             className="drawer__collapse"
             onClick={() => setOpen(false)}
             tabIndex={open ? 0 : -1}
-            aria-label="Collapse BibleMind panel"
+            aria-label="Collapse Knowledge panel"
             title="Collapse"
           >
             <CollapseIcon />

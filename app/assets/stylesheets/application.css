@@ -31,9 +31,15 @@ body {
   color: var(--text);
 }
 
-#home-map,
-.home-map {
-  position: absolute;
+#app {
+  min-height: 100%;
+}
+
+/* Fixed rather than absolute: the map is nested inside Inertia's #app, which
+   has no height of its own to resolve against. The doubled class out-specifies
+   maplibre.css, which is served after this file and sets position: relative. */
+.home-map.home-map {
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;

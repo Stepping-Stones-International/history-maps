@@ -28,18 +28,8 @@
   </head>
 
   <body>
-    <%# The map is full-bleed and has its own drawer, so it opts out via content_for. %>
-    <%= render "layouts/header" unless content_for?(:hide_header) %>
-
-    <% unless content_for?(:hide_header) %>
-      <% if flash[:alert] %>
-        <div class="flash flash--alert flash--page"><%= flash[:alert] %></div>
-      <% end %>
-      <% if flash[:notice] %>
-        <div class="flash flash--notice flash--page"><%= flash[:notice] %></div>
-      <% end %>
-    <% end %>
-
+    <%# Inertia mounts the React app here; header, flash and page markup all
+        live in React components under app/javascript. %>
     <%= yield %>
   </body>
 </html>

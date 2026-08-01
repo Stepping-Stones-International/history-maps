@@ -6,12 +6,15 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
   test "index is reachable without signing in" do
     get topics_path
     assert_response :success
+    assert_inertia_component "Topics/Index"
   end
 
   test "index lists topics with their author" do
     get topics_path
-    assert_select ".topic__title", text: @topic.title
-    assert_select ".topic__author", text: /#{@topic.author.email_address}/
+
+    listed = inertia.props[:topics].find { |topic| topic[:id] == @topic.id }
+    assert_equal @topic.title, listed[:title]
+    assert_equal @topic.author.email_address, listed[:author_email]
   end
 
   test "index orders topics by title" do
@@ -21,30 +24,26 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     Topic.create!(title: "Alpha", author: author)
 
     get topics_path
-    titles = css_select(".topic__title").map(&:text)
-    assert_equal [ "Alpha", "Beta" ], titles
+    assert_equal [ "Alpha", "Beta" ], inertia.props[:topics].map { |topic| topic[:title] }
   end
 
-  test "index renders the site header with signed-out links" do
+  test "index shares no current user when signed out" do
     get topics_path
-    assert_select ".site-header__brand", text: "BibleMind"
-    assert_select ".site-header a[href=?]", new_session_path
-    assert_select ".site-header a[href=?]", new_registration_path
+    assert_nil inertia.props[:currentUser]
   end
 
-  test "index shows the current user and a log out button when signed in" do
+  test "index shares the current user when signed in" do
     sign_in_as users(:one)
 
     get topics_path
-    assert_select ".site-header__user", text: users(:one).email_address
-    assert_select ".site-header form[action=?]", session_path
+    assert_equal users(:one).email_address, inertia.props[:currentUser][:email_address]
   end
 
-  test "index shows a large add button linking to the new topic form" do
+  test "index sends an empty list when there are no topics" do
+    Topic.destroy_all
+
     get topics_path
-    assert_select "a.icon-button--large[href=?]", new_topic_path do
-      assert_select "svg.icon-button__glyph"
-    end
+    assert_empty inertia.props[:topics]
   end
 
   test "new requires authentication" do
@@ -57,14 +56,14 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
     get new_topic_path
     assert_response :success
-    assert_select "form[action=?]", topics_path
+    assert_inertia_component "Topics/New"
   end
 
   test "create attributes the topic to the signed in user" do
     sign_in_as users(:one)
 
     assert_difference -> { Topic.count }, 1 do
-      post topics_path, params: { topic: { title: "New Topic", description: "About it." } }
+      post topics_path, params: { title: "New Topic", description: "About it." }
     end
 
     assert_redirected_to topics_path
@@ -75,25 +74,19 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     assert_no_difference -> { Topic.count } do
-      post topics_path, params: { topic: { title: "", description: "No title." } }
+      post topics_path, params: { title: "", description: "No title." }
     end
 
-    assert_response :unprocessable_entity
-    assert_select ".flash--alert"
+    assert_redirected_to new_topic_path
+    follow_redirect!
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "blank"
   end
 
   test "create requires authentication" do
     assert_no_difference -> { Topic.count } do
-      post topics_path, params: { topic: { title: "Sneaky" } }
+      post topics_path, params: { title: "Sneaky" }
     end
 
     assert_redirected_to new_session_path
-  end
-
-  test "index shows an empty state when there are no topics" do
-    Topic.destroy_all
-
-    get topics_path
-    assert_select ".page__empty"
   end
 end

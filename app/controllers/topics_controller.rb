@@ -2,25 +2,35 @@ class TopicsController < ApplicationController
   allow_unauthenticated_access only: :index
 
   def index
-    @topics = Topic.includes(:author).order(:title)
+    render inertia: "Topics/Index", props: {
+      topics: Topic.includes(:author).order(:title).map { |topic|
+        {
+          id: topic.id,
+          title: topic.title,
+          description: topic.description,
+          author_email: topic.author.email_address
+        }
+      }
+    }
   end
 
   def new
-    @topic = Current.user.topics.new
+    render inertia: "Topics/New"
   end
 
   def create
-    @topic = Current.user.topics.new(topic_params)
+    topic = Current.user.topics.new(topic_params)
 
-    if @topic.save
+    if topic.save
       redirect_to topics_path, notice: "Topic added."
     else
-      render :new, status: :unprocessable_entity
+      redirect_to new_topic_path, inertia: { errors: topic.errors }
     end
   end
 
   private
+    # Inertia forms post a flat payload.
     def topic_params
-      params.expect(topic: [ :title, :description ])
+      params.permit(:title, :description)
     end
 end
