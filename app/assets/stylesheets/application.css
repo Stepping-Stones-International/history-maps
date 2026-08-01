@@ -245,6 +245,29 @@ body {
   min-width: 0;
 }
 
+/* Month and day stay narrow; the year takes the remaining space. */
+.form__row--date .form__field {
+  flex: 0 0 4.5rem;
+}
+
+.form__row--date .form__field--year {
+  flex: 1 1 auto;
+}
+
+.form__fieldset {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.form__sublabel {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
 .form__row-action {
   flex: 0 0 auto;
   cursor: pointer;

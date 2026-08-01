@@ -51,6 +51,68 @@ class NodeTest < ActiveSupport::TestCase
     assert_predicate node.errors[:date_type], :any?
   end
 
+  test "composes a date from the month, day and year fields" do
+    node = Node.create!(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0,
+      occurred_month: "7", occurred_day: "4", occurred_year: "1776"
+    )
+
+    assert_equal Date.new(1776, 7, 4), node.occurred_on
+  end
+
+  test "accepts a year at either end of the supported range" do
+    [ 1, 4000 ].each do |year|
+      node = Node.new(
+        topic: @topic, title: "Dated", latitude: 0, longitude: 0,
+        occurred_month: "1", occurred_day: "1", occurred_year: year.to_s
+      )
+
+      assert node.valid?, "expected year #{year} to be accepted"
+      assert_equal year, node.occurred_on.year
+    end
+  end
+
+  test "rejects a year outside the supported range" do
+    [ "0", "4001", "-5" ].each do |year|
+      node = Node.new(
+        topic: @topic, title: "Dated", latitude: 0, longitude: 0,
+        occurred_month: "1", occurred_day: "1", occurred_year: year
+      )
+
+      assert_not node.valid?, "expected year #{year} to be rejected"
+      assert_includes node.errors[:occurred_year], "must be between 1 and 4000"
+    end
+  end
+
+  test "rejects a day that does not exist in the month" do
+    node = Node.new(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0,
+      occurred_month: "2", occurred_day: "31", occurred_year: "1900"
+    )
+
+    assert_not node.valid?
+    assert_includes node.errors[:occurred_on], "must be a real date"
+  end
+
+  test "rejects a partially filled date" do
+    node = Node.new(
+      topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_year: "1900"
+    )
+
+    assert_not node.valid?
+    assert_predicate node.errors[:occurred_on], :any?
+  end
+
+  test "leaves the date empty when no part is given" do
+    node = Node.new(
+      topic: @topic, title: "Undated", latitude: 0, longitude: 0,
+      occurred_month: "", occurred_day: "", occurred_year: ""
+    )
+
+    assert node.valid?
+    assert_nil node.occurred_on
+  end
+
   test "parses an MM-DD-YYYY date from the form" do
     node = Node.create!(
       topic: @topic, title: "Dated", latitude: 0, longitude: 0, occurred_on: "07-04-1776"

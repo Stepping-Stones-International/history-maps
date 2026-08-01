@@ -75,24 +75,38 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_topic_path(@topic)
   end
 
-  test "create stores an exact date sent as MM-DD-YYYY" do
+  test "create stores a date sent as separate month, day and year fields" do
     sign_in_as users(:one)
 
-    post topic_nodes_path(@topic), params: node_params(date_type: "exact", occurred_on: "12-25-0336")
+    post topic_nodes_path(@topic), params: node_params(
+      date_type: "exact", occurred_month: "12", occurred_day: "25", occurred_year: "336"
+    )
 
     assert_equal Date.new(336, 12, 25), Node.find_by!(title: "Ephesus").occurred_on
   end
 
-  test "create rejects a misformatted date" do
+  test "create accepts a one digit year" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      occurred_month: "1", occurred_day: "1", occurred_year: "1"
+    )
+
+    assert_equal 1, Node.find_by!(title: "Ephesus").occurred_on.year
+  end
+
+  test "create rejects a year past the supported range" do
     sign_in_as users(:one)
 
     assert_no_difference -> { Node.count } do
-      post topic_nodes_path(@topic), params: node_params(occurred_on: "25-12-1990")
+      post topic_nodes_path(@topic), params: node_params(
+        occurred_month: "1", occurred_day: "1", occurred_year: "4001"
+      )
     end
 
     assert_redirected_to edit_topic_path(@topic)
     follow_redirect!
-    assert_includes inertia.props[:errors].values.flatten.join(" "), "MM-DD-YYYY"
+    assert_includes inertia.props[:errors].values.flatten.join(" "), "between 1 and 4000"
   end
 
   test "the map sends dates back formatted MM-DD-YYYY" do

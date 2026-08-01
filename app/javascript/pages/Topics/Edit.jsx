@@ -9,7 +9,9 @@ import Modal from "../../components/Modal"
 
 const EMPTY_DRAFT = {
   date_type: "exact",
-  occurred_on: "",
+  occurred_month: "",
+  occurred_day: "",
+  occurred_year: "",
   title: "",
   description: "",
   latitude: "",

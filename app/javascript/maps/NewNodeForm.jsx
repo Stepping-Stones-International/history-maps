@@ -6,10 +6,14 @@ import { Crosshair } from "lucide-react"
 export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, onCancel, onSubmit }) {
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
-  // Clear the date when it stops applying, so a hidden field is not submitted.
+  // Clear the date when it stops applying, so hidden fields are not submitted.
   const setDateType = (event) => {
     const date_type = event.target.value
-    onChange({ ...draft, date_type, occurred_on: date_type === "exact" ? draft.occurred_on : "" })
+    const cleared = date_type === "exact"
+      ? {}
+      : { occurred_month: "", occurred_day: "", occurred_year: "" }
+
+    onChange({ ...draft, date_type, ...cleared })
   }
 
   const submit = (event) => {
@@ -34,20 +38,56 @@ export default function NewNodeForm({ draft, dateTypes, onChange, onPickOnMap, o
       </div>
 
       {draft.date_type === "exact" && (
-        <div className="form__field">
-          <label htmlFor="node-occurred-on" className="form__label">Date</label>
-          <input
-            id="node-occurred-on"
-            type="text"
-            inputMode="numeric"
-            placeholder="MM-DD-YYYY"
-            pattern="\d{2}-\d{2}-\d{4}"
-            title="Use MM-DD-YYYY"
-            className="form__input"
-            value={draft.occurred_on}
-            onChange={set("occurred_on")}
-          />
-        </div>
+        <fieldset className="form__fieldset">
+          <legend className="form__label">Date</legend>
+
+          <div className="form__row form__row--date">
+            <div className="form__field">
+              <label htmlFor="node-occurred-month" className="form__sublabel">MM</label>
+              <input
+                id="node-occurred-month"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                max="12"
+                placeholder="MM"
+                className="form__input"
+                value={draft.occurred_month}
+                onChange={set("occurred_month")}
+              />
+            </div>
+
+            <div className="form__field">
+              <label htmlFor="node-occurred-day" className="form__sublabel">DD</label>
+              <input
+                id="node-occurred-day"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                max="31"
+                placeholder="DD"
+                className="form__input"
+                value={draft.occurred_day}
+                onChange={set("occurred_day")}
+              />
+            </div>
+
+            <div className="form__field form__field--year">
+              <label htmlFor="node-occurred-year" className="form__sublabel">YYYY</label>
+              <input
+                id="node-occurred-year"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                max="4000"
+                placeholder="YYYY"
+                className="form__input"
+                value={draft.occurred_year}
+                onChange={set("occurred_year")}
+              />
+            </div>
+          </div>
+        </fieldset>
       )}
 
       <div className="form__field">
