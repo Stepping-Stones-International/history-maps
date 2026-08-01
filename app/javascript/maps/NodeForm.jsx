@@ -33,6 +33,15 @@ export default function NodeForm({
     }
   }
 
+  // A layer groups things rather than marking a place, so it takes no
+  // coordinates; ticking it clears and disables them.
+  const isLayer = Boolean(draft.layer)
+
+  const toggleLayer = (event) => {
+    const wanted = event.target.checked
+    onChange(wanted ? { ...draft, layer: true, latitude: "", longitude: "" } : { ...draft, layer: false })
+  }
+
   const typeOptions = embedding
     ? dateTypes
     : dateTypes.filter((option) => option.value !== "none")
@@ -178,7 +187,8 @@ export default function NodeForm({
             step="any"
             min="-90"
             max="90"
-            required
+            required={!isLayer}
+            disabled={isLayer}
             className="form__input"
             value={draft.latitude}
             onChange={set("latitude")}
@@ -193,7 +203,8 @@ export default function NodeForm({
             step="any"
             min="-180"
             max="180"
-            required
+            required={!isLayer}
+            disabled={isLayer}
             className="form__input"
             value={draft.longitude}
             onChange={set("longitude")}
@@ -204,6 +215,7 @@ export default function NodeForm({
           type="button"
           className="icon-button icon-button--small form__row-action"
           onClick={onPickOnMap}
+          disabled={isLayer}
           aria-label="Pick coordinates on the map"
           title="Pick coordinates on the map"
         >
@@ -254,6 +266,18 @@ export default function NodeForm({
         </div>
       </div>
       )}
+
+      <div className="form__field">
+        <label className="form__check">
+          <input
+            type="checkbox"
+            className="form__checkbox"
+            checked={isLayer}
+            onChange={toggleLayer}
+          />
+          Layer
+        </label>
+      </div>
 
       <div className="form__actions">
         <button type="button" className="button button--text" onClick={onCancel}>Cancel</button>

@@ -83,6 +83,7 @@ class TopicsController < ApplicationController
         id: node.id,
         title: node.title,
         description: node.description,
+        layer: node.layer,
         parent_id: node.parent_id,
         position: node.position,
         date_type: node.date_type,

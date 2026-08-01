@@ -10,14 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_205405) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_213048) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "date_type", default: "exact", null: false
     t.text "description"
     t.string "era", default: "AD", null: false
-    t.float "latitude", null: false
-    t.float "longitude", null: false
+    t.float "latitude"
+    t.boolean "layer", default: false, null: false
+    t.float "longitude"
     t.integer "occurred_day"
     t.integer "occurred_month"
     t.integer "occurred_year"

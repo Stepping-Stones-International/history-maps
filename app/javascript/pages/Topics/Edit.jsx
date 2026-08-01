@@ -10,6 +10,7 @@ import TopicSettingsForm from "../../maps/TopicSettingsForm"
 import Modal from "../../components/Modal"
 
 const EMPTY_DRAFT = {
+  layer: false,
   parent_id: "",
   position: "",
   date_type: "exact",
@@ -25,6 +26,7 @@ const EMPTY_DRAFT = {
 
 // Only the fields the form edits; id and display-only values are left behind.
 const draftFrom = (node) => ({
+  layer: Boolean(node.layer),
   parent_id: node.parent_id || "",
   position: node.position ?? "",
   date_type: node.date_type,

@@ -322,6 +322,27 @@ class NodeTest < ActiveSupport::TestCase
     assert_nil child.date_display
   end
 
+  test "a layer needs no coordinates" do
+    layer = Node.new(topic: @topic, title: "Sources", date_type: "range", layer: true)
+
+    assert layer.valid?, layer.errors.full_messages.to_sentence
+    assert_not layer.placed?
+  end
+
+  test "anything that is not a layer still needs coordinates" do
+    node = Node.new(topic: @topic, title: "Placeless", date_type: "range")
+
+    assert_not node.valid?
+    assert_includes node.errors[:latitude], "can't be blank"
+  end
+
+  test "a layer with coordinates still has them checked" do
+    layer = Node.new(topic: @topic, title: "Sources", date_type: "range",
+      layer: true, latitude: 200, longitude: 0)
+
+    assert layer.valid?, "coordinates are not required of a layer"
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy

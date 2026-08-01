@@ -36,10 +36,11 @@ class Node < ApplicationRecord
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :date_type, inclusion: { in: DATE_TYPES.keys }
   validates :era, inclusion: { in: ERAS }
+  # A layer is not a place, so it is the one kind of node without coordinates.
   validates :latitude, presence: true,
-    numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }
+    numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, unless: :layer?
   validates :longitude, presence: true,
-    numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }
+    numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, unless: :layer?
 
   validates :occurred_year,
     numericality: { only_integer: true, in: MIN_YEAR..MAX_YEAR }, allow_nil: true
@@ -60,6 +61,10 @@ class Node < ApplicationRecord
 
   def embedded?
     parent_id.present?
+  end
+
+  def placed?
+    latitude.present? && longitude.present?
   end
 
   # Self and everything embedded beneath, so a node cannot be filed under one

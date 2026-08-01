@@ -186,13 +186,14 @@ export default function HomeMap({
     if (canvas) canvas.style.cursor = placing ? "crosshair" : ""
   }, [placing])
 
-  // Reconcile markers against the current nodes.
+  // Reconcile markers against the current nodes. Layers have no coordinates,
+  // so nothing is drawn for them.
   useEffect(() => {
     if (!map.current) return
 
     const seen = new Set()
 
-    nodes.forEach((node) => {
+    nodes.filter((node) => node.latitude != null && node.longitude != null).forEach((node) => {
       seen.add(node.id)
 
       const existing = markers.current.get(node.id)

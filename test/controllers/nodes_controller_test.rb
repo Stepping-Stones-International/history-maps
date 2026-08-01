@@ -371,6 +371,29 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
     assert_nil Node.find_by!(title: "Ephesus").parent_id
   end
 
+  test "create accepts a layer with no coordinates" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(
+      layer: "true", latitude: "", longitude: ""
+    )
+
+    node = Node.find_by!(title: "Ephesus")
+    assert node.layer
+    assert_not node.placed?
+  end
+
+  test "the sidebar is told which nodes are layers" do
+    sign_in_as users(:one)
+    layer = @topic.nodes.create!(title: "Sources", date_type: "range", layer: true)
+
+    get edit_topic_path(@topic)
+    listed = inertia.props[:nodes].find { |node| node[:id] == layer.id }
+
+    assert listed[:layer]
+    assert_nil listed[:latitude]
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

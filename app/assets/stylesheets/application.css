@@ -461,6 +461,12 @@ textarea.form__input {
   resize: vertical;
 }
 
+.form__input:disabled {
+  color: #55646f;
+  cursor: not-allowed;
+  background: rgba(27, 36, 46, 0.5);
+}
+
 /* Native select, restyled: its own chevron replaces the platform one. */
 .form__select {
   appearance: none;
