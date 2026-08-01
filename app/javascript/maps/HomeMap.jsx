@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { Map as MapLibreMap, Marker, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl"
+import areaCentroid from "./areaCentroid"
 
 // Built as DOM with textContent, never HTML: this is user input.
 function nodeLabel(node) {
@@ -145,6 +146,7 @@ export default function HomeMap({
   const map = useRef(null)
   const markers = useRef(new Map())
   const labels = useRef(new Map())
+  const areaLabels = useRef(new Map())
   const styleReady = useRef(false)
   const highlightedRef = useRef(highlightedId)
   highlightedRef.current = highlightedId
@@ -221,6 +223,23 @@ export default function HomeMap({
         paint: { "line-color": "#8fb8e8", "line-width": 1.5, "line-opacity": 0.8 }
       })
 
+      const showAreaLabel = (event) => {
+        const id = event.features?.[0]?.properties?.id
+        const popup = id && areaLabels.current.get(id)
+        map.current.getCanvas().style.cursor = placingRef.current ? "crosshair" : "pointer"
+        if (popup && !popup.isOpen()) popup.addTo(map.current)
+      }
+
+      const hideAreaLabels = () => {
+        map.current.getCanvas().style.cursor = placingRef.current ? "crosshair" : ""
+        areaLabels.current.forEach((popup, id) => {
+          if (id !== highlightedRef.current) popup.remove()
+        })
+      }
+
+      map.current.on("mousemove", `${AREA_SOURCE}-fill`, showAreaLabel)
+      map.current.on("mouseleave", `${AREA_SOURCE}-fill`, hideAreaLabels)
+
       styleReady.current = true
       map.current.getSource(AREA_SOURCE)?.setData({
         type: "FeatureCollection",
@@ -247,6 +266,8 @@ export default function HomeMap({
     return () => {
       labels.current.forEach((label) => label.remove())
       labels.current.clear()
+      areaLabels.current.forEach((label) => label.remove())
+      areaLabels.current.clear()
       markers.current.forEach((marker) => marker.remove())
       markers.current.clear()
       map.current?.remove()
@@ -341,13 +362,46 @@ export default function HomeMap({
     })
   }, [nodes])
 
-  // Keep the drawn areas in step with the nodes.
+  // Keep the drawn areas, and the labels anchored in the middle of them, in
+  // step with the nodes.
   useEffect(() => {
     if (!map.current || !styleReady.current) return
 
     map.current.getSource(AREA_SOURCE)?.setData({
       type: "FeatureCollection",
       features: areaFeatures(nodes)
+    })
+
+    const seen = new Set()
+
+    nodes.forEach((node) => {
+      if (!Array.isArray(node.area) || node.area.length < 3) return
+
+      const centre = areaCentroid(node.area)
+      if (!centre) return
+
+      seen.add(node.id)
+      const existing = areaLabels.current.get(node.id)
+
+      if (existing) {
+        existing.setLngLat(centre).setDOMContent(nodeLabel(node))
+        return
+      }
+
+      areaLabels.current.set(node.id, new Popup({
+        offset: 0,
+        closeButton: false,
+        closeOnClick: false,
+        focusAfterOpen: false,
+        maxWidth: "260px",
+        className: "node-label"
+      }).setLngLat(centre).setDOMContent(nodeLabel(node)))
+    })
+
+    areaLabels.current.forEach((popup, id) => {
+      if (seen.has(id)) return
+      popup.remove()
+      areaLabels.current.delete(id)
     })
   }, [nodes])
 
@@ -366,6 +420,22 @@ export default function HomeMap({
       if (active && !popup.isOpen()) popup.addTo(map.current)
       if (!active && popup.isOpen()) popup.remove()
     })
+
+    areaLabels.current.forEach((popup, id) => {
+      const active = id === highlightedId
+      if (active && !popup.isOpen()) popup.addTo(map.current)
+      if (!active && popup.isOpen()) popup.remove()
+    })
+
+    if (styleReady.current && map.current.getLayer(`${AREA_SOURCE}-fill`)) {
+      const isActive = [ "==", [ "get", "id" ], highlightedId || "" ]
+      map.current.setPaintProperty(`${AREA_SOURCE}-fill`, "fill-opacity",
+        [ "case", isActive, 0.34, 0.18 ])
+      map.current.setPaintProperty(`${AREA_SOURCE}-line`, "line-color",
+        [ "case", isActive, "#f2b640", "#8fb8e8" ])
+      map.current.setPaintProperty(`${AREA_SOURCE}-fill`, "fill-color",
+        [ "case", isActive, "#f2b640", "#8fb8e8" ])
+    }
   }, [highlightedId, nodes])
 
   return <div ref={container} className="home-map" />
