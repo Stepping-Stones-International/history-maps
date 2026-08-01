@@ -156,6 +156,7 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick, onNod
         closeButton: false,
         closeOnClick: false,
         focusAfterOpen: false,
+        maxWidth: "260px",
         className: "node-label"
       })
         .setLngLat([node.longitude, node.latitude])

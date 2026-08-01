@@ -2,15 +2,6 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import { createInertiaApp } from "@inertiajs/react"
 import Toasts from "../components/Toasts"
-import report from "../lib/report"
-
-// TEMPORARY: surface anything that dies silently in the browser.
-window.addEventListener("error", (event) => {
-  report("window.error", { message: String(event.message), source: `${event.filename}:${event.lineno}` })
-})
-window.addEventListener("unhandledrejection", (event) => {
-  report("window.rejection", { reason: String(event.reason) })
-})
 
 import TopicsIndex from "../pages/Topics/Index"
 import TopicsEdit from "../pages/Topics/Edit"

@@ -808,8 +808,10 @@ textarea.form__input {
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
   text-align: center;
+  /* Long titles wrap rather than stretching the label across the map. */
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .node-label__title {

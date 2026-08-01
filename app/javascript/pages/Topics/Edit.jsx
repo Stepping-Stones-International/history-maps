@@ -7,7 +7,6 @@ import TimelineBar from "../../maps/TimelineBar"
 import NodeForm from "../../maps/NodeForm"
 import NodeList from "../../maps/NodeList"
 import Modal from "../../components/Modal"
-import report from "../../lib/report"
 
 const EMPTY_DRAFT = {
   date_type: "exact",
@@ -81,33 +80,10 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
   // Called on the router, not through a detached reference: router.patch binds
   // this, so pulling it into a variable throws when it reaches this.visit.
   const save = () => {
-    const mode = editor.mode
-    const url = mode === "edit"
-      ? `/topics/${topic.id}/nodes/${editor.id}`
-      : `/topics/${topic.id}/nodes`
-
-    // TEMPORARY tracing; remove with DiagnosticsController.
-    report("submit", { mode, url, draft })
-
-    const options = {
-      onBefore: () => report("before", { mode, url }),
-      onSuccess: (page) => {
-        report("success", { mode, url, nodes: page?.props?.nodes, flash: page?.props?.flash })
-        close()
-      },
-      onError: (errors) => report("error", { mode, url, errors }),
-      onFinish: () => report("finish", { mode, url })
-    }
-
-    try {
-      if (mode === "edit") {
-        router.patch(url, draft, options)
-      } else {
-        router.post(url, draft, options)
-      }
-    } catch (error) {
-      report("exception", { mode, url, message: String(error?.message || error), stack: String(error?.stack || "") })
-      throw error
+    if (editor.mode === "edit") {
+      router.patch(`/topics/${topic.id}/nodes/${editor.id}`, draft, { onSuccess: close })
+    } else {
+      router.post(`/topics/${topic.id}/nodes`, draft, { onSuccess: close })
     }
   }
 
