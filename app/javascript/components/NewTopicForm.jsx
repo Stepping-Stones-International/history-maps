@@ -40,7 +40,7 @@ export default function NewTopicForm({ onCancel }) {
       </div>
 
       <div className="form__actions">
-        <button type="button" className="button button--quiet" onClick={onCancel}>
+        <button type="button" className="button button--text" onClick={onCancel}>
           Cancel
         </button>
         <button type="submit" className="button" disabled={form.processing}>

@@ -412,6 +412,20 @@ textarea.form__input {
   background: var(--surface-raised);
 }
 
+/* Text-only button for secondary actions like Cancel. Declared after .button
+   so it wins on source order. */
+.button--text {
+  color: var(--text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.button--text:hover {
+  color: var(--text);
+  background: transparent;
+  text-decoration: underline;
+}
+
 .topic-list {
   margin: 0;
   padding: 0;

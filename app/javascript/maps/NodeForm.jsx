@@ -171,7 +171,7 @@ export default function NodeForm({
       </div>
 
       <div className="form__actions">
-        <button type="button" className="button button--quiet" onClick={onCancel}>Cancel</button>
+        <button type="button" className="button button--text" onClick={onCancel}>Cancel</button>
         <button type="submit" className="button">Save</button>
       </div>
     </form>
