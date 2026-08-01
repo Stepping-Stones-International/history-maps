@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client"
 import { createInertiaApp } from "@inertiajs/react"
 
 import TopicsIndex from "../pages/Topics/Index"
-import TopicsNew from "../pages/Topics/New"
 import TopicsEdit from "../pages/Topics/Edit"
 import SessionsNew from "../pages/Sessions/New"
 import RegistrationsNew from "../pages/Registrations/New"
@@ -14,7 +13,6 @@ import PasswordsEdit from "../pages/Passwords/Edit"
 // that code splitting would not earn its complexity yet.
 const pages = {
   "Topics/Index": TopicsIndex,
-  "Topics/New": TopicsNew,
   "Topics/Edit": TopicsEdit,
   "Sessions/New": SessionsNew,
   "Registrations/New": RegistrationsNew,

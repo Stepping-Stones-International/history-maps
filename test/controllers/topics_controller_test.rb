@@ -73,19 +73,6 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_empty inertia.props[:topics]
   end
 
-  test "new requires authentication" do
-    get new_topic_path
-    assert_redirected_to new_session_path
-  end
-
-  test "new renders the form when signed in" do
-    sign_in_as users(:one)
-
-    get new_topic_path
-    assert_response :success
-    assert_inertia_component "Topics/New"
-  end
-
   test "create attributes the topic to the signed in user" do
     sign_in_as users(:one)
 
@@ -93,19 +80,29 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
       post topics_path, params: { title: "New Topic", description: "About it." }
     end
 
-    assert_redirected_to topics_path
     assert_equal users(:one), Topic.find_by!(title: "New Topic").author
   end
 
-  test "create rejects a topic without a title" do
+  test "create sends you to the new topic's map" do
+    sign_in_as users(:one)
+
+    post topics_path, params: { title: "New Topic", description: "About it." }
+
+    assert_redirected_to edit_topic_path(Topic.find_by!(title: "New Topic"))
+    follow_redirect!
+    assert_inertia_component "Topics/Edit"
+  end
+
+  test "create returns to the list with errors so the modal can show them" do
     sign_in_as users(:one)
 
     assert_no_difference -> { Topic.count } do
       post topics_path, params: { title: "", description: "No title." }
     end
 
-    assert_redirected_to new_topic_path
+    assert_redirected_to topics_path
     follow_redirect!
+    assert_inertia_component "Topics/Index"
     assert_includes inertia.props[:errors].values.flatten.join(" "), "blank"
   end
 

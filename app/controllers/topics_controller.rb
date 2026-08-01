@@ -14,10 +14,6 @@ class TopicsController < ApplicationController
     }
   end
 
-  def new
-    render inertia: "Topics/New"
-  end
-
   # The map view for a topic. Scoped to the signed-in user's own topics.
   def edit
     topic = Current.user.topics.find(params[:id])
@@ -31,9 +27,10 @@ class TopicsController < ApplicationController
     topic = Current.user.topics.new(topic_params)
 
     if topic.save
-      redirect_to topics_path, notice: "Topic added."
+      redirect_to edit_topic_path(topic), notice: "Topic added."
     else
-      redirect_to new_topic_path, inertia: { errors: topic.errors }
+      # Back to the list, where the modal stays open and shows the errors.
+      redirect_to topics_path, inertia: { errors: topic.errors }
     end
   end
 

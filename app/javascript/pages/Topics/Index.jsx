@@ -1,9 +1,13 @@
-import React from "react"
+import React, { useState } from "react"
 import { Head, Link } from "@inertiajs/react"
 import { Plus } from "lucide-react"
 import Layout from "../../components/Layout"
+import Modal from "../../components/Modal"
+import NewTopicForm from "../../components/NewTopicForm"
 
 export default function Index({ topics }) {
+  const [creating, setCreating] = useState(false)
+
   return (
     <Layout>
       <Head title="Topics" />
@@ -12,14 +16,15 @@ export default function Index({ topics }) {
         <header className="page__header">
           <h1 className="page__title">Topics</h1>
 
-          <Link
-            href="/topics/new"
+          <button
+            type="button"
             className="icon-button icon-button--large"
+            onClick={() => setCreating(true)}
             title="Add new topic"
             aria-label="Add new topic"
           >
             <Plus className="icon-button__glyph" strokeWidth={2} />
-          </Link>
+          </button>
         </header>
 
         {topics.length > 0 ? (
@@ -40,6 +45,12 @@ export default function Index({ topics }) {
           <p className="page__empty">No topics yet.</p>
         )}
       </main>
+
+      {creating && (
+        <Modal title="New topic" onClose={() => setCreating(false)}>
+          <NewTopicForm onCancel={() => setCreating(false)} />
+        </Modal>
+      )}
     </Layout>
   )
 }

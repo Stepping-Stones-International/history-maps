@@ -150,6 +150,73 @@ body {
   height: 52px;
 }
 
+.icon-button--small {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-button--small .icon-button__glyph {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 1rem 2rem;
+  background: rgba(4, 8, 12, 0.66);
+}
+
+.modal__panel {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+}
+
+.modal__panel:focus {
+  outline: none;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0.85rem 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.modal__body {
+  padding: 1.25rem;
+}
+
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.form__error {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #f0a9ad;
+}
+
 .icon-button--large .icon-button__glyph {
   width: 30px;
   height: 30px;
