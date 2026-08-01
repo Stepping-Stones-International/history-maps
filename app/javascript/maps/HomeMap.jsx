@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react"
-import { Map as MapLibreMap, Marker, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl"
+import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl } from "maplibre-gl"
 
 const workerUrl = document.querySelector('meta[name="maplibre-worker-url"]')?.content
 if (workerUrl) setWorkerUrl(workerUrl)
@@ -61,13 +61,18 @@ const TOPO_STYLE = {
   ]
 }
 
-export default function HomeMap({ nodes = [], placing = false, onMapClick }) {
+export default function HomeMap({ nodes = [], placing = false, onMapClick, onNodeSelect }) {
   const container = useRef(null)
   const map = useRef(null)
   const markers = useRef(new Map())
-  // Held in a ref so changing the handler does not re-bind the map listener.
+  // Held in refs so changing these does not re-bind the map and marker
+  // listeners, which are attached once when each is created.
   const clickHandler = useRef(onMapClick)
   clickHandler.current = onMapClick
+  const selectHandler = useRef(onNodeSelect)
+  selectHandler.current = onNodeSelect
+  const placingRef = useRef(placing)
+  placingRef.current = placing
 
   useEffect(() => {
     if (map.current) return
@@ -110,28 +115,29 @@ export default function HomeMap({ nodes = [], placing = false, onMapClick }) {
 
     nodes.forEach((node) => {
       seen.add(node.id)
-      if (markers.current.has(node.id)) return
 
-      // Built as DOM with textContent, never HTML: this is user input.
-      const content = document.createElement("div")
-      content.className = "node-popup"
-
-      const title = document.createElement("p")
-      title.className = "node-popup__title"
-      title.textContent = node.title
-      content.appendChild(title)
-
-      if (node.description) {
-        const description = document.createElement("p")
-        description.className = "node-popup__description"
-        description.textContent = node.description
-        content.appendChild(description)
+      const existing = markers.current.get(node.id)
+      if (existing) {
+        // Keep a moved or renamed node in step without rebuilding the marker.
+        existing.setLngLat([node.longitude, node.latitude])
+        existing.getElement().setAttribute("aria-label", node.title)
+        return
       }
 
       const marker = new Marker({ color: "#8fb8e8" })
         .setLngLat([node.longitude, node.latitude])
-        .setPopup(new Popup({ offset: 18, closeButton: false }).setDOMContent(content))
         .addTo(map.current)
+
+      const element = marker.getElement()
+      element.style.cursor = "pointer"
+      element.setAttribute("role", "button")
+      element.setAttribute("aria-label", node.title)
+      element.addEventListener("click", (event) => {
+        event.stopPropagation()
+        // While placing, the next click belongs to the map.
+        if (placingRef.current) return
+        selectHandler.current?.(node.id)
+      })
 
       markers.current.set(node.id, marker)
     })

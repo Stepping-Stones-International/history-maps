@@ -59,6 +59,12 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
     setEditor({ mode: "edit", id: node.id })
   }
 
+  // Markers hand back an id, since the node they captured may be stale.
+  const startEditingById = (id) => {
+    const node = nodes.find((candidate) => candidate.id === id)
+    if (node) startEditing(node)
+  }
+
   const takeCoordinates = ({ latitude, longitude }) => {
     if (!picking) return
 
@@ -84,7 +90,12 @@ export default function Edit({ topic, nodes, dateTypes, eras }) {
     <>
       <Head title={topic.title} />
 
-      <HomeMap nodes={nodes} placing={picking} onMapClick={takeCoordinates} />
+      <HomeMap
+        nodes={nodes}
+        placing={picking}
+        onMapClick={takeCoordinates}
+        onNodeSelect={startEditingById}
+      />
 
       <Drawer title={topic.title} open={drawerOpen} onOpenChange={setDrawerOpen}>
         <NodeList nodes={nodes} onSelect={startEditing} />
