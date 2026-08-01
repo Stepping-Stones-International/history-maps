@@ -350,6 +350,27 @@ class NodesControllerTest < ActionDispatch::IntegrationTest
       inertia.props[:nodes].map { |node| node[:title] }
   end
 
+  test "update detaches a node when the parent is cleared" do
+    sign_in_as users(:one)
+    child = @topic.nodes.create!(title: "Child", date_type: "range",
+      latitude: 0, longitude: 0, parent: nodes(:one))
+
+    patch topic_node_path(@topic, child), params: node_params(
+      title: "Child", parent_id: "", position: 0
+    )
+
+    assert_response :redirect
+    assert_nil child.reload.parent_id
+  end
+
+  test "create ignores a blank parent" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: node_params(parent_id: "")
+
+    assert_nil Node.find_by!(title: "Ephesus").parent_id
+  end
+
   test "the map is sent the date type options" do
     sign_in_as users(:one)
 

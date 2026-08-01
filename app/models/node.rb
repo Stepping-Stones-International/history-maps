@@ -23,7 +23,12 @@ class Node < ApplicationRecord
 
   scope :roots, -> { where(parent_id: nil) }
 
+  # The form sends "" for "no parent". Left alone it would be written as an
+  # empty string and break the foreign key, so it becomes NULL here.
+  normalizes :parent_id, with: ->(value) { value.presence }
+
   before_validation :place_after_siblings, on: :create
+  before_validation :default_position
 
   validates :title, presence: true
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -90,6 +95,11 @@ class Node < ApplicationRecord
   end
 
   private
+    # Clearing the field should mean "first", not a missing number.
+    def default_position
+      self.position = 0 if position.nil?
+    end
+
     # New nodes land at the end of their parent's list.
     def place_after_siblings
       return if position.present? && position.positive?

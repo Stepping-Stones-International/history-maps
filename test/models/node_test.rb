@@ -295,6 +295,23 @@ class NodeTest < ActiveSupport::TestCase
     assert_includes node.errors[:occurred_year], "can't be blank"
   end
 
+  test "a blank parent means no parent, not an empty id" do
+    node = build_node(title: "Detached", date_type: "range", parent_id: "")
+
+    assert node.valid?
+    assert_nil node.parent_id
+    assert node.save
+    assert_nil node.reload.parent_id
+  end
+
+  test "a blank position falls back to the front" do
+    node = build_node(title: "Unordered", date_type: "range")
+    node.save!
+    node.update!(position: "")
+
+    assert_equal 0, node.reload.position
+  end
+
   test "is destroyed along with its topic" do
     assert_difference -> { Node.count }, -@topic.nodes.count do
       @topic.destroy
