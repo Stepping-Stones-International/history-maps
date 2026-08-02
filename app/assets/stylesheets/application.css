@@ -1109,9 +1109,39 @@ textarea.form__input {
   bottom: 3.25rem;
   z-index: 5;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   pointer-events: none;
   transition: left var(--drawer-transition);
+}
+
+/* Sits above the bar, lined up with its left edge. */
+.timeline__modes {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+  opacity: 0.5;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.timeline__modes:hover,
+.timeline__modes:focus-within {
+  opacity: 1;
+}
+
+.timeline__modes-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.timeline__modes-select.timeline__modes-select {
+  width: auto;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  background: rgba(19, 26, 34, 0.92);
 }
 
 .timeline--inset {

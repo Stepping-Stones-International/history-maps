@@ -7,6 +7,7 @@ import TimelineBar from "../../maps/TimelineBar"
 import NodeForm from "../../maps/NodeForm"
 import NodeList from "../../maps/NodeList"
 import TopicSettingsForm from "../../maps/TopicSettingsForm"
+import { visibleNodes, DEFAULT_REVEAL_MODE } from "../../maps/revealMode"
 import Modal from "../../components/Modal"
 
 const EMPTY_DRAFT = {
@@ -67,6 +68,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
   const [highlightedId, setHighlightedId] = useState(null)
   const toggleHighlight = (node) =>
     setHighlightedId((current) => (current === node.id ? null : node.id))
+  // How much of the topic the map draws as the timeline is walked.
+  const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
   // null when closed, otherwise the topic draft being edited.
   const [settings, setSettings] = useState(null)
   const [capturingView, setCapturingView] = useState(false)
@@ -171,8 +174,10 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     <>
       <Head title={topic.title} />
 
+      {/* The sidebar and timeline always list everything; the reveal mode
+          only decides what the map draws. */}
       <HomeMap
-        nodes={nodes}
+        nodes={visibleNodes(nodes, revealMode, highlightedId)}
         placing={picking}
         highlightedId={highlightedId}
         defaultView={topic.default_view}
@@ -222,6 +227,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         highlightedId={highlightedId}
         onHighlight={toggleHighlight}
         onSelect={(node) => setHighlightedId(node.id)}
+        revealMode={revealMode}
+        onRevealModeChange={setRevealMode}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}

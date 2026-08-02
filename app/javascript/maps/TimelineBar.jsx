@@ -1,11 +1,13 @@
 import React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { buildScale } from "./timelineScale"
+import { REVEAL_MODES, DEFAULT_REVEAL_MODE } from "./revealMode"
 
 // Sits over the map, spanning 80% of the space left of the drawer. The offset
 // follows the drawer so the bar recentres when it collapses.
 export default function TimelineBar({
-  nodes = [], drawerOpen, highlightedId = null, onHighlight, onSelect
+  nodes = [], drawerOpen, highlightedId = null, onHighlight, onSelect,
+  revealMode = DEFAULT_REVEAL_MODE, onRevealModeChange
 }) {
   // Null until two nodes carry different dates: nothing to space out before then.
   const scale = buildScale(nodes)
@@ -23,6 +25,20 @@ export default function TimelineBar({
 
   return (
     <div className={`timeline ${drawerOpen ? "timeline--inset" : ""}`}>
+      <div className="timeline__modes">
+        <label htmlFor="timeline-reveal" className="timeline__modes-label">Reveal</label>
+        <select
+          id="timeline-reveal"
+          className="form__input form__select timeline__modes-select"
+          value={revealMode}
+          onChange={(event) => onRevealModeChange?.(event.target.value)}
+        >
+          {REVEAL_MODES.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="timeline__bar" role="group" aria-label="Timeline">
         <button
           type="button"
