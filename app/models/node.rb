@@ -128,16 +128,14 @@ class Node < ApplicationRecord
 
   # Ascending chronological order. BC years count backwards, so their year is
   # negated; months and days still run forwards within a year. A node with only
-  # a year comes before one that also names a month. Undated nodes sort last,
-  # and created_at breaks ties so the order never wobbles between requests.
+  # a year comes before one that also names a month. A span takes its place
+  # from the date it begins, so it sorts among the points rather than after
+  # them. Undated nodes sort last, and created_at breaks ties so the order
+  # never wobbles between requests.
   def chronological_key
-    [
-      dated? ? 0 : 1,
-      dated? ? signed_year : 0,
-      occurred_month || 0,
-      occurred_day || 0,
-      created_at || Time.current
-    ]
+    year, month, day = sort_parts
+
+    [ year ? 0 : 1, year || 0, month || 0, day || 0, created_at || Time.current ]
   end
 
   # "March 5, 325 AD", "c. March 325 AD", "c. 325 AD" — month and day are
@@ -272,6 +270,16 @@ class Node < ApplicationRecord
       return unless subtree_ids.include?(parent_id)
 
       errors.add(:parent, "cannot be the node itself or one embedded under it")
+    end
+
+    # The date a node is filed under: where a span begins, otherwise its own
+    # date. Nil for anything undated, which sorts to the end.
+    def sort_parts
+      if range? && starts_year.present?
+        [ starts_era == "BC" ? -starts_year : starts_year, starts_month, starts_day ]
+      elsif dated?
+        [ signed_year, occurred_month, occurred_day ]
+      end
     end
 
     def signed_year

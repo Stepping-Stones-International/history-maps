@@ -226,6 +226,42 @@ class NodeTest < ActiveSupport::TestCase
     assert_equal [ "March", "May" ], Node.all.sort_by(&:chronological_key).map(&:title)
   end
 
+  test "sorts a span by the date it begins, not after the dated nodes" do
+    Node.destroy_all
+
+    later = build_node(title: "43 AD", occurred_year: 43, date_type: "approximate")
+    span = build_range(title: "34-40 AD", starts_type: "approximate", starts_year: 34,
+      starts_month: nil, starts_day: nil,
+      ends_type: "approximate", ends_year: 40, ends_month: nil, ends_day: nil)
+    [ later, span ].each(&:save!)
+
+    assert_equal [ "34-40 AD", "43 AD" ], Node.all.sort_by(&:chronological_key).map(&:title)
+  end
+
+  test "sorts a span by its start even when it ends after a later node" do
+    Node.destroy_all
+
+    span = build_range(title: "Long span", starts_type: "approximate", starts_year: 34,
+      starts_month: nil, starts_day: nil,
+      ends_type: "approximate", ends_year: 400, ends_month: nil, ends_day: nil)
+    between = build_node(title: "Between", occurred_year: 100, date_type: "approximate")
+    [ between, span ].each(&:save!)
+
+    assert_equal [ "Long span", "Between" ], Node.all.sort_by(&:chronological_key).map(&:title)
+  end
+
+  test "sorts a BC span before the AD nodes" do
+    Node.destroy_all
+
+    ad = build_node(title: "AD", occurred_year: 30, date_type: "approximate")
+    bc = build_range(title: "BC span", starts_type: "approximate", starts_year: 44,
+      starts_month: nil, starts_day: nil, starts_era: "BC",
+      ends_type: "approximate", ends_year: 20, ends_month: nil, ends_day: nil, ends_era: "BC")
+    [ ad, bc ].each(&:save!)
+
+    assert_equal [ "BC span", "AD" ], Node.all.sort_by(&:chronological_key).map(&:title)
+  end
+
   test "can be embedded under another node in the same topic" do
     parent = build_node(title: "Parent", occurred_year: 100, occurred_month: 1, occurred_day: 1)
     parent.save!
