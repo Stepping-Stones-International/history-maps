@@ -833,6 +833,65 @@ textarea.form__input {
   font-size: 0.8rem;
 }
 
+/* Hover or focus for a bubble of detail. It opens upward: the modal body
+   scrolls and clips what leaves it, and the packs sit at the foot of the form
+   with room above them. */
+.tooltip {
+  position: relative;
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-left: 0.35rem;
+  color: var(--text-muted);
+  cursor: help;
+}
+
+.tooltip:hover,
+.tooltip:focus-visible {
+  color: var(--text);
+  outline: none;
+}
+
+.tooltip__glyph {
+  width: 14px;
+  height: 14px;
+}
+
+.tooltip__bubble {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: -0.5rem;
+  z-index: 2;
+  width: max-content;
+  max-width: 17rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text);
+  text-align: left;
+  white-space: normal;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
+.tooltip:hover .tooltip__bubble,
+.tooltip:focus-visible .tooltip__bubble {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip__line:first-child {
+  color: var(--text-muted);
+}
+
 .form__field--position {
   flex: 0 0 5.5rem;
 }

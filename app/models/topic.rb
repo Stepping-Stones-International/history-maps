@@ -4,7 +4,13 @@ class Topic < ApplicationRecord
   MAP_PACKS = {
     "roman_roads" => {
       label: "Roman roads",
-      note: "Itiner-e's network of the Roman Empire, as it stood around AD 150."
+      note: "Itiner-e's reconstruction of the Roman Empire's road network.",
+      covers: "Main and secondary roads from Italy and Sicily through Greece, " \
+              "Asia Minor, the Levant, Egypt and Mesopotamia — 7,244 segments of " \
+              "the wider empire-wide network.",
+      years: "One snapshot of the network as it stood around AD 150. Individual " \
+             "roads that carry a date range from 514 BC to AD 700, though two " \
+             "thirds carry none at all."
     }
   }.freeze
 

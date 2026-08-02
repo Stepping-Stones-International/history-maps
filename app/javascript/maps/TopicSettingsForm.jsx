@@ -1,6 +1,6 @@
 import React from "react"
 import { usePage } from "@inertiajs/react"
-import { Crosshair } from "lucide-react"
+import { Crosshair, Info } from "lucide-react"
 import FormErrors from "../components/FormErrors"
 
 // Controlled by the page so the values survive the modal being hidden while
@@ -75,7 +75,7 @@ export default function TopicSettingsForm({
         <div className="form__field">
           <span className="form__label">Map packs</span>
 
-          {mapPacks.map(({ value, label, note }) => (
+          {mapPacks.map(({ value, label, note, covers, years }) => (
             <label
               key={value}
               className="form__check form__check--stacked"
@@ -89,7 +89,26 @@ export default function TopicSettingsForm({
                 onChange={setPack(value)}
               />
               <span>
-                <span className="form__check-label">{label}</span>
+                <span className="form__check-label">
+                  {label}
+                  {(covers || years) && (
+                    // A label cannot hold a button, so the tooltip is a focusable
+                    // span: hover for a pointer, tab for a keyboard.
+                    <span
+                      className="tooltip"
+                      tabIndex={0}
+                      role="note"
+                      aria-label={`About ${label}. ${covers || ""} ${years || ""}`}
+                      onClick={(event) => event.preventDefault()}
+                    >
+                      <Info className="tooltip__glyph" aria-hidden="true" />
+                      <span className="tooltip__bubble" aria-hidden="true">
+                        {covers && <span className="tooltip__line">{covers}</span>}
+                        {years && <span className="tooltip__line">{years}</span>}
+                      </span>
+                    </span>
+                  )}
+                </span>
                 {note && <span className="form__note form__note--tight">{note}</span>}
               </span>
             </label>

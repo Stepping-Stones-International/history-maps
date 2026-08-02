@@ -68,7 +68,11 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal [ "roman_roads" ], inertia.props[:topic][:map_packs]
     assert_equal [ "roman_roads" ], inertia.props[:mapPacks].map { |pack| pack[:value] }
-    assert_equal "Roman roads", inertia.props[:mapPacks].first[:label]
+    pack = inertia.props[:mapPacks].first
+    assert_equal "Roman roads", pack[:label]
+    # The tooltip's copy, so the form never has to describe a pack itself.
+    assert_match(/Italy and Sicily/, pack[:covers])
+    assert_match(/AD 150/, pack[:years])
   end
 
   test "update rejects a blank title" do
