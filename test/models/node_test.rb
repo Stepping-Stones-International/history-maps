@@ -12,6 +12,15 @@ class NodeTest < ActiveSupport::TestCase
       date_type: "none").valid?
   end
 
+  test "a standalone node may carry no date at all" do
+    node = build_node(title: "Nisibis", date_type: "none")
+
+    assert node.valid?
+    node.save!
+    assert_nil node.reload.date_display
+    assert_not node.dated?
+  end
+
   test "defaults to the waypoint icon" do
     node = build_node(title: "Ephesus", date_type: "none")
     node.save!

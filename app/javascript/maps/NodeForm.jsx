@@ -48,9 +48,10 @@ export default function NodeForm({
       : { ...draft, layer: false, area_json: "" })
   }
 
-  const typeOptions = embedding
-    ? dateTypes
-    : dateTypes.filter((option) => option.value !== "none")
+  // No Date is offered to any node. An embedded one takes its moment from its
+  // parent; a standalone one may simply have no date worth claiming, which is
+  // the case for most places outside the Roman world.
+  const typeOptions = dateTypes
 
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
 
