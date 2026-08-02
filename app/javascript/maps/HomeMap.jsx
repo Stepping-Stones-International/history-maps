@@ -205,25 +205,39 @@ export default function HomeMap({
     // Areas are map layers, so they always sit beneath the waypoints, which are
     // DOM elements above the canvas.
     //
-    // Hung off the style rather than "load": load also waits for the first
-    // tiles, so a slow or unreachable tile server would leave areas undrawn.
-    // Returns true once the layers are in place. addSource throws while the
-    // style is still loading, so this waits to be told the style has settled.
+    // Returns true once the layers are in place. Adding a source throws while
+    // the style is still loading, and that throw is the signal to wait — the
+    // same reason the roads below do not ask isStyleLoaded either.
     const addAreaLayers = () => {
       if (!map.current) return false
-      if (map.current.getSource(AREA_SOURCE)) return true
-      if (!map.current.isStyleLoaded()) return false
-      map.current.addSource(AREA_SOURCE, {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] }
-      })
 
-      map.current.addLayer({
-        id: `${AREA_SOURCE}-fill`,
-        type: "fill",
-        source: AREA_SOURCE,
-        paint: { "fill-color": "#8fb8e8", "fill-opacity": 0.18 }
-      })
+      try {
+        return buildAreaLayers()
+      } catch {
+        return false
+      }
+    }
+
+    const buildAreaLayers = () => {
+      // Keyed off the last piece to go in, so a part-built style is finished
+      // rather than mistaken for a finished one.
+      if (map.current.getLayer(`${AREA_SOURCE}-line`)) return true
+
+      if (!map.current.getSource(AREA_SOURCE)) {
+        map.current.addSource(AREA_SOURCE, {
+          type: "geojson",
+          data: { type: "FeatureCollection", features: [] }
+        })
+      }
+
+      if (!map.current.getLayer(`${AREA_SOURCE}-fill`)) {
+        map.current.addLayer({
+          id: `${AREA_SOURCE}-fill`,
+          type: "fill",
+          source: AREA_SOURCE,
+          paint: { "fill-color": "#8fb8e8", "fill-opacity": 0.18 }
+        })
+      }
 
       map.current.addLayer({
         id: `${AREA_SOURCE}-line`,
@@ -258,14 +272,15 @@ export default function HomeMap({
       return true
     }
 
-    // styledata fires repeatedly as the style settles; stop listening once the
-    // layers are in.
+    // styledata fires as the style settles and idle every time the map comes
+    // to rest, so between them the layers land however slowly the style
+    // arrives. Both are dropped once they are in.
     if (!addAreaLayers()) {
-      const retry = () => { if (addAreaLayers()) map.current?.off("styledata", retry) }
-      map.current.on("styledata", retry)
-      // load fires once the style and first tiles are in; belt and braces for
-      // the case where styledata has stopped firing by then.
-      map.current.once("load", () => addAreaLayers())
+      const wake = [ "styledata", "idle" ]
+      const retry = () => {
+        if (addAreaLayers()) wake.forEach((event) => map.current?.off(event, retry))
+      }
+      wake.forEach((event) => map.current.on(event, retry))
     }
 
     map.current.on("click", (event) => {
@@ -309,23 +324,35 @@ export default function HomeMap({
 
     let dropped = false
 
-    // As with the areas: addSource throws while the style is still settling.
+    // Tries to draw, and says whether it managed it. Adding a source throws
+    // while the style is still loading, which is the signal to try again —
+    // isStyleLoaded is no use here, since it also waits on every tile and so
+    // reads false whenever the map happens to be fetching one.
     const draw = () => {
       if (dropped || !map.current || !roadNetwork.current) return false
-      if (!map.current.isStyleLoaded()) return false
 
+      try {
+        return addRoadLayers()
+      } catch {
+        return false
+      }
+    }
+
+    const addRoadLayers = () => {
       if (!map.current.getSource(ROADS_SOURCE)) {
         map.current.addSource(ROADS_SOURCE, {
           type: "geojson",
           data: roadNetwork.current,
           attribution: ROADS_CREDIT
         })
+      }
 
-        // Under the node areas, so a topic's own shapes stay on top.
-        const beneath = map.current.getLayer(`${AREA_SOURCE}-fill`)
-          ? `${AREA_SOURCE}-fill`
-          : undefined
+      // Under the node areas, so a topic's own shapes stay on top.
+      const beneath = map.current.getLayer(`${AREA_SOURCE}-fill`)
+        ? `${AREA_SOURCE}-fill`
+        : undefined
 
+      if (!map.current.getLayer(`${ROADS_SOURCE}-secondary`)) {
         map.current.addLayer({
           id: `${ROADS_SOURCE}-secondary`,
           type: "line",
@@ -334,11 +361,13 @@ export default function HomeMap({
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
             "line-color": "#c98f5a",
-            "line-opacity": 0.45,
-            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.5, 9, 1.2, 12, 2 ]
+            "line-opacity": 0.55,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.8, 9, 1.6, 12, 2.6 ]
           }
         }, beneath)
+      }
 
+      if (!map.current.getLayer(`${ROADS_SOURCE}-main`)) {
         map.current.addLayer({
           id: `${ROADS_SOURCE}-main`,
           type: "line",
@@ -347,8 +376,8 @@ export default function HomeMap({
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
             "line-color": "#e0a568",
-            "line-opacity": 0.8,
-            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.9, 9, 2, 12, 3.5 ]
+            "line-opacity": 0.9,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 1.4, 9, 2.6, 12, 4 ]
           }
         }, beneath)
       }
@@ -357,15 +386,24 @@ export default function HomeMap({
       return true
     }
 
-    // Same belt and braces as the areas: styledata while the style settles,
-    // and load in case it has stopped firing by the time this runs.
+    // The data can arrive at any point in the map's life, so the retry has to
+    // be one that keeps coming: idle fires every time the map settles, where
+    // load fires once and would already be spent by the time a download of
+    // this size finishes.
+    const WAKE = [ "styledata", "idle" ]
     let retry = null
+
+    const stopWaiting = () => {
+      if (!retry) return
+      WAKE.forEach((event) => map.current?.off(event, retry))
+      retry = null
+    }
 
     const drawWhenReady = () => {
       if (draw()) return
-      retry = () => { if (draw()) map.current?.off("styledata", retry) }
-      map.current?.on("styledata", retry)
-      map.current?.once("load", () => draw())
+
+      retry = () => { if (draw()) stopWaiting() }
+      WAKE.forEach((event) => map.current?.on(event, retry))
     }
 
     if (roadNetwork.current) {
@@ -383,7 +421,7 @@ export default function HomeMap({
 
     return () => {
       dropped = true
-      if (retry) map.current?.off("styledata", retry)
+      stopWaiting()
     }
   }, [roads])
 
