@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { ChevronRight, Pencil } from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
+import { ChevronRight, Layers, Pencil } from "lucide-react"
 import { expandedIds, remember } from "../lib/expandedNodes"
 
 // The server sends the nodes flat, already ordered; this nests them.
@@ -14,9 +14,25 @@ function nest(nodes) {
   return { roots: children.get(null) || [], childrenOf: (id) => children.get(id) || [] }
 }
 
+// Everything embedded under a node, however deeply.
+function descendantsOf(id, childrenOf) {
+  return childrenOf(id).flatMap((child) => [ child, ...descendantsOf(child.id, childrenOf) ])
+}
+
+// A checkbox that is neither on nor off: some of what it covers is drawn.
+function PartialCheckbox({ partial, ...props }) {
+  const box = useRef(null)
+
+  useEffect(() => {
+    if (box.current) box.current.indeterminate = partial
+  }, [ partial ])
+
+  return <input ref={box} type="checkbox" {...props} />
+}
+
 function Row({
   node, childrenOf, expanded, onToggle, highlightedId, onHighlight, onEdit, depth,
-  hiddenIds, onVisibilityChange
+  visibleIds, onVisibilityChange
 }) {
   const embedded = childrenOf(node.id)
   const hasEmbedded = embedded.length > 0
@@ -24,22 +40,42 @@ function Row({
   // Only embedded nodes carry a meaningful order, and only once one is set.
   const index = node.parent_id && node.position > 0 ? node.position : null
 
+  // The second box covers everything embedded under this node. It follows the
+  // map rather than leading it, so stepping through the embeds fills it in.
+  const embeds = hasEmbedded ? descendantsOf(node.id, childrenOf) : []
+  const shownEmbeds = embeds.filter((child) => visibleIds.has(child.id)).length
+  const allEmbeds = hasEmbedded && shownEmbeds === embeds.length
+
   return (
     <li className="node-list__branch">
       <div
         className={`node-list__item ${node.id === highlightedId ? "node-list__item--active" : ""}`}
         style={{ marginLeft: `${depth * 0.85}rem` }}
       >
-        {/* Kept off the map for as long as it is unticked, whatever the
-            timeline has reached. */}
+        {/* Ticked while the node is on the map: unticking takes it off, and
+            stepping onto it ticks itself back on. */}
         <input
           type="checkbox"
           className="node-list__visible"
-          checked={!hiddenIds.has(node.id)}
-          onChange={(event) => onVisibilityChange(node, event.target.checked)}
+          checked={visibleIds.has(node.id)}
+          onChange={(event) => onVisibilityChange([ node ], event.target.checked)}
           aria-label={`Show ${node.title} on the map`}
           title="Show on the map"
         />
+
+        {hasEmbedded && (
+          <span className="node-list__embeds-toggle">
+            <PartialCheckbox
+              className="node-list__visible"
+              checked={allEmbeds}
+              partial={shownEmbeds > 0 && !allEmbeds}
+              onChange={() => onVisibilityChange(embeds, !allEmbeds)}
+              aria-label={`Show everything embedded under ${node.title} on the map`}
+              title="Show embedded nodes on the map"
+            />
+            <Layers className="node-list__embeds-glyph" aria-hidden="true" />
+          </span>
+        )}
 
         {hasEmbedded ? (
           <button
@@ -94,7 +130,7 @@ function Row({
               onHighlight={onHighlight}
               onEdit={onEdit}
               depth={depth + 1}
-              hiddenIds={hiddenIds}
+              visibleIds={visibleIds}
               onVisibilityChange={onVisibilityChange}
             />
           ))}
@@ -105,7 +141,7 @@ function Row({
 }
 
 export default function NodeList({
-  nodes, highlightedId, onHighlight, onEdit, hiddenIds, onVisibilityChange
+  nodes, highlightedId, onHighlight, onEdit, visibleIds, onVisibilityChange
 }) {
   // Closed unless this browser remembers it being opened.
   const [expanded, setExpanded] = useState(expandedIds)
@@ -142,7 +178,7 @@ export default function NodeList({
           onHighlight={onHighlight}
           onEdit={onEdit}
           depth={0}
-          hiddenIds={hiddenIds}
+          visibleIds={visibleIds}
           onVisibilityChange={onVisibilityChange}
         />
       ))}

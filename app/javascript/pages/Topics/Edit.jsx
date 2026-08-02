@@ -70,15 +70,19 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     setHighlightedId((current) => (current === node.id ? null : node.id))
   // How much of the topic the map draws as the timeline is walked.
   const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
-  // Nodes unticked in the sidebar, kept off the map whatever the mode reveals.
-  const [hiddenIds, setHiddenIds] = useState(() => new Set())
-  const setVisible = (node, visible) =>
-    setHiddenIds((current) => {
-      const next = new Set(current)
-
-      if (visible) next.delete(node.id)
-      else next.add(node.id)
-
+  // Nodes toggled by hand in the sidebar, which hold on or off whatever the
+  // reveal mode would otherwise do with them.
+  const [overrides, setOverrides] = useState(() => new Map())
+  // Changing mode starts the map over from what that mode draws, rather than
+  // carrying the last mode's toggles into it.
+  const changeRevealMode = (mode) => {
+    setRevealMode(mode)
+    setOverrides(new Map())
+  }
+  const setVisible = (chosen, visible) =>
+    setOverrides((current) => {
+      const next = new Map(current)
+      chosen.forEach((node) => next.set(node.id, visible))
       return next
     })
   // null when closed, otherwise the topic draft being edited.
@@ -181,14 +185,17 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     }
   }
 
+  // The sidebar and timeline always list everything; only the map is cut
+  // down, and the sidebar's checkboxes report back what it is drawing.
+  const shown = visibleNodes(nodes, revealMode, highlightedId, overrides)
+  const visibleIds = new Set(shown.map((node) => node.id))
+
   return (
     <>
       <Head title={topic.title} />
 
-      {/* The sidebar and timeline always list everything; the reveal mode
-          only decides what the map draws. */}
       <HomeMap
-        nodes={visibleNodes(nodes, revealMode, highlightedId, hiddenIds)}
+        nodes={shown}
         placing={picking}
         highlightedId={highlightedId}
         defaultView={topic.default_view}
@@ -203,7 +210,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
           highlightedId={highlightedId}
           onHighlight={toggleHighlight}
           onEdit={startEditing}
-          hiddenIds={hiddenIds}
+          visibleIds={visibleIds}
           onVisibilityChange={setVisible}
         />
       </Drawer>
@@ -241,7 +248,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         onHighlight={toggleHighlight}
         onSelect={(node) => setHighlightedId(node.id)}
         revealMode={revealMode}
-        onRevealModeChange={setRevealMode}
+        onRevealModeChange={changeRevealMode}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}

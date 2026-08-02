@@ -864,6 +864,21 @@ textarea.form__input {
   cursor: pointer;
 }
 
+/* The same, for everything embedded under the node. */
+.node-list__embeds-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.node-list__embeds-glyph {
+  width: 12px;
+  height: 12px;
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+}
+
 .node-list__select {
   flex: 1;
   min-width: 0;
