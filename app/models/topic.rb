@@ -13,6 +13,18 @@ class Topic < ApplicationRecord
              "roads that carry a date range from 514 BC to AD 700, though two " \
              "thirds carry none at all."
     },
+    "sea_routes" => {
+      label: "Roman sea routes",
+      file: "orbis-sea-routes.geojson",
+      note: "ORBIS, Stanford's network model of Roman travel.",
+      covers: "485 maritime routes across the Mediterranean, the Black Sea and " \
+              "the Atlantic coast: 411 coastal, 69 open-water crossings and 5 " \
+              "ferries.",
+      years: "A model of the Roman Imperial period, centred on about AD 200 — " \
+             "not a dated record of sailings. Some links are documented " \
+             "crossings; others are short connections the network needs to " \
+             "work at all."
+    },
     "awmc_roads" => {
       label: "Roman roads (Barrington Atlas)",
       file: "awmc-roads.geojson",

@@ -357,7 +357,7 @@ export default function HomeMap({
         ? `${AREA_SOURCE}-fill`
         : undefined
 
-      pack.layers.forEach(({ suffix, filter, color, opacity, widths }) => {
+      pack.layers.forEach(({ suffix, filter, color, opacity, widths, dashes }) => {
         const id = packLayerId(key, suffix)
         if (map.current.getLayer(id)) return
 
@@ -366,11 +366,13 @@ export default function HomeMap({
           type: "line",
           source: packSourceId(key),
           filter,
-          layout: { "line-cap": "round", "line-join": "round" },
+          // A dashed line cannot be round-capped without the dashes closing up.
+          layout: { "line-cap": dashes ? "butt" : "round", "line-join": "round" },
           paint: {
             "line-color": color,
             "line-opacity": opacity,
-            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], ...widths ]
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], ...widths ],
+            ...(dashes ? { "line-dasharray": dashes } : {})
           }
         }, beneath)
       })

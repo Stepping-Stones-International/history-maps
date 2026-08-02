@@ -24,12 +24,39 @@ const roadLayers = (main, secondary) => [
   }
 ]
 
+// Sea routes are dashed: they are sailed, not built, and the dashes also say
+// plainly that this is a modelled network rather than surveyed ground.
+const seaLayers = () => [
+  {
+    suffix: "coastal",
+    filter: [ "!=", [ "get", "kind" ], "overseas" ],
+    color: "#5f9ea8",
+    opacity: 0.6,
+    widths: [ 4, 0.7, 9, 1.4, 12, 2.2 ],
+    dashes: [ 2, 1.6 ]
+  },
+  {
+    suffix: "overseas",
+    filter: [ "==", [ "get", "kind" ], "overseas" ],
+    color: "#7ec8d6",
+    opacity: 0.85,
+    widths: [ 4, 1.2, 9, 2.2, 12, 3.4 ],
+    dashes: [ 3, 1.8 ]
+  }
+]
+
 export const MAP_PACKS = {
   roman_roads: {
     url: () => packUrl("roman_roads"),
     credit: '<a href="https://itiner-e.org" target="_blank" rel="noopener">Itiner-e</a> ' +
             "roads (CC BY 4.0)",
     layers: roadLayers("#e0a568", "#c98f5a")
+  },
+  sea_routes: {
+    url: () => packUrl("sea_routes"),
+    credit: '<a href="https://orbis.stanford.edu" target="_blank" rel="noopener">ORBIS</a> ' +
+            "sea routes (MIT)",
+    layers: seaLayers()
   },
   awmc_roads: {
     url: () => packUrl("awmc_roads"),
