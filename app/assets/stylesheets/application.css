@@ -814,6 +814,25 @@ textarea.form__input {
   cursor: pointer;
 }
 
+/* A map pack: its name over a line about what it draws. */
+.form__check--stacked {
+  align-items: flex-start;
+  padding: 0.35rem 0;
+}
+
+.form__check--stacked .form__checkbox {
+  margin-top: 0.15rem;
+}
+
+.form__check-label {
+  display: block;
+}
+
+.form__note--tight {
+  margin: 0.1rem 0 0;
+  font-size: 0.8rem;
+}
+
 .form__field--position {
   flex: 0 0 5.5rem;
 }
@@ -1156,21 +1175,6 @@ textarea.form__input {
 .timeline__modes:hover,
 .timeline__modes:focus-within {
   opacity: 1;
-}
-
-/* An overlay drawn under the topic, rather than part of it. */
-.timeline__overlay {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.timeline__overlay-box.timeline__overlay-box {
-  margin: 0;
-  accent-color: #e0a568;
 }
 
 .timeline__modes-label {

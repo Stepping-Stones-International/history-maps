@@ -35,6 +35,42 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_topic_path(@topic)
   end
 
+  test "update turns a map pack on and off" do
+    sign_in_as users(:one)
+
+    patch topic_path(@topic), params: { title: @topic.title, map_packs: [ "roman_roads" ] }
+    assert_equal [ "roman_roads" ], @topic.reload.map_packs
+
+    # Unticking the only box posts an empty array, or a blank in browsers that
+    # send the box's own value.
+    patch topic_path(@topic), params: { title: @topic.title, map_packs: [] }
+    assert_empty @topic.reload.map_packs
+
+    patch topic_path(@topic), params: { title: @topic.title, map_packs: [ "roman_roads" ] }
+    patch topic_path(@topic), params: { title: @topic.title, map_packs: [ "" ] }
+    assert_empty @topic.reload.map_packs
+  end
+
+  test "update rejects a map pack that does not exist" do
+    sign_in_as users(:one)
+
+    patch topic_path(@topic), params: { title: @topic.title, map_packs: [ "moon_bases" ] }
+
+    assert_empty @topic.reload.map_packs
+    assert_redirected_to edit_topic_path(@topic)
+  end
+
+  test "the map is sent the packs it draws and the ones on offer" do
+    sign_in_as users(:one)
+    @topic.update!(map_packs: [ "roman_roads" ])
+
+    get edit_topic_path(@topic)
+
+    assert_equal [ "roman_roads" ], inertia.props[:topic][:map_packs]
+    assert_equal [ "roman_roads" ], inertia.props[:mapPacks].map { |pack| pack[:value] }
+    assert_equal "Roman roads", inertia.props[:mapPacks].first[:label]
+  end
+
   test "update rejects a blank title" do
     sign_in_as users(:one)
     original = @topic.title

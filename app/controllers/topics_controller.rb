@@ -23,13 +23,15 @@ class TopicsController < ApplicationController
         id: topic.id,
         title: topic.title,
         description: topic.description,
-        default_view: topic.default_view
+        default_view: topic.default_view,
+        map_packs: topic.map_packs
       },
       nodes: ordered_nodes(topic).map { |node| node_props(node) },
       # Sent from the model so the form cannot drift from the validation.
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
       rangeTypes: Node::RANGE_TYPES.map { |value, label| { value: value, label: label } },
-      eras: Node::ERAS
+      eras: Node::ERAS,
+      mapPacks: Topic::MAP_PACKS.map { |key, pack| { value: key, **pack } }
     }
   end
 
@@ -59,7 +61,7 @@ class TopicsController < ApplicationController
   private
     # Inertia forms post a flat payload.
     def topic_params
-      params.permit(:title, :description, :center_latitude, :center_longitude, :zoom)
+      params.permit(:title, :description, :center_latitude, :center_longitude, :zoom, map_packs: [])
     end
 
     # Roots in date order, each followed by what it embeds, in the order set

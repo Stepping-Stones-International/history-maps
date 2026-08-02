@@ -17,6 +17,39 @@ class TopicTest < ActiveSupport::TestCase
     assert_includes topic.errors[:author], "must exist"
   end
 
+  test "draws no map packs to begin with" do
+    topic = Topic.create!(title: "Bare", author: users(:one))
+
+    assert_empty topic.map_packs
+    assert_not topic.draws?("roman_roads")
+  end
+
+  test "remembers the map packs it draws" do
+    topic = Topic.create!(title: "Roads", author: users(:one), map_packs: [ "roman_roads" ])
+
+    assert topic.reload.draws?("roman_roads")
+  end
+
+  test "drops the blanks an unticked checkbox posts" do
+    topic = Topic.create!(title: "Blanks", author: users(:one), map_packs: [ "", "roman_roads", "" ])
+
+    assert_equal [ "roman_roads" ], topic.map_packs
+  end
+
+  test "keeps a pack once, however many times it is given" do
+    topic = Topic.create!(title: "Twice", author: users(:one),
+      map_packs: [ "roman_roads", "roman_roads" ])
+
+    assert_equal [ "roman_roads" ], topic.map_packs
+  end
+
+  test "rejects a map pack it does not ship" do
+    topic = Topic.new(title: "Unknown", author: users(:one), map_packs: [ "moon_bases" ])
+
+    assert_not topic.valid?
+    assert_includes topic.errors[:map_packs], "does not include moon_bases"
+  end
+
   test "author is a user" do
     assert_instance_of User, topics(:one).author
   end

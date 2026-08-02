@@ -5,9 +5,18 @@ import FormErrors from "../components/FormErrors"
 
 // Controlled by the page so the values survive the modal being hidden while
 // the map is moved to the view worth remembering.
-export default function TopicSettingsForm({ draft, onChange, onSetView, onCancel, onSubmit }) {
+export default function TopicSettingsForm({
+  draft, mapPacks = [], onChange, onSetView, onCancel, onSubmit
+}) {
   const { errors } = usePage().props
   const set = (field) => (event) => onChange({ ...draft, [field]: event.target.value })
+
+  const setPack = (value) => (event) => onChange({
+    ...draft,
+    map_packs: event.target.checked
+      ? [ ...draft.map_packs, value ]
+      : draft.map_packs.filter((pack) => pack !== value)
+  })
 
   const hasView = [ draft.center_latitude, draft.center_longitude, draft.zoom ]
     .every((part) => part !== "" && part !== null && part !== undefined)
@@ -61,6 +70,32 @@ export default function TopicSettingsForm({ draft, onChange, onSetView, onCancel
           Set map location and zoom
         </button>
       </div>
+
+      {mapPacks.length > 0 && (
+        <div className="form__field">
+          <span className="form__label">Map packs</span>
+
+          {mapPacks.map(({ value, label, note }) => (
+            <label
+              key={value}
+              className="form__check form__check--stacked"
+              htmlFor={`topic-pack-${value}`}
+            >
+              <input
+                id={`topic-pack-${value}`}
+                type="checkbox"
+                className="form__checkbox"
+                checked={draft.map_packs.includes(value)}
+                onChange={setPack(value)}
+              />
+              <span>
+                <span className="form__check-label">{label}</span>
+                {note && <span className="form__note form__note--tight">{note}</span>}
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
 
       <div className="form__actions">
         <button type="button" className="button button--text" onClick={onCancel}>Cancel</button>

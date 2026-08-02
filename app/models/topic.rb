@@ -1,8 +1,23 @@
 class Topic < ApplicationRecord
+  # Reference overlays drawn under the topic's own nodes. Each is a dataset
+  # shipped with the app rather than anything the author writes.
+  MAP_PACKS = {
+    "roman_roads" => {
+      label: "Roman roads",
+      note: "Itiner-e's network of the Roman Empire, as it stood around AD 150."
+    }
+  }.freeze
+
   belongs_to :author, class_name: "User"
   has_many :nodes, dependent: :destroy
 
+  serialize :map_packs, coder: JSON, type: Array
+
+  # Checkboxes post an unchecked box as "", which is not a pack.
+  normalizes :map_packs, with: ->(packs) { Array(packs).map(&:to_s).select(&:present?).uniq }
+
   validates :title, presence: true
+  validate :map_packs_are_known
   validates :center_latitude,
     numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
   validates :center_longitude,
@@ -23,7 +38,18 @@ class Topic < ApplicationRecord
     [ center_latitude, center_longitude, zoom ].all?(&:present?)
   end
 
+  def draws?(pack)
+    map_packs.include?(pack)
+  end
+
   private
+    def map_packs_are_known
+      unknown = map_packs - MAP_PACKS.keys
+      return if unknown.empty?
+
+      errors.add(:map_packs, "does not include #{unknown.to_sentence}")
+    end
+
     # A centre without a zoom, or half a coordinate, cannot open a map.
     def default_view_is_whole
       parts = [ center_latitude, center_longitude, zoom ]

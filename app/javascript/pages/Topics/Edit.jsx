@@ -56,7 +56,7 @@ const draftFrom = (node) => ({
 })
 
 // Full-bleed map with its own drawer, so it renders without Layout.
-export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
+export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPacks }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   // null when closed, otherwise { mode: "new" } or { mode: "edit", id }.
@@ -70,8 +70,6 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     setHighlightedId((current) => (current === node.id ? null : node.id))
   // How much of the topic the map draws as the timeline is walked.
   const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
-  // The Roman road overlay, off until asked for: it is a separate download.
-  const [roads, setRoads] = useState(false)
   // Nodes toggled by hand in the sidebar, which hold on or off whatever the
   // reveal mode would otherwise do with them.
   const [overrides, setOverrides] = useState(() => new Map())
@@ -98,7 +96,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     description: topic.description || "",
     center_latitude: topic.default_view?.latitude ?? "",
     center_longitude: topic.default_view?.longitude ?? "",
-    zoom: topic.default_view?.zoom ?? ""
+    zoom: topic.default_view?.zoom ?? "",
+    map_packs: topic.map_packs || []
   })
 
   const closeSettings = () => {
@@ -202,7 +201,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         highlightedId={highlightedId}
         defaultView={topic.default_view}
         viewReader={viewReader}
-        roads={roads}
+        roads={(topic.map_packs || []).includes("roman_roads")}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
@@ -252,8 +251,6 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         onSelect={(node) => setHighlightedId(node.id)}
         revealMode={revealMode}
         onRevealModeChange={changeRevealMode}
-        roads={roads}
-        onRoadsChange={setRoads}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}
@@ -265,6 +262,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         >
           <TopicSettingsForm
             draft={settings}
+            mapPacks={mapPacks}
             onChange={setSettings}
             onSetView={() => setCapturingView(true)}
             onCancel={closeSettings}
