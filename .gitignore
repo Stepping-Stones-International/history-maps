@@ -41,3 +41,7 @@
 
 # Ignore SimpleCov coverage reports.
 /coverage
+
+# Python bytecode from the extract scripts
+__pycache__/
+*.pyc

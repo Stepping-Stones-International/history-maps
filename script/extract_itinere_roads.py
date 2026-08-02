@@ -7,7 +7,7 @@ as it stood around AD 150, licensed CC BY 4.0:
 
 Take itinere_roads.gpkg from that record and run:
 
-    python3 script/extract_roads.py itinere_roads.gpkg \\
+    python3 script/extract_itinere_roads.py itinere_roads.gpkg \\
       app/assets/data/roman-roads.geojson
 
 which keeps the segments touching the New Testament world — Italy through

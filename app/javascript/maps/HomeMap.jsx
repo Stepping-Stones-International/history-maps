@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react"
 import { Map as MapLibreMap, Marker, NavigationControl, Popup, setWorkerUrl } from "maplibre-gl"
 import areaCentroid from "./areaCentroid"
+import { MAP_PACKS, packLayerId, packSourceId } from "./mapPacks"
 
 // Built as DOM with textContent, never HTML: this is user input.
 function nodeLabel(node) {
@@ -84,13 +85,6 @@ const TOPO_STYLE = {
 const SVG_NS = "http://www.w3.org/2000/svg"
 
 const AREA_SOURCE = "node-areas"
-const ROADS_SOURCE = "roman-roads"
-
-// Itiner-e's road network, fetched on demand rather than bundled: it is a few
-// megabytes, and most sessions never ask for it.
-const roadsUrl = document.querySelector('meta[name="roman-roads-url"]')?.content
-const ROADS_CREDIT =
-  '<a href="https://itiner-e.org" target="_blank" rel="noopener">Itiner-e</a> roads (CC BY 4.0)'
 
 // A ring of [longitude, latitude] pairs becomes a closed polygon. GeoJSON wants
 // the first point repeated at the end, which the stored ring does not carry.
@@ -147,7 +141,7 @@ function paintMarker(element, active) {
 
 export default function HomeMap({
   nodes = [], placing = false, highlightedId = null, defaultView = null,
-  viewReader = null, roads = false, onMapClick, onNodeSelect
+  viewReader = null, packs = [], onMapClick, onNodeSelect
 }) {
   const container = useRef(null)
   const map = useRef(null)
@@ -155,8 +149,8 @@ export default function HomeMap({
   const labels = useRef(new Map())
   const areaLabels = useRef(new Map())
   const styleReady = useRef(false)
-  // Kept once fetched, so switching the overlay off and on again is free.
-  const roadNetwork = useRef(null)
+  // Kept once fetched, so switching a pack off and on again is free.
+  const packData = useRef(new Map())
   const highlightedRef = useRef(highlightedId)
   highlightedRef.current = highlightedId
   // Held in refs so changing these does not re-bind the map and marker
@@ -305,45 +299,29 @@ export default function HomeMap({
     if (canvas) canvas.style.cursor = placing ? "crosshair" : ""
   }, [placing])
 
-  // The Roman road overlay. Fetched the first time it is asked for and kept
-  // after that; switching it off hides the layers rather than tearing them
-  // down, so coming back is instant.
+  // The reference overlays. Each pack's data is fetched the first time it is
+  // asked for and kept after that; switching one off hides its layers rather
+  // than tearing them down, so coming back is instant.
   useEffect(() => {
-    const layers = [ `${ROADS_SOURCE}-secondary`, `${ROADS_SOURCE}-main` ]
+    const wanted = new Set(packs)
 
-    const show = (visibility) => layers.forEach((id) => {
-      if (map.current?.getLayer(id)) {
-        map.current.setLayoutProperty(id, "visibility", visibility)
-      }
+    const show = (key, visibility) => MAP_PACKS[key].layers.forEach(({ suffix }) => {
+      const id = packLayerId(key, suffix)
+      if (map.current?.getLayer(id)) map.current.setLayoutProperty(id, "visibility", visibility)
     })
 
-    if (!roads || !roadsUrl) {
-      show("none")
-      return undefined
-    }
+    Object.keys(MAP_PACKS).filter((key) => !wanted.has(key)).forEach((key) => show(key, "none"))
 
     let dropped = false
 
-    // Tries to draw, and says whether it managed it. Adding a source throws
-    // while the style is still loading, which is the signal to try again —
-    // isStyleLoaded is no use here, since it also waits on every tile and so
-    // reads false whenever the map happens to be fetching one.
-    const draw = () => {
-      if (dropped || !map.current || !roadNetwork.current) return false
-
-      try {
-        return addRoadLayers()
-      } catch {
-        return false
-      }
-    }
-
-    const addRoadLayers = () => {
-      if (!map.current.getSource(ROADS_SOURCE)) {
-        map.current.addSource(ROADS_SOURCE, {
+    const build = (key) => {
+      const pack = MAP_PACKS[key]
+      const data = packData.current.get(key)
+      if (!map.current.getSource(packSourceId(key))) {
+        map.current.addSource(packSourceId(key), {
           type: "geojson",
-          data: roadNetwork.current,
-          attribution: ROADS_CREDIT
+          data,
+          attribution: pack.credit
         })
       }
 
@@ -352,38 +330,44 @@ export default function HomeMap({
         ? `${AREA_SOURCE}-fill`
         : undefined
 
-      if (!map.current.getLayer(`${ROADS_SOURCE}-secondary`)) {
+      pack.layers.forEach(({ suffix, filter, color, opacity, widths }) => {
+        const id = packLayerId(key, suffix)
+        if (map.current.getLayer(id)) return
+
         map.current.addLayer({
-          id: `${ROADS_SOURCE}-secondary`,
+          id,
           type: "line",
-          source: ROADS_SOURCE,
-          filter: [ "!=", [ "get", "kind" ], "Main Road" ],
+          source: packSourceId(key),
+          filter,
           layout: { "line-cap": "round", "line-join": "round" },
           paint: {
-            "line-color": "#c98f5a",
-            "line-opacity": 0.55,
-            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.8, 9, 1.6, 12, 2.6 ]
+            "line-color": color,
+            "line-opacity": opacity,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], ...widths ]
           }
         }, beneath)
-      }
+      })
 
-      if (!map.current.getLayer(`${ROADS_SOURCE}-main`)) {
-        map.current.addLayer({
-          id: `${ROADS_SOURCE}-main`,
-          type: "line",
-          source: ROADS_SOURCE,
-          filter: [ "==", [ "get", "kind" ], "Main Road" ],
-          layout: { "line-cap": "round", "line-join": "round" },
-          paint: {
-            "line-color": "#e0a568",
-            "line-opacity": 0.9,
-            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 1.4, 9, 2.6, 12, 4 ]
-          }
-        }, beneath)
-      }
-
-      show("visible")
+      show(key, "visible")
       return true
+    }
+
+    // Tries to draw everything asked for, and says whether it managed it all.
+    // Adding a source throws while the style is still loading, which is the
+    // signal to try again — isStyleLoaded is no use here, since it also waits
+    // on every tile and so reads false whenever the map is fetching one.
+    const draw = () => {
+      if (dropped || !map.current) return false
+
+      return [ ...wanted ].every((key) => {
+        if (!MAP_PACKS[key] || !packData.current.has(key)) return false
+
+        try {
+          return build(key)
+        } catch {
+          return false
+        }
+      })
     }
 
     // The data can arrive at any point in the map's life, so the retry has to
@@ -402,28 +386,32 @@ export default function HomeMap({
     const drawWhenReady = () => {
       if (draw()) return
 
+      if (retry) return
       retry = () => { if (draw()) stopWaiting() }
       WAKE.forEach((event) => map.current?.on(event, retry))
     }
 
-    if (roadNetwork.current) {
-      drawWhenReady()
-    } else {
-      fetch(roadsUrl)
+    wanted.forEach((key) => {
+      const url = MAP_PACKS[key]?.url()
+      if (!url || packData.current.has(key)) return drawWhenReady()
+
+      fetch(url)
         .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
         .then((collection) => {
           if (dropped) return
-          roadNetwork.current = collection
+          packData.current.set(key, collection)
           drawWhenReady()
         })
         .catch(() => {})
-    }
+    })
+
+    drawWhenReady()
 
     return () => {
       dropped = true
       stopWaiting()
     }
-  }, [roads])
+  }, [packs])
 
   // Reconcile markers against the current nodes. Layers have no coordinates,
   // so nothing is drawn for them.

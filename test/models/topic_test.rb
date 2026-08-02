@@ -43,6 +43,21 @@ class TopicTest < ActiveSupport::TestCase
     assert_equal [ "roman_roads" ], topic.map_packs
   end
 
+  test "draws more than one pack at once" do
+    topic = Topic.create!(title: "Both", author: users(:one),
+      map_packs: [ "roman_roads", "awmc_roads" ])
+
+    assert topic.reload.draws?("roman_roads")
+    assert topic.draws?("awmc_roads")
+  end
+
+  test "every pack ships the file it draws from" do
+    Topic::MAP_PACKS.each_value do |pack|
+      assert Rails.root.join("app/assets/data", pack[:file]).exist?,
+        "#{pack[:file]} is missing"
+    end
+  end
+
   test "rejects a map pack it does not ship" do
     topic = Topic.new(title: "Unknown", author: users(:one), map_packs: [ "moon_bases" ])
 

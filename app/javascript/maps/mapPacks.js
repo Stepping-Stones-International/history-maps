@@ -1,0 +1,43 @@
+// The reference overlays a topic can draw beneath its own nodes.
+//
+// Each one's data is a fingerprinted asset named in the layout, fetched only
+// once its pack is switched on: together they are several megabytes, and most
+// sessions ask for none of them.
+const packUrl = (key) => document.querySelector(`meta[name="map-pack-${key}"]`)?.content
+
+// Two reconstructions of the same network, so they are told apart by colour
+// rather than by which is on top: Itiner-e in ochre, the Barrington in sage.
+const roadLayers = (main, secondary) => [
+  {
+    suffix: "secondary",
+    filter: [ "!=", [ "get", "kind" ], "Main Road" ],
+    color: secondary,
+    opacity: 0.55,
+    widths: [ 4, 0.8, 9, 1.6, 12, 2.6 ]
+  },
+  {
+    suffix: "main",
+    filter: [ "==", [ "get", "kind" ], "Main Road" ],
+    color: main,
+    opacity: 0.9,
+    widths: [ 4, 1.4, 9, 2.6, 12, 4 ]
+  }
+]
+
+export const MAP_PACKS = {
+  roman_roads: {
+    url: () => packUrl("roman_roads"),
+    credit: '<a href="https://itiner-e.org" target="_blank" rel="noopener">Itiner-e</a> ' +
+            "roads (CC BY 4.0)",
+    layers: roadLayers("#e0a568", "#c98f5a")
+  },
+  awmc_roads: {
+    url: () => packUrl("awmc_roads"),
+    credit: '<a href="https://awmc.unc.edu" target="_blank" rel="noopener">AWMC</a> ' +
+            "roads (ODbL)",
+    layers: roadLayers("#a8bf7a", "#8a9d63")
+  }
+}
+
+export const packLayerId = (key, suffix) => `map-pack-${key}-${suffix}`
+export const packSourceId = (key) => `map-pack-${key}`

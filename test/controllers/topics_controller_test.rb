@@ -67,9 +67,9 @@ class TopicsControllerTest < ActionDispatch::IntegrationTest
     get edit_topic_path(@topic)
 
     assert_equal [ "roman_roads" ], inertia.props[:topic][:map_packs]
-    assert_equal [ "roman_roads" ], inertia.props[:mapPacks].map { |pack| pack[:value] }
+    assert_equal Topic::MAP_PACKS.keys, inertia.props[:mapPacks].map { |pack| pack[:value] }
     pack = inertia.props[:mapPacks].first
-    assert_equal "Roman roads", pack[:label]
+    assert_equal "Roman roads (Itiner-e)", pack[:label]
     # The tooltip's copy, so the form never has to describe a pack itself.
     assert_match(/Italy and Sicily/, pack[:covers])
     assert_match(/AD 150/, pack[:years])

@@ -3,14 +3,25 @@ class Topic < ApplicationRecord
   # shipped with the app rather than anything the author writes.
   MAP_PACKS = {
     "roman_roads" => {
-      label: "Roman roads",
+      label: "Roman roads (Itiner-e)",
+      file: "roman-roads.geojson",
       note: "Itiner-e's reconstruction of the Roman Empire's road network.",
       covers: "Main and secondary roads from Italy and Sicily through Greece, " \
-              "Asia Minor, the Levant, Egypt and Mesopotamia — 7,244 segments of " \
-              "the wider empire-wide network.",
+              "Asia Minor, the Levant and Egypt, stopping at the Euphrates — " \
+              "7,244 segments of the wider empire-wide network.",
       years: "One snapshot of the network as it stood around AD 150. Individual " \
              "roads that carry a date range from 514 BC to AD 700, though two " \
              "thirds carry none at all."
+    },
+    "awmc_roads" => {
+      label: "Roman roads (Barrington Atlas)",
+      file: "awmc-roads.geojson",
+      note: "The Ancient World Mapping Centre's independent reconstruction.",
+      covers: "1,942 roads over the same ground, drawn at atlas scale, so far " \
+              "coarser than Itiner-e — but it names 117 of the classical viae, " \
+              "which Itiner-e does not.",
+      years: "The Greek and Roman world of the Barrington Atlas, most densely the " \
+             "Roman period. Roads are marked by era rather than by year."
     }
   }.freeze
 

@@ -10,6 +10,10 @@ import TopicSettingsForm from "../../maps/TopicSettingsForm"
 import { visibleNodes, DEFAULT_REVEAL_MODE } from "../../maps/revealMode"
 import Modal from "../../components/Modal"
 
+// A stable empty array: a fresh [] each render would restart the map's pack
+// effect every time anything on the page changed.
+const NO_PACKS = []
+
 const EMPTY_DRAFT = {
   layer: false,
   area_json: "",
@@ -201,7 +205,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
         highlightedId={highlightedId}
         defaultView={topic.default_view}
         viewReader={viewReader}
-        roads={(topic.map_packs || []).includes("roman_roads")}
+        packs={topic.map_packs || NO_PACKS}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
