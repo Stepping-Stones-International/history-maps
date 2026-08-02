@@ -2,6 +2,7 @@ import React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { buildScale } from "./timelineScale"
 import { REVEAL_MODES, DEFAULT_REVEAL_MODE } from "./revealMode"
+import { walkOrder } from "./timelineWalk"
 
 // Sits over the map, spanning 80% of the space left of the drawer. The offset
 // follows the drawer so the bar recentres when it collapses.
@@ -12,14 +13,18 @@ export default function TimelineBar({
   // Null until two nodes carry different dates: nothing to space out before then.
   const scale = buildScale(nodes)
 
-  // The arrows walk the plots in the order they sit on the line. With nothing
-  // picked out, or with something undated picked from the sidebar, they start
-  // at whichever end they are pointing away from.
-  const plots = scale?.epochs || []
-  const current = plots.findIndex(({ node }) => node.id === highlightedId)
-  const previous = current === -1 ? plots[plots.length - 1] : plots[current - 1]
-  const next = current === -1 ? plots[0] : plots[current + 1]
-  const step = (plot) => (plot && onSelect ? () => onSelect(plot.node) : null)
+  // The arrows walk the plots in the order they sit on the line — except while
+  // stepping through, where embedded nodes are steps of their own so the map
+  // fills in one at a time. With nothing picked out, or with something off the
+  // line picked from the sidebar, they start at whichever end they point away
+  // from.
+  const stops = revealMode === "step"
+    ? walkOrder(nodes)
+    : (scale?.epochs || []).map(({ node }) => node)
+  const current = stops.findIndex((node) => node.id === highlightedId)
+  const previous = current === -1 ? stops[stops.length - 1] : stops[current - 1]
+  const next = current === -1 ? stops[0] : stops[current + 1]
+  const step = (node) => (node && onSelect ? () => onSelect(node) : null)
   const stepBack = step(previous)
   const stepForward = step(next)
 
@@ -46,7 +51,7 @@ export default function TimelineBar({
           onClick={stepBack}
           disabled={!stepBack}
           aria-label="Step back"
-          title={previous ? `Back to ${previous.node.title}` : "Step back"}
+          title={previous ? `Back to ${previous.title}` : "Step back"}
         >
           <ChevronLeft className="icon-button__glyph" />
         </button>
@@ -95,7 +100,7 @@ export default function TimelineBar({
           onClick={stepForward}
           disabled={!stepForward}
           aria-label="Step forward"
-          title={next ? `On to ${next.node.title}` : "Step forward"}
+          title={next ? `On to ${next.title}` : "Step forward"}
         >
           <ChevronRight className="icon-button__glyph" />
         </button>
