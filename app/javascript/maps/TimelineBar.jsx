@@ -5,10 +5,21 @@ import { buildScale } from "./timelineScale"
 // Sits over the map, spanning 80% of the space left of the drawer. The offset
 // follows the drawer so the bar recentres when it collapses.
 export default function TimelineBar({
-  nodes = [], drawerOpen, highlightedId = null, onHighlight, onStepBack, onStepForward
+  nodes = [], drawerOpen, highlightedId = null, onHighlight, onSelect
 }) {
   // Null until two nodes carry different dates: nothing to space out before then.
   const scale = buildScale(nodes)
+
+  // The arrows walk the plots in the order they sit on the line. With nothing
+  // picked out, or with something undated picked from the sidebar, they start
+  // at whichever end they are pointing away from.
+  const plots = scale?.epochs || []
+  const current = plots.findIndex(({ node }) => node.id === highlightedId)
+  const previous = current === -1 ? plots[plots.length - 1] : plots[current - 1]
+  const next = current === -1 ? plots[0] : plots[current + 1]
+  const step = (plot) => (plot && onSelect ? () => onSelect(plot.node) : null)
+  const stepBack = step(previous)
+  const stepForward = step(next)
 
   return (
     <div className={`timeline ${drawerOpen ? "timeline--inset" : ""}`}>
@@ -16,10 +27,10 @@ export default function TimelineBar({
         <button
           type="button"
           className="icon-button icon-button--small timeline__step"
-          onClick={onStepBack}
-          disabled={!onStepBack}
+          onClick={stepBack}
+          disabled={!stepBack}
           aria-label="Step back"
-          title="Step back"
+          title={previous ? `Back to ${previous.node.title}` : "Step back"}
         >
           <ChevronLeft className="icon-button__glyph" />
         </button>
@@ -65,10 +76,10 @@ export default function TimelineBar({
         <button
           type="button"
           className="icon-button icon-button--small timeline__step"
-          onClick={onStepForward}
-          disabled={!onStepForward}
+          onClick={stepForward}
+          disabled={!stepForward}
           aria-label="Step forward"
-          title="Step forward"
+          title={next ? `On to ${next.node.title}` : "Step forward"}
         >
           <ChevronRight className="icon-button__glyph" />
         </button>

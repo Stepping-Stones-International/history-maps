@@ -221,6 +221,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         drawerOpen={drawerOpen}
         highlightedId={highlightedId}
         onHighlight={toggleHighlight}
+        onSelect={(node) => setHighlightedId(node.id)}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}
