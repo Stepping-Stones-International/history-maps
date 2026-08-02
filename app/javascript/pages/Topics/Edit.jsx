@@ -15,6 +15,7 @@ import Modal from "../../components/Modal"
 const NO_PACKS = []
 
 const EMPTY_DRAFT = {
+  marker: "waypoint",
   layer: false,
   area_json: "",
   parent_id: "",
@@ -34,6 +35,7 @@ const EMPTY_DRAFT = {
 
 // Only the fields the form edits; id and display-only values are left behind.
 const draftFrom = (node) => ({
+  marker: node.marker || "waypoint",
   layer: Boolean(node.layer),
   area_json: node.area_json || "",
   parent_id: node.parent_id || "",
@@ -60,7 +62,7 @@ const draftFrom = (node) => ({
 })
 
 // Full-bleed map with its own drawer, so it renders without Layout.
-export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPacks }) {
+export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPacks, markers }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
   // null when closed, otherwise { mode: "new" } or { mode: "edit", id }.
@@ -206,6 +208,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
         defaultView={topic.default_view}
         viewReader={viewReader}
         packs={topic.map_packs || NO_PACKS}
+        markers={markers}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
@@ -299,6 +302,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
             dateTypes={dateTypes}
             rangeTypes={rangeTypes}
             eras={eras}
+            markers={markers}
             parentOptions={parentChoices}
             onChange={setDraft}
             onPickOnMap={() => setPicking(true)}

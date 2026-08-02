@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_014158) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_061533) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.json "area"
     t.datetime "created_at", null: false
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_014158) do
     t.float "latitude"
     t.boolean "layer", default: false, null: false
     t.float "longitude"
+    t.string "marker", default: "waypoint"
     t.integer "occurred_day"
     t.integer "occurred_month"
     t.integer "occurred_year"

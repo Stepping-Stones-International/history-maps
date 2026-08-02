@@ -12,6 +12,34 @@ class NodeTest < ActiveSupport::TestCase
       date_type: "none").valid?
   end
 
+  test "defaults to the waypoint icon" do
+    node = build_node(title: "Ephesus", date_type: "none")
+    node.save!
+
+    assert_equal "waypoint", node.reload.marker
+  end
+
+  test "takes a blank icon as the default rather than storing it" do
+    node = build_node(title: "Ephesus", date_type: "none", marker: "")
+    node.save!
+
+    assert_equal "waypoint", node.marker
+  end
+
+  test "remembers the icon it was given" do
+    node = build_node(title: "Antioch", date_type: "none", marker: "apostolic_see")
+    node.save!
+
+    assert_equal "apostolic_see", node.reload.marker
+  end
+
+  test "rejects an icon it does not draw" do
+    node = build_node(title: "Nowhere", marker: "obelisk")
+
+    assert_not node.valid?
+    assert_includes node.errors[:marker], "is not included in the list"
+  end
+
   test "requires a title" do
     node = Node.new(topic: @topic, latitude: 0, longitude: 0, date_type: "none")
     assert_not node.valid?

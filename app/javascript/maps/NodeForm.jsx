@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 import { Crosshair } from "lucide-react"
 import DateParts from "./DateParts"
+import MarkerPicker from "./MarkerPicker"
 
 // Controlled by the page so the values survive the modal being hidden while
 // coordinates are picked off the map.
 export default function NodeForm({
-  draft, dateTypes, eras, rangeTypes = [], parentOptions = [],
+  draft, dateTypes, eras, rangeTypes = [], parentOptions = [], markers = [],
   onChange, onPickOnMap, onCancel, onSubmit
 }) {
   // Exact wants a whole date; approximate settles for a year. An embedded node
@@ -258,6 +259,15 @@ export default function NodeForm({
           </div>
         </fieldset>
       )}
+
+      <div className="form__field">
+        <label htmlFor="node-marker" className="form__label">Icon</label>
+        <MarkerPicker
+          markers={markers}
+          value={draft.marker}
+          onChange={(marker) => onChange({ ...draft, marker })}
+        />
+      </div>
 
       <div className="form__field">
         <label htmlFor="node-title" className="form__label">Title</label>

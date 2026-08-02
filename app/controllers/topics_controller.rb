@@ -31,6 +31,7 @@ class TopicsController < ApplicationController
       dateTypes: Node::DATE_TYPES.map { |value, label| { value: value, label: label } },
       rangeTypes: Node::RANGE_TYPES.map { |value, label| { value: value, label: label } },
       eras: Node::ERAS,
+      markers: Node::MARKERS.map { |value, marker| { value: value, **marker } },
       mapPacks: Topic::MAP_PACKS.map { |key, pack| { value: key, **pack } }
     }
   end
@@ -86,6 +87,7 @@ class TopicsController < ApplicationController
         id: node.id,
         title: node.title,
         description: node.description,
+        marker: node.marker,
         layer: node.layer,
         area: node.area,
         area_json: node.area_json,

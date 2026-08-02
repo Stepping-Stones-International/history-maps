@@ -28,6 +28,16 @@ class Node < ApplicationRecord
   MIN_YEAR = 1
   MAX_YEAR = 4000
 
+  # What the node draws on the map. The shape and colour are given here rather
+  # than in the stylesheet, so the picker in the form and the marker on the map
+  # can never disagree about what a kind of node looks like.
+  MARKERS = {
+    "waypoint" => { label: "Waypoint", shape: "triangle", color: "#8fb8e8" },
+    "apostolic_see" => { label: "Apostolic See", shape: "circle", color: "#d0524e" }
+  }.freeze
+
+  DEFAULT_MARKER = "waypoint"
+
   belongs_to :topic
   belongs_to :parent, class_name: "Node", optional: true
   has_many :children, -> { order(:position) },
@@ -41,10 +51,12 @@ class Node < ApplicationRecord
 
   before_validation :place_after_siblings, on: :create
   before_validation :default_position
+  before_validation :default_marker
 
   validates :title, presence: true
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :date_type, inclusion: { in: DATE_TYPES.keys }
+  validates :marker, inclusion: { in: MARKERS.keys }
   validates :era, inclusion: { in: ERAS }
   # A layer is not a place, so it is the one kind of node without coordinates.
   validates :latitude, presence: true,
@@ -202,6 +214,11 @@ class Node < ApplicationRecord
       signed = public_send(:"#{edge}_era") == "BC" ? -year : year
 
       [ signed, public_send(:"#{edge}_month") || 0, public_send(:"#{edge}_day") || 0 ]
+    end
+
+    # Covers both a node that never named an icon and a form that sent "".
+    def default_marker
+      self.marker = DEFAULT_MARKER if marker.blank?
     end
 
     def super_area(value)

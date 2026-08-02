@@ -3,6 +3,27 @@ require "test_helper"
 class NodesControllerTest < ActionDispatch::IntegrationTest
   setup { @topic = topics(:one) }
 
+  test "create stores the icon the picker chose" do
+    sign_in_as users(:one)
+
+    post topic_nodes_path(@topic), params: {
+      title: "Antioch", latitude: 36.2, longitude: 36.16,
+      date_type: "none", marker: "apostolic_see"
+    }
+
+    assert_equal "apostolic_see", @topic.nodes.order(:created_at).last.marker
+  end
+
+  test "update rejects an icon that is not offered" do
+    sign_in_as users(:one)
+    node = @topic.nodes.create!(title: "Lydda", latitude: 31.95, longitude: 34.89,
+      date_type: "none")
+
+    patch topic_node_path(@topic, node), params: { title: node.title, marker: "obelisk" }
+
+    assert_equal "waypoint", node.reload.marker
+  end
+
   test "create requires authentication" do
     assert_no_difference -> { Node.count } do
       post topic_nodes_path(@topic), params: node_params

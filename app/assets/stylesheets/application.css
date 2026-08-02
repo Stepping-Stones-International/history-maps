@@ -814,6 +814,72 @@ textarea.form__input {
   cursor: pointer;
 }
 
+/* Icon picker: the shape and its name, so what is chosen is what lands on
+   the map. Built rather than a native select, which takes only text. */
+.picker {
+  position: relative;
+}
+
+.picker__button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.picker__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.picker__caret {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.picker__list {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+}
+
+.picker__option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.picker__option:hover,
+.picker__option--chosen {
+  background: var(--surface-hover);
+}
+
+.marker-icon {
+  flex: 0 0 auto;
+}
+
 /* A map pack: its name over a line about what it draws. */
 .form__check--stacked {
   align-items: flex-start;

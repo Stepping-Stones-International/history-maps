@@ -105,43 +105,63 @@ function areaFeatures(nodes) {
     })
 }
 
-const MARKER_COLOR = "#8fb8e8"
 const MARKER_ACTIVE_COLOR = "#f2b640"
-const MARKER_SIZE = { width: 20, height: 18 }
-const MARKER_ACTIVE_SIZE = { width: 30, height: 27 }
+const MARKER_COLOR = "#8fb8e8"
+const DEFAULT_MARKER = "waypoint"
+// A triangle points at its coordinate from above, so it hangs by its tip; a
+// circle sits on the spot.
+const MARKER_SHAPES = {
+  triangle: { box: "0 0 20 18", ratio: 18 / 20, anchor: "bottom" },
+  circle: { box: "0 0 20 20", ratio: 1, anchor: "center" }
+}
+const MARKER_WIDTH = 20
+const MARKER_ACTIVE_WIDTH = 30
 
-// A triangle pointing down at its coordinate, drawn ourselves so colour and
-// size are plain CSS rather than surgery on MapLibre's pin.
-function markerElement() {
+const markerShape = (marker) => MARKER_SHAPES[marker?.shape] || MARKER_SHAPES.triangle
+
+// Drawn ourselves rather than by surgery on MapLibre's pin, so the shape and
+// colour are whatever the node was given.
+function markerElement(marker) {
   const element = document.createElement("div")
   element.className = "node-marker"
 
+  const shape = markerShape(marker)
   const svg = document.createElementNS(SVG_NS, "svg")
-  svg.setAttribute("viewBox", "0 0 20 18")
+  svg.setAttribute("viewBox", shape.box)
 
-  const triangle = document.createElementNS(SVG_NS, "polygon")
-  triangle.setAttribute("points", "0,0 20,0 10,18")
+  if (marker?.shape === "circle") {
+    const circle = document.createElementNS(SVG_NS, "circle")
+    circle.setAttribute("cx", 10)
+    circle.setAttribute("cy", 10)
+    circle.setAttribute("r", 8)
+    svg.appendChild(circle)
+  } else {
+    const triangle = document.createElementNS(SVG_NS, "polygon")
+    triangle.setAttribute("points", "0,0 20,0 10,18")
+    svg.appendChild(triangle)
+  }
 
-  svg.appendChild(triangle)
   element.appendChild(svg)
-  paintMarker(element, false)
+  paintMarker(element, false, marker)
   return element
 }
 
-// Size and colour are set as attributes rather than left to CSS, so the
-// triangle cannot be left at its base size by a stylesheet ordering surprise.
-function paintMarker(element, active) {
-  const { width, height } = active ? MARKER_ACTIVE_SIZE : MARKER_SIZE
+// Size and colour are set as attributes rather than left to CSS, so a marker
+// cannot be left at its base size by a stylesheet ordering surprise. Being
+// picked out overrides the node's own colour, whatever shape it is.
+function paintMarker(element, active, marker) {
+  const shape = markerShape(marker)
+  const width = active ? MARKER_ACTIVE_WIDTH : MARKER_WIDTH
   const svg = element.querySelector("svg")
 
   svg.setAttribute("width", width)
-  svg.setAttribute("height", height)
-  svg.querySelector("polygon").setAttribute("fill", active ? MARKER_ACTIVE_COLOR : MARKER_COLOR)
+  svg.setAttribute("height", Math.round(width * shape.ratio))
+  svg.firstChild.setAttribute("fill", active ? MARKER_ACTIVE_COLOR : (marker?.color || MARKER_COLOR))
 }
 
 export default function HomeMap({
   nodes = [], placing = false, highlightedId = null, defaultView = null,
-  viewReader = null, packs = [], onMapClick, onNodeSelect
+  viewReader = null, packs = [], markers: markerKinds = [], onMapClick, onNodeSelect
 }) {
   const container = useRef(null)
   const map = useRef(null)
@@ -151,6 +171,9 @@ export default function HomeMap({
   const styleReady = useRef(false)
   // Kept once fetched, so switching a pack off and on again is free.
   const packData = useRef(new Map())
+  // What icon each drawn marker was built with, so a node that changes icon is
+  // rebuilt rather than repainted into the wrong shape.
+  const nodeMarkers = useRef(new Map())
   const highlightedRef = useRef(highlightedId)
   highlightedRef.current = highlightedId
   // Held in refs so changing these does not re-bind the map and marker
@@ -164,6 +187,10 @@ export default function HomeMap({
   // Read by the load handler, which may fire after the first render.
   const nodesRef = useRef(nodes)
   nodesRef.current = nodes
+
+  // Sent by the server, so the form's picker and the map cannot disagree.
+  const markersById = Object.fromEntries(markerKinds.map((kind) => [ kind.value, kind ]))
+  const iconFor = (node) => markersById[node?.marker] || markersById[DEFAULT_MARKER]
 
   useEffect(() => {
     if (map.current) return
@@ -424,7 +451,11 @@ export default function HomeMap({
       seen.add(node.id)
 
       const existing = markers.current.get(node.id)
-      if (existing) {
+      // A changed icon means a different shape and anchor, so that marker is
+      // torn down and built again rather than repainted.
+      const restyled = existing && nodeMarkers.current.get(node.id) !== node.marker
+
+      if (existing && !restyled) {
         // Keep a moved or renamed node in step without rebuilding the marker.
         existing.setLngLat([node.longitude, node.latitude])
         existing.getElement().setAttribute("aria-label", node.title)
@@ -432,6 +463,13 @@ export default function HomeMap({
           ?.setLngLat([node.longitude, node.latitude])
           ?.setDOMContent(nodeLabel(node))
         return
+      }
+
+      if (restyled) {
+        existing.remove()
+        markers.current.delete(node.id)
+        labels.current.get(node.id)?.remove()
+        labels.current.delete(node.id)
       }
 
       // Label shown on hover. Positioned itself rather than via setPopup, so
@@ -447,7 +485,12 @@ export default function HomeMap({
         .setLngLat([node.longitude, node.latitude])
         .setDOMContent(nodeLabel(node))
 
-      const marker = new Marker({ element: markerElement(), anchor: "bottom" })
+      const icon = iconFor(node)
+      nodeMarkers.current.set(node.id, node.marker)
+      const marker = new Marker({
+        element: markerElement(icon),
+        anchor: markerShape(icon).anchor
+      })
         .setLngLat([node.longitude, node.latitude])
         .addTo(map.current)
 
@@ -491,6 +534,7 @@ export default function HomeMap({
       markers.current.delete(id)
       labels.current.get(id)?.remove()
       labels.current.delete(id)
+      nodeMarkers.current.delete(id)
     })
   }, [nodes])
 
@@ -545,7 +589,7 @@ export default function HomeMap({
       const active = id === highlightedId
       const element = marker.getElement()
       element.classList.toggle("node-marker--active", active)
-      paintMarker(element, active)
+      paintMarker(element, active, markersById[nodeMarkers.current.get(id)])
 
       const popup = labels.current.get(id)
       if (!popup) return
