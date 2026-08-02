@@ -70,6 +70,17 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     setHighlightedId((current) => (current === node.id ? null : node.id))
   // How much of the topic the map draws as the timeline is walked.
   const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
+  // Nodes unticked in the sidebar, kept off the map whatever the mode reveals.
+  const [hiddenIds, setHiddenIds] = useState(() => new Set())
+  const setVisible = (node, visible) =>
+    setHiddenIds((current) => {
+      const next = new Set(current)
+
+      if (visible) next.delete(node.id)
+      else next.add(node.id)
+
+      return next
+    })
   // null when closed, otherwise the topic draft being edited.
   const [settings, setSettings] = useState(null)
   const [capturingView, setCapturingView] = useState(false)
@@ -177,7 +188,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
       {/* The sidebar and timeline always list everything; the reveal mode
           only decides what the map draws. */}
       <HomeMap
-        nodes={visibleNodes(nodes, revealMode, highlightedId)}
+        nodes={visibleNodes(nodes, revealMode, highlightedId, hiddenIds)}
         placing={picking}
         highlightedId={highlightedId}
         defaultView={topic.default_view}
@@ -192,6 +203,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
           highlightedId={highlightedId}
           onHighlight={toggleHighlight}
           onEdit={startEditing}
+          hiddenIds={hiddenIds}
+          onVisibilityChange={setVisible}
         />
       </Drawer>
 

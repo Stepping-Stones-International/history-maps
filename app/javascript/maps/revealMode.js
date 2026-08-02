@@ -17,14 +17,25 @@ export const DEFAULT_REVEAL_MODE = "all"
 // keeps only the one being looked at. Both start empty, since nothing has
 // been reached yet, and neither draws a loose undated node: it has no place
 // on the line to be reached from.
-export function visibleNodes(nodes = [], mode = DEFAULT_REVEAL_MODE, highlightedId = null) {
-  if (mode !== "step" && mode !== "isolated") return nodes
+//
+// A node unticked in the sidebar stays off the map in every mode.
+export function visibleNodes(
+  nodes = [], mode = DEFAULT_REVEAL_MODE, highlightedId = null, hiddenIds = new Set()
+) {
+  const shown = nodes.filter((node) => !hiddenIds.has(node.id))
+
+  if (mode !== "step" && mode !== "isolated") return shown
   if (!highlightedId) return []
 
-  if (mode === "isolated") return nodes.filter((node) => node.id === highlightedId)
+  if (mode === "isolated") return shown.filter((node) => node.id === highlightedId)
 
+  // The walk covers every node, so unticking one does not shuffle the rest
+  // along; it just leaves a gap.
   const order = walkOrder(nodes)
   const reached = order.findIndex((node) => node.id === highlightedId)
+  if (reached === -1) return []
 
-  return reached === -1 ? [] : order.slice(0, reached + 1)
+  const revealed = new Set(order.slice(0, reached + 1).map((node) => node.id))
+
+  return shown.filter((node) => revealed.has(node.id))
 }

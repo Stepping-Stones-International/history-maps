@@ -14,7 +14,10 @@ function nest(nodes) {
   return { roots: children.get(null) || [], childrenOf: (id) => children.get(id) || [] }
 }
 
-function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight, onEdit, depth }) {
+function Row({
+  node, childrenOf, expanded, onToggle, highlightedId, onHighlight, onEdit, depth,
+  hiddenIds, onVisibilityChange
+}) {
   const embedded = childrenOf(node.id)
   const hasEmbedded = embedded.length > 0
   const isOpen = expanded.has(node.id)
@@ -27,6 +30,17 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
         className={`node-list__item ${node.id === highlightedId ? "node-list__item--active" : ""}`}
         style={{ marginLeft: `${depth * 0.85}rem` }}
       >
+        {/* Kept off the map for as long as it is unticked, whatever the
+            timeline has reached. */}
+        <input
+          type="checkbox"
+          className="node-list__visible"
+          checked={!hiddenIds.has(node.id)}
+          onChange={(event) => onVisibilityChange(node, event.target.checked)}
+          aria-label={`Show ${node.title} on the map`}
+          title="Show on the map"
+        />
+
         {hasEmbedded ? (
           <button
             type="button"
@@ -80,6 +94,8 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
               onHighlight={onHighlight}
               onEdit={onEdit}
               depth={depth + 1}
+              hiddenIds={hiddenIds}
+              onVisibilityChange={onVisibilityChange}
             />
           ))}
         </ol>
@@ -88,7 +104,9 @@ function Row({ node, childrenOf, expanded, onToggle, highlightedId, onHighlight,
   )
 }
 
-export default function NodeList({ nodes, highlightedId, onHighlight, onEdit }) {
+export default function NodeList({
+  nodes, highlightedId, onHighlight, onEdit, hiddenIds, onVisibilityChange
+}) {
   // Closed unless this browser remembers it being opened.
   const [expanded, setExpanded] = useState(expandedIds)
 
@@ -124,6 +142,8 @@ export default function NodeList({ nodes, highlightedId, onHighlight, onEdit }) 
           onHighlight={onHighlight}
           onEdit={onEdit}
           depth={0}
+          hiddenIds={hiddenIds}
+          onVisibilityChange={onVisibilityChange}
         />
       ))}
     </ul>

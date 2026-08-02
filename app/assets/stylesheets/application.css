@@ -853,6 +853,17 @@ textarea.form__input {
   width: 18px;
 }
 
+/* Whether the node is drawn on the map. Lined up with the row's first line
+   of text rather than its top, since a row can wrap onto two. */
+.node-list__visible {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  margin: 0.5rem 0 0;
+  accent-color: #8fb8e8;
+  cursor: pointer;
+}
+
 .node-list__select {
   flex: 1;
   min-width: 0;
