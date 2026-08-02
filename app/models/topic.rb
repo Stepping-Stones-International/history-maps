@@ -25,6 +25,17 @@ class Topic < ApplicationRecord
              "crossings; others are short connections the network needs to " \
              "work at all."
     },
+    "mesopotamia_roads" => {
+      label: "Roads of northern Mesopotamia",
+      file: "orbis-mesopotamia-roads.geojson",
+      note: "ORBIS's land routes, where Itiner-e stops at the Euphrates.",
+      covers: "21 links across the north, between Edessa, Carrhae, Nisibis, " \
+              "Singara, Circesium and Dura, reaching 42.19°E. Nothing runs " \
+              "south of Assyria: Babylon, Kish, Uruk and Ur have no roads in " \
+              "any published dataset.",
+      years: "The same model of the Roman Imperial period as the sea routes, " \
+             "centred on about AD 200."
+    },
     "awmc_roads" => {
       label: "Roman roads (Barrington Atlas)",
       file: "awmc-roads.geojson",

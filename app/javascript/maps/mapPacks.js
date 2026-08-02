@@ -58,6 +58,23 @@ export const MAP_PACKS = {
             "sea routes (MIT)",
     layers: seaLayers()
   },
+  mesopotamia_roads: {
+    url: () => packUrl("mesopotamia_roads"),
+    credit: '<a href="https://orbis.stanford.edu" target="_blank" rel="noopener">ORBIS</a> ' +
+            "roads (MIT)",
+    // One kind only, and a colour of its own: these are modelled links between
+    // stations, not a surveyed network like Itiner-e's.
+    layers: [
+      {
+        suffix: "road",
+        filter: [ "==", [ "get", "kind" ], "road" ],
+        color: "#c58fd0",
+        opacity: 0.85,
+        widths: [ 4, 1.2, 9, 2.2, 12, 3.4 ],
+        dashes: [ 3, 1.8 ]
+      }
+    ]
+  },
   awmc_roads: {
     url: () => packUrl("awmc_roads"),
     credit: '<a href="https://awmc.unc.edu" target="_blank" rel="noopener">AWMC</a> ' +
