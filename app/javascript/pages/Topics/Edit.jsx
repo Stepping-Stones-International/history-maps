@@ -63,8 +63,10 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
   // Held here rather than in the form so it survives the modal being hidden.
   const [draft, setDraft] = useState(EMPTY_DRAFT)
   const [picking, setPicking] = useState(false)
-  // Which node is called out on the map; clicking its row again clears it.
+  // Which node is called out on the map; clicking its row or plot again clears it.
   const [highlightedId, setHighlightedId] = useState(null)
+  const toggleHighlight = (node) =>
+    setHighlightedId((current) => (current === node.id ? null : node.id))
   // null when closed, otherwise the topic draft being edited.
   const [settings, setSettings] = useState(null)
   const [capturingView, setCapturingView] = useState(false)
@@ -183,7 +185,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         <NodeList
           nodes={nodes}
           highlightedId={highlightedId}
-          onHighlight={(node) => setHighlightedId((current) => (current === node.id ? null : node.id))}
+          onHighlight={toggleHighlight}
           onEdit={startEditing}
         />
       </Drawer>
@@ -214,7 +216,12 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         )}
       </div>
 
-      <TimelineBar nodes={nodes} drawerOpen={drawerOpen} />
+      <TimelineBar
+        nodes={nodes}
+        drawerOpen={drawerOpen}
+        highlightedId={highlightedId}
+        onHighlight={toggleHighlight}
+      />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}
       {settings && !capturingView && (

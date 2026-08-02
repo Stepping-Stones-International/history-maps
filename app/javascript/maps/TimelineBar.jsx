@@ -4,7 +4,9 @@ import { buildScale } from "./timelineScale"
 
 // Sits over the map, spanning 80% of the space left of the drawer. The offset
 // follows the drawer so the bar recentres when it collapses.
-export default function TimelineBar({ nodes = [], drawerOpen, onStepBack, onStepForward }) {
+export default function TimelineBar({
+  nodes = [], drawerOpen, highlightedId = null, onHighlight, onStepBack, onStepForward
+}) {
   // Null until two nodes carry different dates: nothing to space out before then.
   const scale = buildScale(nodes)
 
@@ -34,24 +36,30 @@ export default function TimelineBar({ nodes = [], drawerOpen, onStepBack, onStep
             />
           ))}
 
-          {scale?.epochs.map(({ node, left, right }) => (
-            right === null ? (
-              <span key={node.id} className="timeline__epoch" style={{ left: `${left}%` }}>
-                <span className="timeline__epoch-label">{node.date_display}</span>
-                <span className="timeline__epoch-line" />
-              </span>
-            ) : (
-              // A span: a bar between its two ends, each end marked.
-              <span
+          {/* Each plot picks out its node, the same as its row in the sidebar. */}
+          {scale?.epochs.map(({ node, left, right }) => {
+            const active = node.id === highlightedId
+            const plot = right === null ? "epoch" : "span"
+
+            return (
+              <button
+                type="button"
                 key={node.id}
-                className="timeline__span"
-                style={{ left: `${left}%`, width: `${Math.max(right - left, 0.4)}%` }}
+                className={`timeline__${plot} ${active ? `timeline__${plot}--active` : ""}`}
+                style={
+                  right === null
+                    ? { left: `${left}%` }
+                    : { left: `${left}%`, width: `${Math.max(right - left, 0.4)}%` }
+                }
+                onClick={() => onHighlight?.(node)}
+                aria-pressed={active}
+                title={`${node.title} — ${node.date_display}`}
               >
-                <span className="timeline__span-label">{node.date_display}</span>
-                <span className="timeline__span-bar" />
-              </span>
+                <span className={`timeline__${plot}-label`}>{node.date_display}</span>
+                <span className={`timeline__${plot}-${right === null ? "line" : "bar"}`} />
+              </button>
             )
-          ))}
+          })}
         </div>
 
         <button
