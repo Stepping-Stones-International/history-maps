@@ -84,6 +84,13 @@ const TOPO_STYLE = {
 const SVG_NS = "http://www.w3.org/2000/svg"
 
 const AREA_SOURCE = "node-areas"
+const ROADS_SOURCE = "roman-roads"
+
+// Itiner-e's road network, fetched on demand rather than bundled: it is a few
+// megabytes, and most sessions never ask for it.
+const roadsUrl = document.querySelector('meta[name="roman-roads-url"]')?.content
+const ROADS_CREDIT =
+  '<a href="https://itiner-e.org" target="_blank" rel="noopener">Itiner-e</a> roads (CC BY 4.0)'
 
 // A ring of [longitude, latitude] pairs becomes a closed polygon. GeoJSON wants
 // the first point repeated at the end, which the stored ring does not carry.
@@ -140,7 +147,7 @@ function paintMarker(element, active) {
 
 export default function HomeMap({
   nodes = [], placing = false, highlightedId = null, defaultView = null,
-  viewReader = null, onMapClick, onNodeSelect
+  viewReader = null, roads = false, onMapClick, onNodeSelect
 }) {
   const container = useRef(null)
   const map = useRef(null)
@@ -148,6 +155,8 @@ export default function HomeMap({
   const labels = useRef(new Map())
   const areaLabels = useRef(new Map())
   const styleReady = useRef(false)
+  // Kept once fetched, so switching the overlay off and on again is free.
+  const roadNetwork = useRef(null)
   const highlightedRef = useRef(highlightedId)
   highlightedRef.current = highlightedId
   // Held in refs so changing these does not re-bind the map and marker
@@ -280,6 +289,103 @@ export default function HomeMap({
     const canvas = map.current?.getCanvas()
     if (canvas) canvas.style.cursor = placing ? "crosshair" : ""
   }, [placing])
+
+  // The Roman road overlay. Fetched the first time it is asked for and kept
+  // after that; switching it off hides the layers rather than tearing them
+  // down, so coming back is instant.
+  useEffect(() => {
+    const layers = [ `${ROADS_SOURCE}-secondary`, `${ROADS_SOURCE}-main` ]
+
+    const show = (visibility) => layers.forEach((id) => {
+      if (map.current?.getLayer(id)) {
+        map.current.setLayoutProperty(id, "visibility", visibility)
+      }
+    })
+
+    if (!roads || !roadsUrl) {
+      show("none")
+      return undefined
+    }
+
+    let dropped = false
+
+    // As with the areas: addSource throws while the style is still settling.
+    const draw = () => {
+      if (dropped || !map.current || !roadNetwork.current) return false
+      if (!map.current.isStyleLoaded()) return false
+
+      if (!map.current.getSource(ROADS_SOURCE)) {
+        map.current.addSource(ROADS_SOURCE, {
+          type: "geojson",
+          data: roadNetwork.current,
+          attribution: ROADS_CREDIT
+        })
+
+        // Under the node areas, so a topic's own shapes stay on top.
+        const beneath = map.current.getLayer(`${AREA_SOURCE}-fill`)
+          ? `${AREA_SOURCE}-fill`
+          : undefined
+
+        map.current.addLayer({
+          id: `${ROADS_SOURCE}-secondary`,
+          type: "line",
+          source: ROADS_SOURCE,
+          filter: [ "!=", [ "get", "kind" ], "Main Road" ],
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-color": "#c98f5a",
+            "line-opacity": 0.45,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.5, 9, 1.2, 12, 2 ]
+          }
+        }, beneath)
+
+        map.current.addLayer({
+          id: `${ROADS_SOURCE}-main`,
+          type: "line",
+          source: ROADS_SOURCE,
+          filter: [ "==", [ "get", "kind" ], "Main Road" ],
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-color": "#e0a568",
+            "line-opacity": 0.8,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], 4, 0.9, 9, 2, 12, 3.5 ]
+          }
+        }, beneath)
+      }
+
+      show("visible")
+      return true
+    }
+
+    // Same belt and braces as the areas: styledata while the style settles,
+    // and load in case it has stopped firing by the time this runs.
+    let retry = null
+
+    const drawWhenReady = () => {
+      if (draw()) return
+      retry = () => { if (draw()) map.current?.off("styledata", retry) }
+      map.current?.on("styledata", retry)
+      map.current?.once("load", () => draw())
+    }
+
+    if (roadNetwork.current) {
+      drawWhenReady()
+    } else {
+      fetch(roadsUrl)
+        .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
+        .then((collection) => {
+          if (dropped) return
+          roadNetwork.current = collection
+          drawWhenReady()
+        })
+        .catch(() => {})
+    }
+
+    return () => {
+      dropped = true
+      if (retry) map.current?.off("styledata", retry)
+    }
+  }, [roads])
 
   // Reconcile markers against the current nodes. Layers have no coordinates,
   // so nothing is drawn for them.

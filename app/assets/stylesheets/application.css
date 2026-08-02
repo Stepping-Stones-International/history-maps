@@ -1158,6 +1158,21 @@ textarea.form__input {
   opacity: 1;
 }
 
+/* An overlay drawn under the topic, rather than part of it. */
+.timeline__overlay {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.timeline__overlay-box.timeline__overlay-box {
+  margin: 0;
+  accent-color: #e0a568;
+}
+
 .timeline__modes-label {
   font-size: 0.75rem;
   color: var(--text-muted);

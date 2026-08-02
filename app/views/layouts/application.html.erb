@@ -14,6 +14,9 @@
     <%# MapLibre loads its worker from a separate file; hand it the digested asset URL. %>
     <meta name="maplibre-worker-url" content="<%= asset_path("maplibre-gl-worker.js") %>">
 
+    <%# Fetched only when the roads overlay is switched on. %>
+    <meta name="roman-roads-url" content="<%= asset_path("roman-roads.geojson") %>">
+
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>

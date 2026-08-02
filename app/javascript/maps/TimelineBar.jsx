@@ -8,7 +8,7 @@ import { walkOrder } from "./timelineWalk"
 // follows the drawer so the bar recentres when it collapses.
 export default function TimelineBar({
   nodes = [], drawerOpen, highlightedId = null, onHighlight, onSelect,
-  revealMode = DEFAULT_REVEAL_MODE, onRevealModeChange
+  revealMode = DEFAULT_REVEAL_MODE, onRevealModeChange, roads = false, onRoadsChange
 }) {
   // Null until two nodes carry different dates: nothing to space out before then.
   const scale = buildScale(nodes)
@@ -42,6 +42,17 @@ export default function TimelineBar({
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
+
+        <label className="timeline__overlay" htmlFor="timeline-roads">
+          <input
+            id="timeline-roads"
+            type="checkbox"
+            className="node-list__visible timeline__overlay-box"
+            checked={roads}
+            onChange={(event) => onRoadsChange?.(event.target.checked)}
+          />
+          Roman roads
+        </label>
       </div>
 
       <div className="timeline__bar" role="group" aria-label="Timeline">

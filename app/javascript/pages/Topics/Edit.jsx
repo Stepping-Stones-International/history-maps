@@ -70,6 +70,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
     setHighlightedId((current) => (current === node.id ? null : node.id))
   // How much of the topic the map draws as the timeline is walked.
   const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
+  // The Roman road overlay, off until asked for: it is a separate download.
+  const [roads, setRoads] = useState(false)
   // Nodes toggled by hand in the sidebar, which hold on or off whatever the
   // reveal mode would otherwise do with them.
   const [overrides, setOverrides] = useState(() => new Map())
@@ -200,6 +202,7 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         highlightedId={highlightedId}
         defaultView={topic.default_view}
         viewReader={viewReader}
+        roads={roads}
         onMapClick={takeCoordinates}
         onNodeSelect={startEditingById}
       />
@@ -249,6 +252,8 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras }) {
         onSelect={(node) => setHighlightedId(node.id)}
         revealMode={revealMode}
         onRevealModeChange={changeRevealMode}
+        roads={roads}
+        onRoadsChange={setRoads}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}
