@@ -38,20 +38,6 @@ class Topic < ApplicationRecord
       years: "The same model of the Roman Imperial period as the sea routes, " \
              "centred on about AD 200."
     },
-    "isidore_stations" => {
-      label: "Parthian Stations (Isidore)",
-      file: "isidore-stations.geojson",
-      note: "AWMC's mapping of Isidore of Charax's itinerary.",
-      covers: "41 stations of the Parthian road, from Antioch and Zeugma down " \
-              "the Euphrates past Dura and Seleucia, over the Zagros at " \
-              "Behistun and on to Alexandria in Arachosia — modern Kandahar, " \
-              "at 66.7°E. Stations only: no one has published the road between " \
-              "them, so none is drawn. Ten are shown hollow because AWMC's " \
-              "position and the Pleiades place it cites disagree by more than " \
-              "100km.",
-      years: "Isidore wrote in the first century AD, describing the road as it " \
-             "then ran through the Parthian empire."
-    },
     "awmc_roads" => {
       label: "Roman roads (Barrington Atlas)",
       file: "awmc-roads.geojson",

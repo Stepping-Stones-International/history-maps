@@ -1,14 +1,14 @@
 # Adds the stations of Isidore's Parthian Stations to a topic as waypoints.
 #
-# Reads the extract this repository already ships, so the nodes and the map
-# pack say the same thing:
+# Build the extract first, anywhere you like — it is not shipped as a pack,
+# since packs carry routes and shapes and these are places:
 #
-#   app/assets/data/isidore-stations.geojson
+#   python3 script/extract_isidore_stations.py points.geojson /tmp/stations.geojson
 #
-# built by script/extract_isidore_stations.py from AWMC's mapping (GPL-3.0) of
-# Isidore of Charax, Mansiones Parthicae, first century AD.
+# from AWMC's mapping (GPL-3.0) of Isidore of Charax, Mansiones Parthicae,
+# first century AD. Then:
 #
-#   bin/rails runner script/import_isidore_stations.rb TOPIC_ID [stations.geojson]
+#   bin/rails runner script/import_isidore_stations.rb TOPIC_ID /tmp/stations.geojson
 #
 # The stations carry no date. Isidore names them in order and gives the
 # distances between them, but neither he nor AWMC dates the founding of any
@@ -16,7 +16,7 @@
 #
 # Running it twice adds nothing: a station already in the topic is left alone.
 
-path = ARGV[1] || Rails.root.join("app/assets/data/isidore-stations.geojson").to_s
+path = ARGV[1]
 stations = JSON.parse(File.read(path))
 provenance = stations["source"] || {}
 

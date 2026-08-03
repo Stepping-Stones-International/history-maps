@@ -357,35 +357,27 @@ export default function HomeMap({
         ? `${AREA_SOURCE}-fill`
         : undefined
 
-      pack.layers.forEach(({ suffix, filter, color, opacity, widths, dashes, radii, edge }) => {
+      // Packs are routes and shapes only. Places belong to nodes, which carry a
+      // date and a description and can be stepped through, so a pack of points
+      // would draw the same things again in a second language.
+      pack.layers.forEach(({ suffix, filter, color, opacity, widths, dashes }) => {
         const id = packLayerId(key, suffix)
         if (map.current.getLayer(id)) return
 
-        // A pack of places rather than routes: radii instead of widths.
-        const drawn = radii
-          ? {
-              type: "circle",
-              paint: {
-                "circle-color": color,
-                "circle-opacity": opacity,
-                "circle-radius": [ "interpolate", [ "linear" ], [ "zoom" ], ...radii ],
-                "circle-stroke-width": 1,
-                "circle-stroke-color": edge || "#0d1218"
-              }
-            }
-          : {
-              type: "line",
-              // A dashed line cannot be round-capped without the dashes closing up.
-              layout: { "line-cap": dashes ? "butt" : "round", "line-join": "round" },
-              paint: {
-                "line-color": color,
-                "line-opacity": opacity,
-                "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], ...widths ],
-                ...(dashes ? { "line-dasharray": dashes } : {})
-              }
-            }
-
-        map.current.addLayer({ id, source: packSourceId(key), filter, ...drawn }, beneath)
+        map.current.addLayer({
+          id,
+          type: "line",
+          source: packSourceId(key),
+          filter,
+          // A dashed line cannot be round-capped without the dashes closing up.
+          layout: { "line-cap": dashes ? "butt" : "round", "line-join": "round" },
+          paint: {
+            "line-color": color,
+            "line-opacity": opacity,
+            "line-width": [ "interpolate", [ "linear" ], [ "zoom" ], ...widths ],
+            ...(dashes ? { "line-dasharray": dashes } : {})
+          }
+        }, beneath)
       })
 
       show(key, "visible")
