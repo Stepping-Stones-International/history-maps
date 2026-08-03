@@ -208,6 +208,7 @@ def main(source, destination, west, south, east, north, tolerance):
 
 
 if __name__ == "__main__":
-    # Italy and Sicily through Mesopotamia, Egypt up to the Black Sea, and
-    # about 200m of detail — finer than this map can draw at its deepest zoom.
-    main(sys.argv[1], sys.argv[2], west=8.0, south=24.0, east=50.0, north=46.0, tolerance=0.002)
+    # The whole of the source: Britain and Iberia through Mesopotamia, at about
+    # 200m of detail — finer than this map can draw at its deepest zoom. A
+    # narrower window would leave cities the topics carry with no road to them.
+    main(sys.argv[1], sys.argv[2], west=-12.0, south=20.0, east=60.0, north=60.0, tolerance=0.002)

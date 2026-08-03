@@ -100,4 +100,6 @@ def main(source, destination, west, south, east, north, tolerance):
 
 if __name__ == "__main__":
     # The same window as the Itiner-e extract, so the two lie over each other.
-    main(sys.argv[1], sys.argv[2], west=8.0, south=24.0, east=50.0, north=46.0, tolerance=0.002)
+    # Wide enough for the whole empire: a city with roads in the source should
+    # not look stranded because the extract stopped short of it.
+    main(sys.argv[1], sys.argv[2], west=-12.0, south=20.0, east=60.0, north=60.0, tolerance=0.002)
