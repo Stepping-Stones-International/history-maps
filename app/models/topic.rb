@@ -29,10 +29,12 @@ class Topic < ApplicationRecord
       label: "Roads of northern Mesopotamia",
       file: "orbis-mesopotamia-roads.geojson",
       note: "ORBIS's land routes, where Itiner-e stops at the Euphrates.",
-      covers: "21 links across the north, between Edessa, Carrhae, Nisibis, " \
-              "Singara, Circesium and Dura, reaching 42.19°E. Nothing runs " \
-              "south of Assyria: Babylon, Kish, Uruk and Ur have no roads in " \
-              "any published dataset.",
+      covers: "The 6 links ORBIS carries that Itiner-e does not: Edessa to " \
+              "Nisibis, on to Singara, down to Circesium and Dura, and east to " \
+              "42.19°E. Its other 15 links here run along roads Itiner-e " \
+              "already maps, and are left out rather than drawn twice. Nothing " \
+              "runs south of Assyria: Babylon, Kish, Uruk and Ur have no roads " \
+              "in any published dataset.",
       years: "The same model of the Roman Imperial period as the sea routes, " \
              "centred on about AD 200."
     },
