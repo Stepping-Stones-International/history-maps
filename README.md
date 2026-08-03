@@ -35,6 +35,7 @@ it. Anyone downloading a file gets its provenance in the same breath.
 | Roman roads | [Itiner-e](https://doi.org/10.5281/zenodo.17122148) — Brughmans, Pažout, de Soto & Bjerregaard Vahlstrup | CC BY 4.0 |
 | Roman roads, named viae | [AWMC geodata](https://github.com/AWMC/geodata), after the Barrington Atlas | ODbL 1.0 |
 | Sea routes | [ORBIS](https://github.com/emeeks/orbis_v2) — Scheidel & Meeks, Stanford | MIT |
+| Navigable rivers | ORBIS, as above | MIT |
 | Roads of northern Mesopotamia | ORBIS, as above | MIT |
 
 Packs carry lines and shapes only. Places are nodes, which already hold a

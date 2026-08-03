@@ -61,6 +61,22 @@ export const MAP_PACKS = {
             "sea routes (MIT)",
     layers: seaLayers()
   },
+  river_routes: {
+    url: () => packUrl("river_routes"),
+    credit: '<a href="https://orbis.stanford.edu" target="_blank" rel="noopener">ORBIS</a> ' +
+            "river routes (MIT)",
+    // One line per direction of travel, drawn as one: the geometry is the same
+    // river either way, so upstream and downstream share a layer.
+    layers: [
+      {
+        suffix: "river",
+        filter: [ "!=", [ "get", "kind" ], "" ],
+        color: "#6f9fc4",
+        opacity: 0.75,
+        widths: [ 4, 1, 9, 2, 12, 3.2 ]
+      }
+    ]
+  },
   mesopotamia_roads: {
     url: () => packUrl("mesopotamia_roads"),
     credit: '<a href="https://orbis.stanford.edu" target="_blank" rel="noopener">ORBIS</a> ' +

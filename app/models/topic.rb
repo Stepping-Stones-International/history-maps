@@ -25,6 +25,18 @@ class Topic < ApplicationRecord
              "crossings; others are short connections the network needs to " \
              "work at all."
     },
+    "river_routes" => {
+      label: "Navigable rivers",
+      file: "orbis-river-routes.geojson",
+      note: "ORBIS's river routes — the water people actually travelled on.",
+      covers: "103 stretches of navigable river across the Roman world, the " \
+              "Nile, the Rhone, the Rhine, the Danube and the Euphrates among " \
+              "them. On the Euphrates it runs from Nicephorium down past Dura, " \
+              "within about a kilometre of Isidore's stations, then stops at " \
+              "41.28°E where Roman navigation did.",
+      years: "The same model of the Roman Imperial period as the roads and sea " \
+             "lanes, centred on about AD 200."
+    },
     "mesopotamia_roads" => {
       label: "Roads of northern Mesopotamia",
       file: "orbis-mesopotamia-roads.geojson",
