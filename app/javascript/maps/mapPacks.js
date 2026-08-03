@@ -5,6 +5,11 @@
 // sessions ask for none of them.
 const packUrl = (key) => document.querySelector(`meta[name="map-pack-${key}"]`)?.content
 
+// How a road is drawn, whichever pack it came from: solid, and heavier for a
+// main road than a secondary one.
+const MAIN_ROAD = { opacity: 0.9, widths: [ 4, 1.4, 9, 2.6, 12, 4 ] }
+const SECONDARY_ROAD = { opacity: 0.55, widths: [ 4, 0.8, 9, 1.6, 12, 2.6 ] }
+
 // Two reconstructions of the same network, so they are told apart by colour
 // rather than by which is on top: Itiner-e in ochre, the Barrington in sage.
 const roadLayers = (main, secondary) => [
@@ -12,15 +17,13 @@ const roadLayers = (main, secondary) => [
     suffix: "secondary",
     filter: [ "!=", [ "get", "kind" ], "Main Road" ],
     color: secondary,
-    opacity: 0.55,
-    widths: [ 4, 0.8, 9, 1.6, 12, 2.6 ]
+    ...SECONDARY_ROAD
   },
   {
     suffix: "main",
     filter: [ "==", [ "get", "kind" ], "Main Road" ],
     color: main,
-    opacity: 0.9,
-    widths: [ 4, 1.4, 9, 2.6, 12, 4 ]
+    ...MAIN_ROAD
   }
 ]
 
@@ -62,16 +65,15 @@ export const MAP_PACKS = {
     url: () => packUrl("mesopotamia_roads"),
     credit: '<a href="https://orbis.stanford.edu" target="_blank" rel="noopener">ORBIS</a> ' +
             "roads (MIT)",
-    // One kind only, and a colour of its own: these are modelled links between
-    // stations, not a surveyed network like Itiner-e's.
+    // Drawn as Itiner-e draws a main road, since it is carrying on from where
+    // Itiner-e stops: ORBIS marks no main or secondary here, so all of it is
+    // the heavier line.
     layers: [
       {
         suffix: "road",
         filter: [ "==", [ "get", "kind" ], "road" ],
-        color: "#c58fd0",
-        opacity: 0.85,
-        widths: [ 4, 1.2, 9, 2.2, 12, 3.4 ],
-        dashes: [ 3, 1.8 ]
+        color: "#e0a568",
+        ...MAIN_ROAD
       }
     ]
   },
