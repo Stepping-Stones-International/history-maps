@@ -330,7 +330,9 @@ export default function HomeMap({
   // asked for and kept after that; switching one off hides its layers rather
   // than tearing them down, so coming back is instant.
   useEffect(() => {
-    const wanted = new Set(packs)
+    // A topic may still name a pack this build no longer ships; drawing waits
+    // on the packs it knows and ignores the rest.
+    const wanted = new Set(packs.filter((key) => MAP_PACKS[key]))
 
     const show = (key, visibility) => MAP_PACKS[key].layers.forEach(({ suffix }) => {
       const id = packLayerId(key, suffix)
@@ -392,7 +394,7 @@ export default function HomeMap({
       if (dropped || !map.current) return false
 
       return [ ...wanted ].every((key) => {
-        if (!MAP_PACKS[key] || !packData.current.has(key)) return false
+        if (!packData.current.has(key)) return false
 
         try {
           return build(key)

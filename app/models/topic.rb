@@ -70,8 +70,11 @@ class Topic < ApplicationRecord
   # Checkboxes post an unchecked box as "", which is not a pack.
   normalizes :map_packs, with: ->(packs) { Array(packs).map(&:to_s).select(&:present?).uniq }
 
+  # A pack this app no longer ships is dropped rather than refused, on any
+  # save: uninstalling one must not wedge every topic that had it on.
+  before_validation :drop_retired_packs
+
   validates :title, presence: true
-  validate :map_packs_are_known
   validates :center_latitude,
     numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
   validates :center_longitude,
@@ -97,11 +100,9 @@ class Topic < ApplicationRecord
   end
 
   private
-    def map_packs_are_known
-      unknown = map_packs - MAP_PACKS.keys
-      return if unknown.empty?
-
-      errors.add(:map_packs, "does not include #{unknown.to_sentence}")
+    def drop_retired_packs
+      kept = map_packs & MAP_PACKS.keys
+      self.map_packs = kept unless kept == map_packs
     end
 
     # A centre without a zoom, or half a coordinate, cannot open a map.

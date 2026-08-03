@@ -58,11 +58,24 @@ class TopicTest < ActiveSupport::TestCase
     end
   end
 
-  test "rejects a map pack it does not ship" do
-    topic = Topic.new(title: "Unknown", author: users(:one), map_packs: [ "moon_bases" ])
+  test "drops a map pack it does not ship rather than refusing to save" do
+    topic = Topic.create!(title: "Unknown", author: users(:one),
+      map_packs: [ "roman_roads", "moon_bases" ])
 
-    assert_not topic.valid?
-    assert_includes topic.errors[:map_packs], "does not include moon_bases"
+    assert_equal [ "roman_roads" ], topic.reload.map_packs
+  end
+
+  test "a topic left holding an uninstalled pack can still be saved" do
+    topic = Topic.create!(title: "Stale", author: users(:one), map_packs: [ "roman_roads" ])
+    # As if the pack had been removed from the app after the topic chose it:
+    # written straight to the column, past the model.
+    Topic.connection.execute(
+      "update topics set map_packs = '#{%w[roman_roads retired_pack].to_json}' " \
+      "where id = '#{topic.id}'"
+    )
+
+    assert topic.reload.update(title: "Renamed")
+    assert_equal [ "roman_roads" ], topic.reload.map_packs
   end
 
   test "author is a user" do
