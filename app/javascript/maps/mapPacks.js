@@ -77,6 +77,32 @@ export const MAP_PACKS = {
       }
     ]
   },
+  isidore_stations: {
+    url: () => packUrl("isidore_stations"),
+    credit: '<a href="https://github.com/AWMC/isidore" target="_blank" rel="noopener">AWMC</a> ' +
+            "Parthian Stations (GPL-3.0)",
+    // Places, not routes, and deliberately unjoined: Isidore lists them in
+    // order, but no one has published the road between them.
+    layers: [
+      {
+        suffix: "station",
+        filter: [ "!", [ "has", "id_disagrees_km" ] ],
+        color: "#e8d5a3",
+        opacity: 0.95,
+        radii: [ 4, 2.5, 9, 5, 12, 7 ]
+      },
+      {
+        // Identified with a Pleiades place hundreds of km away: drawn hollow,
+        // so a station whose identification is in doubt looks like one.
+        suffix: "station-doubted",
+        filter: [ "has", "id_disagrees_km" ],
+        color: "#0d1218",
+        opacity: 0.9,
+        radii: [ 4, 2.5, 9, 5, 12, 7 ],
+        edge: "#e8d5a3"
+      }
+    ]
+  },
   awmc_roads: {
     url: () => packUrl("awmc_roads"),
     credit: '<a href="https://awmc.unc.edu" target="_blank" rel="noopener">AWMC</a> ' +

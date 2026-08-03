@@ -79,11 +79,22 @@ def main(source, destination, covering, near_km=5.0, share=0.5):
         if covered < share:
             kept.append(feature)
 
+    dropped = len(routes["features"]) - len(kept)
     routes["features"] = kept
+
+    # The subtraction is part of how this file came to be, so it is recorded
+    # alongside where the routes came from.
+    provenance = routes.setdefault("source", {})
+    provenance["processing"] = " ".join(filter(None, [
+        provenance.get("processing"),
+        f"Routes running within {near_km}km of {covering.split('/')[-1]} for more than "
+        f"{int(share * 100)}% of their length dropped by script/drop_covered_routes.py."
+    ]))
+
     with open(destination, "w") as out:
         json.dump(routes, out, separators=(",", ":"))
 
-    print(f"kept {len(kept)} routes, dropped {len(json.load(open(source))['features']) - len(kept)}")
+    print(f"kept {len(kept)} routes, dropped {dropped}")
 
 
 if __name__ == "__main__":

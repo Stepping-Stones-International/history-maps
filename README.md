@@ -25,24 +25,30 @@ Things you may want to cover:
 
 ## Map data
 
-The Roman road overlay is an extract of **Itiner-e**, the road network as it
-stood around AD 150, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
+Every overlay is an extract of a published dataset, and **the credit travels
+with the data**: each file under `app/assets/data` carries a `source` block
+naming its citation, URL, licence, and exactly what the extract script did to
+it. Anyone downloading a file gets its provenance in the same breath.
 
-> Brughmans, Pažout, de Soto and Bjerregaard Vahlstrup, *Itiner-e: the digital
-> atlas of ancient roads*. https://doi.org/10.5281/zenodo.17122148
+| Pack | Source | Licence |
+|---|---|---|
+| Roman roads | [Itiner-e](https://doi.org/10.5281/zenodo.17122148) — Brughmans, Pažout, de Soto & Bjerregaard Vahlstrup | CC BY 4.0 |
+| Roman roads, named viae | [AWMC geodata](https://github.com/AWMC/geodata), after the Barrington Atlas | ODbL 1.0 |
+| Sea routes | [ORBIS](https://github.com/emeeks/orbis_v2) — Scheidel & Meeks, Stanford | MIT |
+| Roads of northern Mesopotamia | ORBIS, as above | MIT |
+| Parthian Stations | [AWMC Isidore](https://github.com/AWMC/isidore), after Isidore of Charax | GPL-3.0 |
 
-A second reconstruction of the same network comes from the **Ancient World
-Mapping Centre**, drawn from the Barrington Atlas and licensed
-[ODbL](https://opendatacommons.org/licenses/odbl/1-0/):
+Imported nodes carry their provenance too, in each node's own description:
+cities of the Roman world from [Hanson's Cities Database](https://doi.org/10.5287/bodleian:eqapevAn8)
+(with its Barrington rank and per-city bibliography), cities of Mesopotamia
+from [Pleiades](https://pleiades.stoa.org) (CC BY) with founding years from
+Wikidata (CC0), each naming the record it came from.
 
-> Ancient World Mapping Centre, *Cultural Data: roads*.
-> https://github.com/AWMC/geodata
-
-Both extracts are checked in under `app/assets/data`, with the script that
-produced each beside it in `script/` — re-run either to change the region or
-the level of detail. Being ODbL, the AWMC extract is itself offered under
-ODbL. Credits are shown on the map through MapLibre's attribution control.
+The scripts that produced every extract are in `script/`, one per source, with
+the exact command in each file's header — so any extract can be reproduced,
+re-cut to a different region, or re-run against a newer release of its source.
 
 Packs are declared in `Topic::MAP_PACKS`, which names the file each one draws
 from; the layout turns that into a meta tag per pack so the browser fetches a
-pack's data only once a topic switches it on.
+pack's data only once a topic switches it on. Credits are also shown on the map
+itself, through MapLibre's attribution control.

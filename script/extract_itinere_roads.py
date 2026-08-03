@@ -123,6 +123,15 @@ def simplify(points, tolerance):
     return simplify(points[:index + 1], tolerance)[:-1] + simplify(points[index:], tolerance)
 
 
+SOURCE = {
+    "name": "Itiner-e: the digital atlas of ancient roads",
+    "citation": "Brughmans, Pazout, de Soto and Bjerregaard Vahlstrup, Itiner-e, "
+                "static version 2024",
+    "url": "https://doi.org/10.5281/zenodo.17122148",
+    "licence": "CC BY 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by/4.0/"
+}
+
 UNKNOWN = 9999.0
 
 
@@ -183,7 +192,15 @@ def main(source, destination, west, south, east, north, tolerance):
             )
         })
 
-    collection = { "type": "FeatureCollection", "features": features }
+    collection = {
+        "type": "FeatureCollection",
+        "source": {
+            **SOURCE,
+            "processing": f"Clipped to {west},{south},{east},{north} and simplified to "
+                          f"{tolerance} degrees by script/extract_itinere_roads.py"
+        },
+        "features": features
+    }
     with open(destination, "w") as out:
         json.dump(collection, out, separators=(",", ":"))
 

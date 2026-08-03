@@ -46,6 +46,16 @@ import sys
 
 MARITIME = ("coastal", "overseas", "ferry")
 
+SOURCE = {
+    "name": "ORBIS: the Stanford Geospatial Network Model of the Roman World",
+    "citation": "Scheidel and Meeks, ORBIS, Stanford University Libraries, "
+                "base_routes v2",
+    "url": "https://github.com/emeeks/orbis_v2",
+    "licence": "MIT",
+    "licence_url": "https://opensource.org/licenses/MIT",
+    "period": "A model of the Roman Imperial period, centred on about AD 200"
+}
+
 
 def rounded(points):
     return [ [ round(point[0], 5), round(point[1], 5) ] for point in points ]
@@ -93,8 +103,17 @@ def main(source, destination, kinds, bounds):
             "geometry": shape
         })
 
+    clipped = f", clipped to {','.join(str(n) for n in bounds)}" if bounds else ""
     with open(destination, "w") as out:
-        json.dump({ "type": "FeatureCollection", "features": features }, out, separators=(",", ":"))
+        json.dump({
+            "type": "FeatureCollection",
+            "source": {
+                **SOURCE,
+                "processing": f"Filtered to t={'/'.join(kinds)}{clipped} "
+                              "by script/extract_orbis_routes.py"
+            },
+            "features": features
+        }, out, separators=(",", ":"))
 
     counts = {}
     for feature in features:

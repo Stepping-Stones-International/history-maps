@@ -23,6 +23,15 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 
 from extract_itinere_roads import simplify
 
+SOURCE = {
+    "name": "Ancient World Mapping Centre, Cultural Data: roads",
+    "citation": "Ancient World Mapping Centre, AWMC geodata, derived from the "
+                "Barrington Atlas of the Greek and Roman World",
+    "url": "https://github.com/AWMC/geodata",
+    "licence": "ODbL 1.0",
+    "licence_url": "https://opendatacommons.org/licenses/odbl/1-0/"
+}
+
 
 def main(source, destination, west, south, east, north, tolerance):
     sys.setrecursionlimit(10000)
@@ -76,7 +85,15 @@ def main(source, destination, west, south, east, north, tolerance):
         })
 
     with open(destination, "w") as out:
-        json.dump({ "type": "FeatureCollection", "features": features }, out, separators=(",", ":"))
+        json.dump({
+            "type": "FeatureCollection",
+            "source": {
+                **SOURCE,
+                "processing": f"Clipped to {west},{south},{east},{north} and simplified to "
+                              f"{tolerance} degrees by script/extract_awmc_roads.py"
+            },
+            "features": features
+        }, out, separators=(",", ":"))
 
     print(f"{len(features)} roads, {vertices_in} vertices in, {vertices_out} out")
 
