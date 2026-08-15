@@ -678,6 +678,43 @@ textarea.form__input {
   transition: transform 0.25s ease, visibility 0.25s;
 }
 
+.drawer-resize {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  z-index: 3;
+  width: 12px;
+  height: 100%;
+  padding: 0;
+  cursor: ew-resize;
+  touch-action: none;
+  background: transparent;
+  border: 0;
+}
+
+.drawer-resize::after {
+  content: "";
+  position: absolute;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 5px;
+  width: 2px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.drawer-resize:hover::after,
+.drawer-resize:focus-visible::after,
+.is-resizing-drawer .drawer-resize::after {
+  background: #8fb8e8;
+}
+
+.is-resizing-drawer,
+.is-resizing-drawer * {
+  cursor: ew-resize !important;
+  user-select: none;
+}
+
 .drawer--closed .drawer__panel {
   transform: translateX(calc(-1 * var(--drawer-width) - 2px));
   visibility: hidden;
@@ -1520,4 +1557,3 @@ textarea.form__input {
   background-color: var(--surface-raised);
   filter: invert(1) brightness(1.7);
 }
-

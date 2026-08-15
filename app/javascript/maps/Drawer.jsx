@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "@inertiajs/react"
 import { ChevronLeft } from "lucide-react"
+import DrawerResizeHandle from "./DrawerResizeHandle"
 
 function HamburgerIcon() {
   return (
@@ -32,7 +33,7 @@ function CollapseIcon() {
 }
 
 // Controlled: the page owns `open` so the timeline can follow the drawer.
-export default function Drawer({ title, open, onOpenChange, children }) {
+export default function Drawer({ title, open, onOpenChange, drawerWidth, onDrawerWidthChange, children }) {
   const setOpen = onOpenChange
 
   return (
@@ -73,6 +74,7 @@ export default function Drawer({ title, open, onOpenChange, children }) {
             Back to Topics
           </Link>
         </footer>
+        <DrawerResizeHandle width={drawerWidth} onWidthChange={onDrawerWidthChange} />
       </div>
     </aside>
   )

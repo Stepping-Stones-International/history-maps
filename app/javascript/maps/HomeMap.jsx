@@ -99,7 +99,7 @@ function areaFeatures(nodes) {
 
       return {
         type: "Feature",
-        properties: { id: node.id, title: node.title },
+        properties: { id: node.id, title: node.title, color: node.polygon_color || "#8fb8e8" },
         geometry: { type: "Polygon", coordinates: [ ring ] }
       }
     })
@@ -256,7 +256,7 @@ export default function HomeMap({
           id: `${AREA_SOURCE}-fill`,
           type: "fill",
           source: AREA_SOURCE,
-          paint: { "fill-color": "#8fb8e8", "fill-opacity": 0.18 }
+          paint: { "fill-color": [ "get", "color" ], "fill-opacity": 0.18 }
         })
       }
 
@@ -264,7 +264,7 @@ export default function HomeMap({
         id: `${AREA_SOURCE}-line`,
         type: "line",
         source: AREA_SOURCE,
-        paint: { "line-color": "#8fb8e8", "line-width": 1.5, "line-opacity": 0.8 }
+        paint: { "line-color": [ "get", "color" ], "line-width": 1.5, "line-opacity": 0.8 }
       })
 
       const showAreaLabel = (event) => {
@@ -615,9 +615,9 @@ export default function HomeMap({
       map.current.setPaintProperty(`${AREA_SOURCE}-fill`, "fill-opacity",
         [ "case", isActive, 0.34, 0.18 ])
       map.current.setPaintProperty(`${AREA_SOURCE}-line`, "line-color",
-        [ "case", isActive, "#f2b640", "#8fb8e8" ])
+        [ "case", isActive, "#f2b640", [ "get", "color" ] ])
       map.current.setPaintProperty(`${AREA_SOURCE}-fill`, "fill-color",
-        [ "case", isActive, "#f2b640", "#8fb8e8" ])
+        [ "case", isActive, "#f2b640", [ "get", "color" ] ])
     }
   }, [highlightedId, nodes])
 

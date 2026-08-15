@@ -37,6 +37,7 @@ class Node < ApplicationRecord
   }.freeze
 
   DEFAULT_MARKER = "waypoint"
+  DEFAULT_POLYGON_COLOR = "#8fb8e8"
 
   belongs_to :topic
   belongs_to :parent, class_name: "Node", optional: true

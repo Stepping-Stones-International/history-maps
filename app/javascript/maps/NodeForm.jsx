@@ -354,6 +354,8 @@ export default function NodeForm({
 
       {isLayer && (
         <div className="form__field">
+          <label htmlFor="node-polygon-color" className="form__label">Polygon color</label>
+          <input id="node-polygon-color" type="color" className="form__input" value={draft.polygon_color || "#8fb8e8"} onChange={set("polygon_color")} />
           <label htmlFor="node-area" className="form__label">Area outline</label>
           <p className="form__note">
             A ring of [longitude, latitude] pairs. Leave empty for a layer with no shape.

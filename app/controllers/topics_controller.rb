@@ -91,6 +91,7 @@ class TopicsController < ApplicationController
         layer: node.layer,
         area: node.area,
         area_json: node.area_json,
+        polygon_color: node.polygon_color,
         parent_id: node.parent_id,
         position: node.position,
         date_type: node.date_type,

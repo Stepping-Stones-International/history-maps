@@ -3,21 +3,26 @@ import { Head, router } from "@inertiajs/react"
 import { MapPin, Settings } from "lucide-react"
 import HomeMap from "../../maps/HomeMap"
 import Drawer from "../../maps/Drawer"
+import NodeDetailPanel from "../../maps/NodeDetailPanel"
+import NodeEditorPanel from "../../maps/NodeEditorPanel"
 import TimelineBar from "../../maps/TimelineBar"
 import NodeForm from "../../maps/NodeForm"
 import NodeList from "../../maps/NodeList"
 import TopicSettingsForm from "../../maps/TopicSettingsForm"
-import { visibleNodes, DEFAULT_REVEAL_MODE } from "../../maps/revealMode"
+import { visibleNodes, DEFAULT_REVEAL_MODE, REVEAL_MODES } from "../../maps/revealMode"
 import Modal from "../../components/Modal"
 
 // A stable empty array: a fresh [] each render would restart the map's pack
 // effect every time anything on the page changed.
 const NO_PACKS = []
+const revealModeValues = new Set(REVEAL_MODES.map(({ value }) => value))
+const urlParam = (name) => typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get(name)
 
 const EMPTY_DRAFT = {
   marker: "waypoint",
   layer: false,
   area_json: "",
+  polygon_color: "#8fb8e8",
   parent_id: "",
   position: "",
   date_type: "exact",
@@ -38,6 +43,7 @@ const draftFrom = (node) => ({
   marker: node.marker || "waypoint",
   layer: Boolean(node.layer),
   area_json: node.area_json || "",
+  polygon_color: node.polygon_color || "#8fb8e8",
   parent_id: node.parent_id || "",
   position: node.position ?? "",
   date_type: node.date_type,
@@ -65,17 +71,38 @@ const draftFrom = (node) => ({
 export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPacks, markers }) {
   // Owned here so the drawer, button and timeline stay in step.
   const [drawerOpen, setDrawerOpen] = useState(true)
+  const [drawerWidth, setDrawerWidth] = useState(380)
   // null when closed, otherwise { mode: "new" } or { mode: "edit", id }.
   const [editor, setEditor] = useState(null)
   // Held here rather than in the form so it survives the modal being hidden.
   const [draft, setDraft] = useState(EMPTY_DRAFT)
   const [picking, setPicking] = useState(false)
   // Which node is called out on the map; clicking its row or plot again clears it.
-  const [highlightedId, setHighlightedId] = useState(null)
-  const toggleHighlight = (node) =>
-    setHighlightedId((current) => (current === node.id ? null : node.id))
+  const [highlightedId, setHighlightedId] = useState(() => {
+    const id = urlParam("node")
+    return id && nodes.some((node) => node.id === id) ? id : null
+  })
+  const updateUrl = (key, value) => {
+    if (typeof window === "undefined") return
+    const next = new URL(window.location.href)
+    if (value == null || value === "") next.searchParams.delete(key)
+    else next.searchParams.set(key, value)
+    window.history.replaceState(window.history.state, "", next)
+  }
+  const highlightNode = (node) => {
+    const id = node?.id || null
+    setHighlightedId(id)
+    updateUrl("node", id)
+  }
+  const toggleHighlight = (node) => setHighlightedId((current) => {
+    const id = current === node.id ? null : node.id
+    updateUrl("node", id)
+    return id
+  })
   // How much of the topic the map draws as the timeline is walked.
-  const [revealMode, setRevealMode] = useState(DEFAULT_REVEAL_MODE)
+  const [revealMode, setRevealMode] = useState(() => revealModeValues.has(urlParam("reveal")) ? urlParam("reveal") : DEFAULT_REVEAL_MODE)
+  const [explanationWindow, setExplanationWindow] = useState(() => urlParam("explain") !== "0")
+  const [popoutWidth, setPopoutWidth] = useState(360)
   // Nodes toggled by hand in the sidebar, which hold on or off whatever the
   // reveal mode would otherwise do with them.
   const [overrides, setOverrides] = useState(() => new Map())
@@ -84,6 +111,11 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
   const changeRevealMode = (mode) => {
     setRevealMode(mode)
     setOverrides(new Map())
+    updateUrl("reveal", mode === DEFAULT_REVEAL_MODE ? null : mode)
+  }
+  const changeExplanationWindow = (visible) => {
+    setExplanationWindow(visible)
+    updateUrl("explain", visible ? null : "0")
   }
   const setVisible = (chosen, visible) =>
     setOverrides((current) => {
@@ -197,14 +229,21 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
   const shown = visibleNodes(nodes, revealMode, highlightedId, overrides)
   const visibleIds = new Set(shown.map((node) => node.id))
 
+  const highlightedNode = nodes.find((node) => node.id === highlightedId)
+  const editingNode = editor?.mode === "edit" ? nodes.find((node) => node.id === editor.id) : null
+  const editorOpen = Boolean(drawerOpen && editingNode && !picking)
+  const detailOpen = Boolean(explanationWindow && drawerOpen && highlightedNode && !editorOpen)
+  const popoutOpen = detailOpen || editorOpen
+
   return (
-    <>
+    <div className="topic-map" style={{ "--drawer-width": `${drawerWidth}px` }}>
       <Head title={topic.title} />
 
       <HomeMap
         nodes={shown}
         placing={picking}
         highlightedId={highlightedId}
+        explanationWindow={explanationWindow}
         defaultView={topic.default_view}
         viewReader={viewReader}
         packs={topic.map_packs || NO_PACKS}
@@ -213,16 +252,39 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
         onNodeSelect={startEditingById}
       />
 
-      <Drawer title={topic.title} open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <Drawer title={topic.title} open={drawerOpen} onOpenChange={setDrawerOpen} drawerWidth={drawerWidth} onDrawerWidthChange={setDrawerWidth}>
         <NodeList
           nodes={nodes}
           highlightedId={highlightedId}
           onHighlight={toggleHighlight}
-          onEdit={startEditing}
           visibleIds={visibleIds}
           onVisibilityChange={setVisible}
         />
       </Drawer>
+
+      <NodeDetailPanel
+        node={detailOpen ? highlightedNode : null}
+        width={popoutWidth}
+        onWidthChange={setPopoutWidth}
+        onEdit={startEditing}
+        onClose={() => highlightNode(null)}
+      />
+
+      <NodeEditorPanel
+        node={editorOpen ? editingNode : null}
+        width={popoutWidth}
+        onWidthChange={setPopoutWidth}
+        draft={draft}
+        dateTypes={dateTypes}
+        rangeTypes={rangeTypes}
+        eras={eras}
+        markers={markers}
+        parentOptions={parentChoices}
+        onChange={setDraft}
+        onPickOnMap={() => setPicking(true)}
+        onCancel={close}
+        onSubmit={save}
+      />
 
       <div className={`map-actions ${drawerOpen ? "map-actions--inset" : ""}`}>
         <button
@@ -255,9 +317,11 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
         drawerOpen={drawerOpen}
         highlightedId={highlightedId}
         onHighlight={toggleHighlight}
-        onSelect={(node) => setHighlightedId(node.id)}
+        onSelect={highlightNode}
         revealMode={revealMode}
         onRevealModeChange={changeRevealMode}
+        explanationWindow={explanationWindow}
+        onExplanationWindowChange={changeExplanationWindow}
       />
 
       {/* Hidden, not unmounted, while the map is being positioned. */}
@@ -311,6 +375,6 @@ export default function Edit({ topic, nodes, dateTypes, rangeTypes, eras, mapPac
           />
         </Modal>
       )}
-    </>
+    </div>
   )
 }

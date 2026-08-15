@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_061533) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_15_000000) do
   create_table "nodes", id: :string, force: :cascade do |t|
     t.json "area"
     t.datetime "created_at", null: false
@@ -30,6 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_061533) do
     t.integer "occurred_month"
     t.integer "occurred_year"
     t.string "parent_id"
+    t.string "polygon_color", default: "#8fb8e8", null: false
     t.integer "position", default: 0, null: false
     t.integer "starts_day"
     t.string "starts_era", default: "AD", null: false
