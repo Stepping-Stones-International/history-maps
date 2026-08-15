@@ -10,23 +10,22 @@
 # Ignore all environment files.
 /.env*
 
-# Ignore all logfiles and tempfiles.
+# Ignore all logfiles and temporary files.
 /log/*
-/tmp/*
+/tmp/
 !/log/.keep
-!/tmp/.keep
 
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/
-!/tmp/pids/.keep
+# Local development databases; keep schema.rb and migrations versioned.
+/db/*.sqlite3
+/db/*.sqlite
+/db/*.db
+*.sqlite3
+*.sqlite
+*.db
 
 # Ignore storage (uploaded files in development and any SQLite databases).
 /storage/*
 !/storage/.keep
-/tmp/storage/*
-!/tmp/storage/
-!/tmp/storage/.keep
 
 /public/assets
 
