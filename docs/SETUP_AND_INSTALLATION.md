@@ -1,5 +1,7 @@
 # Setup and installation
 
+[← Back to README](../README.md)
+
 History Maps runs locally in Docker. Docker is the supported cross-platform
 installation for macOS, Windows, and Linux, so users do not need to install
 Ruby or Node.js directly.
