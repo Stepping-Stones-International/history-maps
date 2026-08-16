@@ -38,6 +38,10 @@ class Node < ApplicationRecord
 
   DEFAULT_MARKER = "waypoint"
   DEFAULT_POLYGON_COLOR = "#8fb8e8"
+  RICH_TEXT_TAGS = %w[
+    p br strong b em i u s ul ol li blockquote a h3 h4
+  ].freeze
+  RICH_TEXT_ATTRIBUTES = %w[href].freeze
 
   belongs_to :topic
   belongs_to :parent, class_name: "Node", optional: true
@@ -53,6 +57,7 @@ class Node < ApplicationRecord
   before_validation :place_after_siblings, on: :create
   before_validation :default_position
   before_validation :default_marker
+  before_validation :sanitize_description_html
 
   validates :title, presence: true
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -158,7 +163,25 @@ class Node < ApplicationRecord
     "#{first} – #{last}"
   end
 
+  def sanitized_description_html
+    self.class.sanitize_rich_text(description)
+  end
+
+  def self.sanitize_rich_text(value)
+    return if value.blank?
+
+    Rails::HTML5::SafeListSanitizer.new.sanitize(
+      value.to_s,
+      tags: RICH_TEXT_TAGS,
+      attributes: RICH_TEXT_ATTRIBUTES
+    ).presence
+  end
+
   private
+    def sanitize_description_html
+      self.description = self.class.sanitize_rich_text(description)
+    end
+
     def written_date(year, month, day, era_name, kind)
       day_and_year = [ day, year ].compact.join(", ")
       written = [ month && Date::MONTHNAMES[month], day_and_year ].compact.join(" ")
