@@ -51,10 +51,9 @@ class TopicTest < ActiveSupport::TestCase
     assert topic.draws?("awmc_roads")
   end
 
-  test "every pack ships the file it draws from" do
+  test "every pack declares its external data file" do
     Topic::MAP_PACKS.each_value do |pack|
-      assert Rails.root.join("app/assets/data", pack[:file]).exist?,
-        "#{pack[:file]} is missing"
+      assert_predicate pack[:file], :present?
     end
   end
 

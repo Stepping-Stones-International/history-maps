@@ -1,59 +1,30 @@
-# README
+# Stepping Stones International
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## History Maps
 
-Things you may want to cover:
+History Maps is a display tool for building and viewing historical and
+location-based events on a timeline. When teaching or studying a topic, it is
+often easiest to see it on a map and step through events visually.
 
-* Ruby version
+In the world of LLM-powered learning, History Maps can be fired up locally and
+used as a visual workspace for an LLM to plot out events, places, sources, and
+territories. It is also useful for YouTubers, educators, and other public
+history creators who want to turn research into an explorable visual story.
 
-* System dependencies
+## Getting Started
 
-* Configuration
 
-* Database creation
+- [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
 
-* Database initialization
+## Documentation
 
-* How to run the test suite
+- [User guide](docs/USER_GUIDE.md)
+- [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
+- [Report an issue](docs/REPORTING_ISSUES.md)
+- [Request a feature](docs/REPORTING_ISSUES.md#feature-request)
 
-* Services (job queues, cache servers, search engines, etc.)
+## Want to contribute?
 
-* Deployment instructions
-
-* ...
-
-## Map data
-
-Every overlay is an extract of a published dataset, and **the credit travels
-with the data**: each file under `app/assets/data` carries a `source` block
-naming its citation, URL, licence, and exactly what the extract script did to
-it. Anyone downloading a file gets its provenance in the same breath.
-
-| Pack | Source | Licence |
-|---|---|---|
-| Roman roads | [Itiner-e](https://doi.org/10.5281/zenodo.17122148) — Brughmans, Pažout, de Soto & Bjerregaard Vahlstrup | CC BY 4.0 |
-| Roman roads, named viae | [AWMC geodata](https://github.com/AWMC/geodata), after the Barrington Atlas | ODbL 1.0 |
-| Sea routes | [ORBIS](https://github.com/emeeks/orbis_v2) — Scheidel & Meeks, Stanford | MIT |
-| Navigable rivers | ORBIS, as above | MIT |
-| Roads of northern Mesopotamia | ORBIS, as above | MIT |
-
-Packs carry lines and shapes only. Places are nodes, which already hold a
-title, a date and a description, so a pack of points would draw them twice.
-
-Imported nodes carry their provenance too, in each node's own description:
-cities of the Roman world from [Hanson's Cities Database](https://doi.org/10.5287/bodleian:eqapevAn8)
-(with its Barrington rank and per-city bibliography), cities of Mesopotamia
-from [Pleiades](https://pleiades.stoa.org) (CC BY) with founding years from
-Wikidata (CC0), and the stations of
-[Isidore of Charax](https://github.com/AWMC/isidore) as mapped by AWMC — each
-naming the record it came from.
-
-The scripts that produced every extract are in `script/`, one per source, with
-the exact command in each file's header — so any extract can be reproduced,
-re-cut to a different region, or re-run against a newer release of its source.
-
-Packs are declared in `Topic::MAP_PACKS`, which names the file each one draws
-from; the layout turns that into a meta tag per pack so the browser fetches a
-pack's data only once a topic switches it on. Credits are also shown on the map
-itself, through MapLibre's attribution control.
+We welcome contributors. See the [contribution guide](docs/CONTRIBUTING.md) to
+learn how to contribute code, documentation, or historical data. If you plan
+to work with an LLM, use the [LLM contribution guide](docs/LLM_CONTRIBUTING.md).

@@ -1,0 +1,35 @@
+# Development image for Docker Compose. The production image remains in
+# Dockerfile and is intentionally kept separate.
+FROM ruby:3.2.2-slim
+
+ARG NODE_VERSION=22.19.0
+ARG YARN_VERSION=1.22.10
+
+WORKDIR /rails
+
+ENV PATH=/usr/local/node/bin:$PATH \
+    BUNDLE_PATH=/usr/local/bundle
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential curl git libsqlite3-dev libvips libyaml-dev \
+      pkg-config python3 xz-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    npm install --global "yarn@${YARN_VERSION}" && \
+    rm -rf /tmp/node-build-master
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY . .
+
+ENV RAILS_ENV=development \
+    NODE_ENV=development
+
+EXPOSE 3000

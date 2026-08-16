@@ -16,7 +16,10 @@
 
     <%# Each overlay's data, fetched only once the pack is switched on. %>
     <% Topic::MAP_PACKS.each do |key, pack| %>
-      <meta name="map-pack-<%= key %>" content="<%= asset_path(pack[:file]) %>">
+      <%# Map packs are optional external content and are not shipped with the app. %>
+      <% if Rails.root.join("app/assets/data", pack[:file]).file? %>
+        <meta name="map-pack-<%= key %>" content="<%= asset_path(pack[:file]) %>">
+      <% end %>
     <% end %>
 
 

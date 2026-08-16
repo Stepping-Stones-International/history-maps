@@ -40,8 +40,7 @@ function Row({
   // Only embedded nodes carry a meaningful order, and only once one is set.
   const index = node.parent_id && node.position > 0 ? node.position : null
 
-  // The second box covers everything embedded under this node. It follows the
-  // map rather than leading it, so stepping through the embeds fills it in.
+  // The aggregate control is rendered as index 0 inside the expanded sublist.
   const embeds = hasEmbedded ? descendantsOf(node.id, childrenOf) : []
   const shownEmbeds = embeds.filter((child) => visibleIds.has(child.id)).length
   const allEmbeds = hasEmbedded && shownEmbeds === embeds.length
@@ -62,20 +61,6 @@ function Row({
           aria-label={`Show ${node.title} on the map`}
           title="Show on the map"
         />
-
-        {hasEmbedded && (
-          <span className="node-list__embeds-toggle">
-            <PartialCheckbox
-              className="node-list__visible"
-              checked={allEmbeds}
-              partial={shownEmbeds > 0 && !allEmbeds}
-              onChange={() => onVisibilityChange(embeds, !allEmbeds)}
-              aria-label={`Show everything embedded under ${node.title} on the map`}
-              title="Show embedded nodes on the map"
-            />
-            <Layers className="node-list__embeds-glyph" aria-hidden="true" />
-          </span>
-        )}
 
         {hasEmbedded ? (
           <button
@@ -119,6 +104,26 @@ function Row({
 
       {hasEmbedded && isOpen && (
         <ol className="node-list__embedded">
+          <li className="node-list__branch">
+            <div className="node-list__item node-list__item--embedded-all">
+              <PartialCheckbox
+                className="node-list__visible"
+                checked={allEmbeds}
+                partial={shownEmbeds > 0 && !allEmbeds}
+                onChange={() => onVisibilityChange(embeds, !allEmbeds)}
+                aria-label={`Show everything embedded under ${node.title} on the map`}
+                title="Show embedded nodes on the map"
+              />
+              <span className="node-list__toggle-space" aria-hidden="true" />
+              <span className="node-list__select node-list__embedded-all-label">
+                <span className="node-list__title">
+                  <span className="node-list__index">0.</span>
+                  <Layers className="node-list__embeds-glyph" aria-hidden="true" />
+                  <span className="node-list__label">All embedded nodes</span>
+                </span>
+              </span>
+            </div>
+          </li>
           {embedded.map((child) => (
             <Row
               key={child.id}

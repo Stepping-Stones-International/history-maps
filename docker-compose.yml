@@ -1,0 +1,36 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: sh -c "bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      NODE_ENV: development
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+      - node_modules:/rails/node_modules
+      - storage:/rails/storage
+      - builds:/rails/app/assets/builds
+
+  assets:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: sh -c "yarn build:maplibre-worker && yarn build:app --watch=forever"
+    environment:
+      NODE_ENV: development
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+      - node_modules:/rails/node_modules
+      - builds:/rails/app/assets/builds
+
+volumes:
+  bundle:
+  node_modules:
+  storage:
+  builds:
