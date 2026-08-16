@@ -26,9 +26,14 @@ you open it in a web browser at `http://localhost:3000`.
 
 ### What is Git?
 
-Git is software that keeps a history of changes to files. GitHub is a website
-that hosts Git repositories. Cloning means making a local copy of a repository
-on your computer.
+Git is a tool that lets developers—and anyone working with code—download and
+work with code projects. It keeps a history of changes so you can create
+branches for your own contributions, collaborate safely, and roll back to an
+earlier state if you make a mistake.
+
+GitHub is a website that hosts Git repositories and makes collaboration easier.
+Cloning means downloading a local working copy of a repository to your
+computer.
 
 ### What is a repository?
 
