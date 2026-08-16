@@ -53,6 +53,10 @@ History Maps uses Docker to keep the same Ruby, Rails, Node.js, database, and
 system libraries together instead of asking every user to install and
 configure them separately.
 
+On Windows, Docker Desktop may require the Windows Subsystem for Linux (WSL 2)
+and hardware virtualization. See Microsoft's official
+[Install WSL guide](https://learn.microsoft.com/en-us/windows/wsl/install).
+
 Docker is not a programming language and it does not replace your operating
 system. Docker Desktop is the application that runs containers on Windows and
 macOS. On Linux, Docker Engine provides the container runtime.
