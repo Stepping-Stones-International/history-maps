@@ -29,6 +29,10 @@
 
 /public/assets
 
+# Historical map data packs are external content, not application code.
+/app/assets/data/*
+!/app/assets/data/.gitkeep
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
