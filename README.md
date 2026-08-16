@@ -11,8 +11,6 @@ used as a visual workspace for an LLM to plot out events, places, sources, and
 territories. It is also useful for YouTubers, educators, and other public
 history creators who want to turn research into an explorable visual story.
 
-The current collaborative build is `0.1.0-dev`.
-
 ## Welcome
 
 Use these links to find the right starting point:
