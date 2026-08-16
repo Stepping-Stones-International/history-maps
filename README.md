@@ -1,32 +1,71 @@
-# README
+# Stepping Stones International
+
+## History Maps
+
+This project helps Stepping Stones International build map-based teaching
+materials for studying Christian history, biblical history, sources, places,
+political boundaries, and historical change over time. The current
+collaborative build is `0.1.0-dev`.
+
+## Welcome
+
+Use these links to find the right starting point:
+
+- [What the project is](#history-maps)
+- [Set up a development copy](#setup)
+- [Run and use the application](#use-the-application)
+- [Contribute with a normal Git workflow](docs/CONTRIBUTING.md)
+- [Contribute with an LLM](docs/LLM_CONTRIBUTING.md)
+- [Map data, sources, and attribution](#map-data)
+- [GitHub Actions](#continuous-integration)
+
+## Setup
+
+The application is a Rails project with a JavaScript map interface. Install
+Ruby and Node.js, then run:
+
+    make setup
+
+This installs Ruby and JavaScript dependencies and prepares the development
+database. If you prefer to run the steps separately:
+
+    bundle install
+    yarn install
+    bin/rails db:prepare
+
+## Use the application
+
+Start the local application with:
+
+    make dev
+
+Then open `http://localhost:3000`. Create or open a topic to work with nodes,
+layers, dates, descriptions, source notes, and map geometries. Use `make
+server` when you only need the Rails server, without the JavaScript watcher.
+
+Useful commands:
+
+| Command | Purpose |
+|---|---|
+| `make dev` | Start the Rails server and JavaScript watcher |
+| `make server` | Start only the Rails server |
+| `make build` | Build the JavaScript assets once |
+| `make test` | Run the test suite |
+| `make coverage` | Run tests and open the HTML coverage report |
+| `make lint` | Run RuboCop |
 
 ## Contributing
 
-See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the contribution,
-testing, map-data, and pull-request workflow.
+All contributions enter the protected `main` branch through pull requests.
+Start with the [contribution guide](docs/CONTRIBUTING.md). If an LLM will help
+you work, read the [LLM contribution guide](docs/LLM_CONTRIBUTING.md) before
+giving it repository access or asking it to edit files.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Continuous integration
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+GitHub Actions runs the build and test jobs for pushes and pull requests. The
+test suite enforces a minimum of 90% line coverage. See
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## Map data
 
