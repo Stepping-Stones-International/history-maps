@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup dev server test lint build
+.PHONY: help setup dev server test coverage lint build
 
 help: ## List the available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -18,6 +18,14 @@ server: ## Start only the Rails server, without the JS watcher
 
 test: ## Run the test suite with the 90% coverage check
 	bin/rails test
+
+coverage: ## Run tests and open the HTML coverage report
+	bin/rails test
+	@if command -v open >/dev/null 2>&1; then \
+		open coverage/index.html; \
+	else \
+		echo "Coverage report: coverage/index.html"; \
+	fi
 
 lint: ## Run RuboCop
 	bin/rubocop
