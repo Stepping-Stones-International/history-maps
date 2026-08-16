@@ -20,3 +20,9 @@ history creators who want to turn research into an explorable visual story.
 
 - [User guide](docs/USER_GUIDE.md)
 - [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
+
+## Want to contribute?
+
+We welcome contributors. See the [contribution guide](docs/CONTRIBUTING.md) to
+learn how to contribute code, documentation, or historical data. If you plan
+to work with an LLM, use the [LLM contribution guide](docs/LLM_CONTRIBUTING.md).
