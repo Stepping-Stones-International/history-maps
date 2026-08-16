@@ -21,6 +21,7 @@ history creators who want to turn research into an explorable visual story.
 - [User guide](docs/USER_GUIDE.md)
 - [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
 - [Report an issue](docs/REPORTING_ISSUES.md)
+- [Request a feature](docs/REPORTING_ISSUES.md#feature-request)
 
 ## Want to contribute?
 
