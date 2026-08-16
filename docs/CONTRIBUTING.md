@@ -3,6 +3,10 @@
 Stepping Stones International welcomes contributions to the application, map data,
 source documentation, and teaching materials.
 
+Many contributors will work with an LLM. See
+[Contributing with an LLM](LLM_CONTRIBUTING.md) for a guided fork, branch,
+review, and pull-request workflow.
+
 ## Workflow
 
 `main` is the protected integration branch. Do not push directly to it. Work
@@ -65,3 +69,9 @@ Before pushing, review the change with `git status`, `git diff --check`, and
 
 Keep secrets, local databases, temporary files, and generated coverage output
 out of commits. Delete the working branch after its pull request is merged.
+Stepping Stones International welcomes contributions to the application, map data,
+source documentation, and teaching materials.
+
+Many contributors will work with an LLM. See
+[Contributing with an LLM](LLM_CONTRIBUTING.md) for a guided fork, branch,
+review, and pull-request workflow.
