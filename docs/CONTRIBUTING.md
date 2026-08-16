@@ -33,6 +33,11 @@ your fork as `origin`:
     git remote rename origin upstream
     git remote add origin https://github.com/YOUR-USERNAME/history-maps.git
 
+After creating your fork, open its **Actions** tab and enable GitHub Actions if
+GitHub asks for permission. Push your working branch to the fork and confirm
+that the build and test workflows complete successfully there before opening a
+pull request.
+
 ## Development checks
 
 Install dependencies and prepare the database with `make setup`. Run the
@@ -71,9 +76,3 @@ Before pushing, review the change with `git status`, `git diff --check`, and
 
 Keep secrets, local databases, temporary files, and generated coverage output
 out of commits. Delete the working branch after its pull request is merged.
-Stepping Stones International welcomes contributions to the application, map data,
-source documentation, and teaching materials.
-
-Many contributors will work with an LLM. See
-[Contributing with an LLM](LLM_CONTRIBUTING.md) for a guided fork, branch,
-review, and pull-request workflow.
