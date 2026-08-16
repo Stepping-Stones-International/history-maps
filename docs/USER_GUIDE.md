@@ -1,5 +1,7 @@
 # User and developer guide
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [Map data and sources](MAP_DATA.md)
+
 ## Set up a development copy
 
 The application is a Rails project with a JavaScript map interface. Install
@@ -30,4 +32,3 @@ Useful commands:
 | `make test` | Run the test suite |
 | `make coverage` | Run tests and open the HTML coverage report |
 | `make lint` | Run RuboCop |
-

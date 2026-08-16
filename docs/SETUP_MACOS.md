@@ -1,5 +1,7 @@
 # Install History Maps on macOS
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [Windows setup](SETUP_WINDOWS.md) · [LLM-assisted setup](SETUP_WITH_LLM.md)
+
 This is the self-guided macOS installation. It uses Docker so you do not need
 to install Ruby or Node.js directly.
 
@@ -52,4 +54,3 @@ Make sure Docker Desktop is open. Then try:
 
 If port 3000 is already in use, change `3000:3000` in `docker-compose.yml` to
 `3001:3000` and open `http://localhost:3001`.
-

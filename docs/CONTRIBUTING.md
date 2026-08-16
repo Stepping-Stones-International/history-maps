@@ -1,5 +1,7 @@
 # Contributing
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [LLM contribution guide](LLM_CONTRIBUTING.md)
+
 Stepping Stones International welcomes contributions to the application, map data,
 source documentation, and teaching materials.
 

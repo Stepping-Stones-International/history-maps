@@ -1,5 +1,7 @@
 # Contributing with an LLM
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [Contribution guide](CONTRIBUTING.md)
+
 Stepping Stones International expects many contributors to use an LLM as a
 coding assistant. An LLM can help inspect the repository, make a focused
 change, run checks, and prepare a pull request. The human contributor remains
@@ -113,4 +115,3 @@ for visible interface changes.
 The LLM may draft the pull request description, but the human contributor must
 verify it. Never let an LLM merge its own pull request or bypass branch
 protection.
-

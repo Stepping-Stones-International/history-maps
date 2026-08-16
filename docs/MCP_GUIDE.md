@@ -1,5 +1,7 @@
 # What is an MCP interface?
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [LLM contribution guide](LLM_CONTRIBUTING.md)
+
 MCP means **Model Context Protocol**. It is a common way for an LLM to connect
 to an outside application and use that application’s tools and data.
 
@@ -81,4 +83,3 @@ The LLM client must be configured to connect to that server. The exact client
 configuration depends on the LLM application. Keep the server and the History
 Maps application pointed at the same local database and development
 environment.
-

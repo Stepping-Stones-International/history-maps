@@ -1,5 +1,7 @@
 # Install History Maps on Windows
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [macOS setup](SETUP_MACOS.md) · [LLM-assisted setup](SETUP_WITH_LLM.md)
+
 This is the self-guided Windows installation. It uses Docker Desktop so you do
 not need to install Ruby or Node.js directly.
 

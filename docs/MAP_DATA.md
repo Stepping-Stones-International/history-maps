@@ -1,5 +1,7 @@
 # Map data and sources
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [User guide](USER_GUIDE.md)
+
 Every overlay is an extract of a published dataset, and **the credit travels
 with the data**. Each file under `app/assets/data` carries a `source` block
 naming its citation, URL, license, and exactly what the extract script did to
@@ -28,4 +30,3 @@ to a different region, or re-run against a newer source release.
 
 Packs are declared in `Topic::MAP_PACKS`. Credits are also shown on the map
 through MapLibre's attribution control.
-

@@ -1,5 +1,7 @@
 # Install History Maps with an LLM
 
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [macOS setup](SETUP_MACOS.md) · [Windows setup](SETUP_WINDOWS.md)
+
 This guide is for people who have Docker installed but are not comfortable
 using terminal or command-line commands. The LLM helps with the repository
 setup; you install Docker yourself from the official Docker website.
@@ -55,4 +57,3 @@ Ask the LLM to diagnose the exact error and show the proposed command before
 running it. You can also open an issue with your operating system, Docker
 version, command, and complete error message. Never include passwords, tokens,
 private keys, or private data.
-
