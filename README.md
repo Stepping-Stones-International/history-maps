@@ -14,8 +14,9 @@ history creators who want to turn research into an explorable visual story.
 ## Getting Started
 
 
-- [Setup and Installation](docs/USER_GUIDE.md)
+- [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
 
 ## Documentation
 
 - [User guide](docs/USER_GUIDE.md)
+- [Setup and Installation](docs/SETUP_AND_INSTALLATION.md)
