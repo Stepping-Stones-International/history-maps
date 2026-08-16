@@ -98,6 +98,9 @@ The self-guided paths explain Docker, Git, cloning, and starting the app for
 each platform. The LLM path assumes Docker is already installed and asks the
 LLM to guide the command-line setup.
 
+Our opinion: LLM-assisted installation makes setup much easier now, especially
+for people who are unfamiliar with terminals and developer tools.
+
 ## After installation
 
 Open [http://localhost:3000](http://localhost:3000). Create or open a topic to
