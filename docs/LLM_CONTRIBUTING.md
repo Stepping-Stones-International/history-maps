@@ -2,6 +2,12 @@
 
 [← Setup and installation](SETUP_AND_INSTALLATION.md) · [Contribution guide](CONTRIBUTING.md)
 
+Before asking an LLM to modify the project, read the [application codebase
+license](../LICENSE.md). It permits broad use of the application—including
+lectures, media, and internal school hosting—and contributions to the official
+repository, but does not permit redistributing the application, creating a
+spin-off, or offering it as an external hosted service.
+
 Stepping Stones International expects many contributors to use an LLM as a
 coding assistant. An LLM can help inspect the repository, make a focused
 change, run checks, and prepare a pull request. The human contributor remains

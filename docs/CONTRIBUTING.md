@@ -2,6 +2,12 @@
 
 [← Setup and installation](SETUP_AND_INSTALLATION.md) · [LLM contribution guide](LLM_CONTRIBUTING.md)
 
+Before contributing, read the [application codebase license](../LICENSE.md). It
+permits broad use of the application—including lectures, media, and internal
+school hosting—and contributions to the official repository, but does not
+permit redistributing the application, creating a spin-off, or offering it as
+an external hosted service.
+
 Stepping Stones International welcomes contributions to the application, map data,
 source documentation, and teaching materials.
 
