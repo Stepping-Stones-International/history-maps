@@ -9,6 +9,9 @@ Ruby or Node.js directly.
 - [Understand the project](#understand-the-project)
   - [What is Git?](#what-is-git)
   - [What is a repository?](#what-is-a-repository)
+  - [What is Docker?](#what-is-docker)
+  - [What are Ruby and Ruby on Rails?](#what-are-ruby-and-ruby-on-rails)
+  - [What is Node.js?](#what-is-nodejs)
 - [Choose a setup path](#choose-a-setup-path)
   - [Do it yourself on macOS](SETUP_MACOS.md)
   - [Do it yourself on Windows](SETUP_WINDOWS.md)
@@ -33,6 +36,37 @@ A repository, or repo, is the project folder plus its Git history. The public
 repository is:
 
     https://github.com/Stepping-Stones-International/history-maps
+
+### What is Docker?
+
+Docker is a tool that packages an application and the software it needs into
+an isolated environment called a container. History Maps uses Docker so the
+same Ruby, Rails, Node.js, database, and system libraries can run consistently
+on Windows, macOS, and Linux.
+
+Docker is not a programming language and it does not replace your operating
+system. Docker Desktop is the application that runs containers on Windows and
+macOS. On Linux, Docker Engine provides the container runtime.
+
+### What are Ruby and Ruby on Rails?
+
+Ruby is a programming language. Ruby on Rails, usually called Rails, is a web
+application framework written in Ruby. Rails provides the server-side parts
+of History Maps: users, topics, nodes, database records, validation, routes,
+and API responses.
+
+You do not need to install Ruby directly when using Docker. The development
+container already includes the project’s required Ruby version.
+
+### What is Node.js?
+
+Node.js is a runtime that lets JavaScript tools run outside a web browser.
+History Maps uses Node.js and Yarn to install JavaScript packages and build
+the map interface. The browser displays the finished interface; Node.js helps
+prepare it during development.
+
+You do not need to install Node.js directly when using Docker. The development
+container includes the project’s required Node.js and Yarn versions.
 
 ## Choose a setup path
 
