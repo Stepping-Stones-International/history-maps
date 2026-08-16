@@ -11,7 +11,7 @@ request.
 
 Use the official issue form:
 
-[Open a History Maps issue](https://github.com/Stepping-Stones-International/history-maps/issues/new/choose)
+[Open a GitHub Ticket](https://github.com/Stepping-Stones-International/history-maps/issues/new/choose)
 
 Sign in to GitHub if prompted, choose the issue type, and complete the form as
 fully as you can.
@@ -71,4 +71,3 @@ from screenshots and logs before uploading them.
 An LLM can help summarize an error and draft an issue. Tell it to preserve the
 exact error message and commands, and review the draft yourself before
 posting. Do not give the LLM secrets or private data.
-
