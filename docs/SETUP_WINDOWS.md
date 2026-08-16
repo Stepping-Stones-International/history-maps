@@ -10,6 +10,8 @@ If you have never used Docker on Windows, Docker Desktop will usually require
 you to enable the Windows Subsystem for Linux (WSL 2) and hardware
 virtualization. Follow Docker's setup prompts for those components; Docker
 Desktop uses WSL 2 to provide its Linux-based container runtime on Windows.
+For Microsoft's official installation instructions, see
+[Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
 Open Docker Desktop and wait until it finishes starting.
 
 ## 2. Install Git
