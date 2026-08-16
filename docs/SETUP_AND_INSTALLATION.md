@@ -118,7 +118,8 @@ the application code.
 You can also instruct your LLM to add data to History Maps through the MCP
 interface. Tell it what events, places, sources, nodes, or layers you want it
 to add, then review the resulting titles, dates, coordinates, polygons, and
-citations for accuracy.
+citations for accuracy. See [What is an MCP interface?](MCP_GUIDE.md) for an
+explanation and examples.
 
 ## Contributing
 
