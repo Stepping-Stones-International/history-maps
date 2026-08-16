@@ -13,7 +13,7 @@ not need to install Ruby or Node.js directly when using Docker.
   - [Workflow A: Do it yourself](#workflow-a-do-it-yourself)
   - [Workflow B: Have an LLM set it up](#workflow-b-have-an-llm-set-it-up)
 - [3. Install Docker](#3-install-docker)
-  - [If you are not comfortable installing software](#if-you-are-not-comfortable-installing-software)
+  - [If you are not comfortable using the command line](#if-you-are-not-comfortable-using-the-command-line)
   - [Install Docker yourself](#install-docker-yourself)
 - [4. Start History Maps with Docker](#4-start-history-maps-with-docker)
 - [5. Native setup for advanced contributors](#5-native-setup-for-advanced-contributors)
@@ -92,30 +92,32 @@ Docker is the software that creates and runs the History Maps container. On
 Windows and macOS, this usually means installing Docker Desktop. On Linux, it
 means installing Docker Engine and the Docker Compose plugin.
 
-### If you are not comfortable installing software
+### Install Docker from the official website
 
-You should ask your LLM to install Docker for you. An LLM with access to your
-computer can identify your operating system, open the official installer, and
-walk you through the permissions it needs.
-
-Copy and paste this prompt into your LLM:
-
-> I need Docker to run the Stepping Stones International History Maps project. Please inspect my operating system and determine whether Docker Desktop or Docker Engine is appropriate. Guide me through installing Docker from the official Docker website only. Explain every step before taking it, ask me to approve downloads and system permissions, and do not install unrelated software. After installation, start Docker and verify it with `docker --version` and `docker compose version`. Do not ask for or expose passwords, tokens, or private keys.
-
-The LLM may be able to open the installer, but you may still need to click
-through an operating-system security dialog, accept a license, enter your
-computer password, or restart the computer yourself. Never give your password
-to the LLM.
-
-### Install Docker yourself
-
-If you prefer to install it yourself, use the official instructions:
+Everyone should install Docker from the official instructions. Do not ask an
+LLM to download or install Docker from an unofficial source:
 
 - [Docker Desktop for Windows and macOS](https://www.docker.com/products/docker-desktop/)
 - [Docker Engine for Linux](https://docs.docker.com/engine/install/)
 
 After installation, open Docker Desktop or start the Docker service. Wait for
-it to finish starting before continuing.
+it to finish starting before continuing. You may need to click through an
+operating-system security dialog, accept a license, enter your computer
+password, or restart the computer yourself. Never give your password to an
+LLM.
+
+### If you are not comfortable using the command line
+
+Once Docker is installed and running, you can ask your LLM to guide you
+through the remaining commands. The LLM is helping with the command-line
+workflow; it is not installing Docker.
+
+Copy and paste this prompt into your LLM:
+
+> Docker is already installed and running on my computer. Help me set up the Stepping Stones International History Maps project from https://github.com/Stepping-Stones-International/history-maps.git. Explain each terminal command before running it. Clone the repository only if the destination does not already exist, then run `docker compose up --build`. Do not delete or overwrite folders, do not ask for or expose passwords, tokens, or private keys, and stop before any destructive command.
+
+The LLM may be able to open a terminal and run the commands, but you should
+approve the destination folder and review the commands first.
 
 ### Verify Docker
 
