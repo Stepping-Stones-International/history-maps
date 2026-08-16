@@ -2,10 +2,16 @@
 
 ## History Maps
 
-This project helps Stepping Stones International build map-based teaching
-materials for studying history. It is a general tool for displaying events,
-sources, places, political boundaries, and changing territories on a timeline
-of nodes and polygons. The current collaborative build is `0.1.0-dev`.
+History Maps is a display tool for building and viewing historical and
+location-based events on a timeline. When teaching or studying a topic, it is
+often easiest to see it on a map and step through events visually.
+
+In the world of LLM-powered learning, History Maps can be fired up locally and
+used as a visual workspace for an LLM to plot out events, places, sources, and
+territories. It is also useful for YouTubers, educators, and other public
+history creators who want to turn research into an explorable visual story.
+
+The current collaborative build is `0.1.0-dev`.
 
 ## Welcome
 
