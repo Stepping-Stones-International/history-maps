@@ -9,6 +9,8 @@ source documentation, and teaching materials.
 on a focused branch, push it to your fork, and open a pull request into
 `Stepping-Stones-International/history-maps:main`.
 
+The fork’s checks should pass before you request review.
+
 Use branch prefixes such as `feature/`, `fix/`, `docs/`, and `chore/`. Do not
 use tool or assistant names in branch names.
 
@@ -63,4 +65,3 @@ Before pushing, review the change with `git status`, `git diff --check`, and
 
 Keep secrets, local databases, temporary files, and generated coverage output
 out of commits. Delete the working branch after its pull request is merged.
-
