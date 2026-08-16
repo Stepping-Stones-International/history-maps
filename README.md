@@ -11,15 +11,11 @@ used as a visual workspace for an LLM to plot out events, places, sources, and
 territories. It is also useful for YouTubers, educators, and other public
 history creators who want to turn research into an explorable visual story.
 
-## Welcome
+## Getting Started
 
-Use these links to find the right starting point:
 
-- [What the project is](#history-maps)
-- [Set up and use the application](docs/USER_GUIDE.md)
-- [Map data, sources, and attribution](docs/MAP_DATA.md)
+- [Setup and Installation](docs/USER_GUIDE.md)
 
 ## Documentation
 
 - [User guide](docs/USER_GUIDE.md)
-- [Map data and sources](docs/MAP_DATA.md)
