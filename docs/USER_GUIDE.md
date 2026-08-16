@@ -1,6 +1,6 @@
 # User and developer guide
 
-[← Setup and installation](SETUP_AND_INSTALLATION.md) · [Map data and sources](MAP_DATA.md)
+[← Setup and installation](SETUP_AND_INSTALLATION.md) · [Map data and sources](MAP_DATA.md) · [Report an issue](REPORTING_ISSUES.md)
 
 ## Set up a development copy
 

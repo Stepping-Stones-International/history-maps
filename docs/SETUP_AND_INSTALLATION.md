@@ -4,7 +4,7 @@ History Maps runs locally in Docker. Docker is the supported cross-platform
 installation for macOS, Windows, and Linux, so users do not need to install
 Ruby or Node.js directly.
 
-[User guide](USER_GUIDE.md) · [Map data and sources](MAP_DATA.md) · [Contributing](CONTRIBUTING.md)
+[User guide](USER_GUIDE.md) · [Map data and sources](MAP_DATA.md) · [Report an issue](REPORTING_ISSUES.md) · [Contributing](CONTRIBUTING.md)
 
 ## Topic tree
 
