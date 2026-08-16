@@ -82,6 +82,9 @@ container includes the project’s required Node.js and Yarn versions.
 Everyone should install Docker from the official Docker website first. Then
 choose one of these paths:
 
+Windows users who have never used Docker may also need to enable WSL 2 and
+hardware virtualization during Docker Desktop's first-time setup.
+
 - [Do it yourself on macOS](SETUP_MACOS.md)
 - [Do it yourself on Windows](SETUP_WINDOWS.md)
 - [Have an LLM guide the setup](SETUP_WITH_LLM.md)

@@ -6,8 +6,11 @@ not need to install Ruby or Node.js directly.
 ## 1. Install Docker Desktop
 
 Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/).
-Follow Docker's Windows instructions, including any WSL 2 or virtualization
-requirements. Open Docker Desktop and wait until it finishes starting.
+If you have never used Docker on Windows, Docker Desktop will usually require
+you to enable the Windows Subsystem for Linux (WSL 2) and hardware
+virtualization. Follow Docker's setup prompts for those components; Docker
+Desktop uses WSL 2 to provide its Linux-based container runtime on Windows.
+Open Docker Desktop and wait until it finishes starting.
 
 ## 2. Install Git
 
@@ -52,4 +55,3 @@ if Docker requests it. Then try:
 
 If port 3000 is already in use, change `3000:3000` in `docker-compose.yml` to
 `3001:3000` and open `http://localhost:3001`.
-
