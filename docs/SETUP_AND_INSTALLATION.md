@@ -45,9 +45,13 @@ repository is:
 ### What is Docker?
 
 Docker is a tool that packages an application and the software it needs into
-an isolated environment called a container. History Maps uses Docker so the
-same Ruby, Rails, Node.js, database, and system libraries can run consistently
-on Windows, macOS, and Linux.
+an isolated environment called a container. It gives us a uniform runtime, so
+the installation works consistently whether someone is running History Maps
+from Windows, macOS, or Linux.
+
+History Maps uses Docker to keep the same Ruby, Rails, Node.js, database, and
+system libraries together instead of asking every user to install and
+configure them separately.
 
 Docker is not a programming language and it does not replace your operating
 system. Docker Desktop is the application that runs containers on Windows and
