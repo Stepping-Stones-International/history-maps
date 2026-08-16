@@ -3,9 +3,9 @@
 ## History Maps
 
 This project helps Stepping Stones International build map-based teaching
-materials for studying Christian history, biblical history, sources, places,
-political boundaries, and historical change over time. The current
-collaborative build is `0.1.0-dev`.
+materials for studying history. It is a general tool for displaying events,
+sources, places, political boundaries, and changing territories on a timeline
+of nodes and polygons. The current collaborative build is `0.1.0-dev`.
 
 ## Welcome
 
