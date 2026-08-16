@@ -101,6 +101,10 @@ LLM to guide the command-line setup.
 Our opinion: LLM-assisted installation makes setup much easier now, especially
 for people who are unfamiliar with terminals and developer tools.
 
+We are particularly excited that LLMs let us work with contributors who
+historically might not have been able to participate because they did not know
+how to code.
+
 ## After installation
 
 Open [http://localhost:3000](http://localhost:3000). Create or open a topic to
