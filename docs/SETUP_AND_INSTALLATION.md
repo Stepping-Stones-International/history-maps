@@ -9,10 +9,9 @@ the first sections.
 - [1. What you are installing](#1-what-you-are-installing)
   - [What is Git?](#what-is-git)
   - [What is a repository?](#what-is-a-repository)
-- [2. Download the code](#2-download-the-code)
-  - [Clone with the command line](#clone-with-the-command-line)
-  - [Clone with a desktop app](#clone-with-a-desktop-app)
-  - [Have an LLM clone it for you](#have-an-llm-clone-it-for-you)
+- [2. Choose a setup workflow](#2-choose-a-setup-workflow)
+  - [Workflow A: Do it yourself](#workflow-a-do-it-yourself)
+  - [Workflow B: Have an LLM set it up](#workflow-b-have-an-llm-set-it-up)
 - [3. Install prerequisites](#3-install-prerequisites)
 - [4. Install History Maps](#4-install-history-maps)
 - [5. Start the application](#5-start-the-application)
@@ -43,9 +42,17 @@ has a public repository at:
 
 Cloning means making a local copy of that repository on your computer.
 
-## 2. Download the code
+## 2. Choose a setup workflow
 
-### Clone with the command line
+There are two supported ways to install History Maps. Choose the one that
+matches how you prefer to work. Both workflows produce the same local
+application.
+
+### Workflow A: Do it yourself
+
+Follow this path if you want to run each command and understand each step.
+
+#### Clone with the command line
 
 Install Git first. macOS users can install Xcode Command Line Tools with:
 
@@ -58,23 +65,24 @@ Then choose a folder for projects and run:
     git clone https://github.com/Stepping-Stones-International/history-maps.git
     cd history-maps
 
-### Clone with a desktop app
+#### Clone with a desktop app
 
 You can also use a Git desktop application such as GitHub Desktop or
 Sourcetree. Choose **Clone**, paste the repository URL, select a local folder,
 and open the cloned project in a terminal or code editor.
 
-### Have an LLM clone it for you
+### Workflow B: Have an LLM set it up
 
-An LLM with access to your terminal can run the clone command for you. Give it
-the repository URL and ask it to explain each command before running it:
+An LLM with access to your terminal can clone the repository, check your
+prerequisites, run setup, and start the application. Give it the repository
+URL and ask it to explain each command before running it:
 
-> Clone the public History Maps repository from https://github.com/Stepping-Stones-International/history-maps.git into my projects folder. Before running commands, explain what each command will do. Do not delete or overwrite an existing folder, do not ask for or expose secrets, and stop if the destination already exists.
+> Set up History Maps locally from https://github.com/Stepping-Stones-International/history-maps.git. First inspect my environment and explain what you need to do. Clone it into my projects folder only if the destination does not already exist. Check Git, Ruby, Node.js, and Yarn versions against the repository files. Then run `make setup`, report any errors, and start the app with `make dev` only after I approve. Do not delete or overwrite folders, do not ask for or expose secrets, and stop before any destructive command.
 
-The human should approve the destination folder and review commands before
-they run. Never give an LLM your GitHub password, personal access token, or
-SSH private key in chat. For contribution work with an LLM, read the
-[LLM contribution guide](LLM_CONTRIBUTING.md).
+The human should approve the destination folder, review commands, and confirm
+when the app should start. Never give an LLM your GitHub password, personal
+access token, or SSH private key in chat. For contribution work with an LLM,
+read the [LLM contribution guide](LLM_CONTRIBUTING.md).
 
 ## 3. Install prerequisites
 
@@ -177,4 +185,3 @@ Do not include passwords, tokens, private keys, or private data in an issue.
 If you want to change the application or contribute data, continue with the
 [contribution guide](CONTRIBUTING.md) or the
 [LLM contribution guide](LLM_CONTRIBUTING.md).
-
