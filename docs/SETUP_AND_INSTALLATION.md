@@ -53,14 +53,18 @@ application.
 ### Workflow A: Do it yourself
 
 Follow this path if you want to run each command and understand each step.
+Start by following [Install Docker from the official website](#install-docker-from-the-official-website)
+for your operating system. Then return here to clone the repository and run
+History Maps.
 
 #### Clone with the command line
 
-Install Git first. macOS users can install Xcode Command Line Tools with:
+Install Git first:
 
-    xcode-select --install
+- [Git for macOS](https://git-scm.com/download/mac)
+- [Git for Windows](https://git-scm.com/download/win)
 
-Windows and Linux users can install Git from [git-scm.com](https://git-scm.com/downloads).
+After Git is installed, open Terminal on macOS or PowerShell on Windows.
 
 Then choose a folder for projects and run:
 
