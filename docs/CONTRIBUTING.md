@@ -1,6 +1,6 @@
 # Contributing
 
-Christian History Maps welcomes contributions to the application, map data,
+Stepping Stones International welcomes contributions to the application, map data,
 source documentation, and teaching materials.
 
 ## Workflow
